@@ -28,7 +28,9 @@ type CartContextValue = {
 };
 
 const KEY = "luna-atelier-cart";
+const EMPTY_JSON = "[]";
 const CartContext = createContext<CartContextValue | null>(null);
+const listeners = new Set<() => void>();
 
 function normalize(items: CartItem[]) {
   const map = new Map<string, number>();
@@ -39,71 +41,59 @@ function normalize(items: CartItem[]) {
   return [...map.entries()].map(([slug, quantity]) => ({ slug, quantity }));
 }
 
-let memory: CartItem[] | null = null;
-const listeners = new Set<() => void>();
-
 function emit() {
   for (const listener of listeners) listener();
 }
 
-function readStorage(): CartItem[] {
+function getSnapshot() {
+  return window.localStorage.getItem(KEY) ?? EMPTY_JSON;
+}
+
+function getServerSnapshot() {
+  return EMPTY_JSON;
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  window.addEventListener("storage", listener);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+function write(items: CartItem[]) {
+  window.localStorage.setItem(KEY, JSON.stringify(normalize(items)));
+  emit();
+}
+
+function parse(json: string): CartItem[] {
   try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) return [];
-    return normalize(JSON.parse(raw) as CartItem[]);
+    const parsed = JSON.parse(json) as CartItem[];
+    return Array.isArray(parsed) ? normalize(parsed) : [];
   } catch {
     return [];
   }
 }
 
-function getSnapshot() {
-  if (memory === null) memory = readStorage();
-  return memory;
-}
-
-function getServerSnapshot(): CartItem[] {
-  return [];
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-function write(items: CartItem[]) {
-  memory = items;
-  window.localStorage.setItem(KEY, JSON.stringify(items));
-  emit();
-}
-
-function subscribeMounted() {
-  return () => {};
-}
-
 export function CartProvider({ children }: { children: ReactNode }) {
-  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const ready = useSyncExternalStore(
-    subscribeMounted,
-    () => true,
-    () => false,
-  );
+  const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const items = useMemo(() => parse(json), [json]);
 
   const add = useCallback((slug: string, quantity = 1) => {
-    write(normalize([...getSnapshot(), { slug, quantity }]));
+    write([...parse(getSnapshot()), { slug, quantity }]);
   }, []);
 
   const setQuantity = useCallback((slug: string, quantity: number) => {
     write(
-      normalize(
-        getSnapshot().map((item) =>
-          item.slug === slug ? { ...item, quantity } : item,
-        ),
+      parse(getSnapshot()).map((item) =>
+        item.slug === slug ? { ...item, quantity } : item,
       ),
     );
   }, []);
 
   const remove = useCallback((slug: string) => {
-    write(getSnapshot().filter((item) => item.slug !== slug));
+    write(parse(getSnapshot()).filter((item) => item.slug !== slug));
   }, []);
 
   const clear = useCallback(() => write([]), []);
@@ -120,7 +110,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       );
     return {
       items,
-      ready,
+      ready: true,
       add,
       setQuantity,
       remove,
@@ -132,7 +122,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       ),
       lines,
     };
-  }, [add, clear, items, ready, remove, setQuantity]);
+  }, [add, clear, items, remove, setQuantity]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

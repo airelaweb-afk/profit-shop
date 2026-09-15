@@ -44,6 +44,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1">
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             className="relative"
@@ -59,6 +60,7 @@ export function SiteHeader() {
           </Button>
 
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             className="md:hidden"

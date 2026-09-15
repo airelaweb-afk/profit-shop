@@ -1,28 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
 import { DownloadButton } from "@/components/download-button";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/money";
-import { getOrder, type Order } from "@/lib/orders";
-
-function subscribe() {
-  return () => {};
-}
-
-function useClientOrder(id: string): Order | null | undefined {
-  const ready = useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
-  if (!ready) return undefined;
-  return getOrder(id);
-}
+import { useOrder } from "@/lib/use-order";
 
 export function OrderReceipt({ id }: { id: string }) {
-  const order = useClientOrder(id);
+  const order = useOrder(id);
 
   if (order === undefined) {
     return <p className="text-sm text-muted-foreground">Buscando el pedido…</p>;

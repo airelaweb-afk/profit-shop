@@ -23,11 +23,12 @@ export function AddToCartButton({
 
   return (
     <Button
+      type="button"
       size={size}
       className={cn("h-11 px-5", className)}
       onClick={() => {
-        add(slug);
         setAdded(true);
+        add(slug);
         window.setTimeout(() => setAdded(false), 1600);
       }}
     >
@@ -49,6 +50,7 @@ export function BuyNowButton({
 
   return (
     <Button
+      type="button"
       variant="outline"
       size="lg"
       className={cn("h-11 px-5", className)}
