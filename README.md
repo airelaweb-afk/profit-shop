@@ -53,6 +53,8 @@ Necesitas el código en un repositorio de GitHub. Si todavía no lo tienes, cré
 
 Si Hostinger detecta Next.js y pone `out` como `.next` o rellena un entry file, cámbialo: con el plan React tiene que quedar **`out`** y **sin** entry file. Si dejas `.next`, la web sale en blanco o falla al arrancar.
 
+Si el build de Next termina bien pero Hostinger dice «No output directory found», pulsa **Redistribuir** (la carpeta `out/` ya no está en `.gitignore`). Si sigue fallando, cambia el preajuste del marco de Next.js a **React** y deja el directorio de salida en `out`.
+
 5. Pulsa **Deploy**. Cada `git push` a `main` vuelve a publicar.
 
 ### Opción B — subir `out/` a mano

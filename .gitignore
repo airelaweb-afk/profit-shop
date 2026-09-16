@@ -15,7 +15,8 @@
 
 # next.js
 /.next/
-/out/
+# Do not ignore `out/`: Hostinger's deploy collector skips gitignored
+# folders and then reports "No output directory found after build".
 
 # production
 /build
