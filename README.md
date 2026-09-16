@@ -4,7 +4,9 @@ Herramientas de administración para **autónomos y empresas pequeñas**. No es 
 
 ## Herramienta lista
 
-**Tanda de presupuestos** (`/presupuestos`): pegas una lista de clientes, defines tus servicios una vez e imprimes o guardas cada presupuesto en PDF. Los datos se quedan en el navegador.
+**Tanda de presupuestos** (`/presupuestos`): pegas una lista de clientes, defines tus servicios una vez e imprimes o guardas cada presupuesto en PDF.
+
+**Recordatorios de cobro** (`/cobros`): pegas quién te debe y copias una tanda de mensajes de WhatsApp o correo (primera, segunda o última ronda).
 
 La tienda de plantillas (`/tienda`) sigue disponible como extra.
 

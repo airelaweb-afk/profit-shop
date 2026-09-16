@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileStack, Printer, ShieldOff } from "lucide-react";
+import { ArrowRight, Copy, FileStack, Printer, ShieldOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
@@ -14,52 +14,49 @@ export default function HomePage() {
             No otro CRM. Un trabajo feo, resuelto de un tirón.
           </h1>
           <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-            Holded, Notion y Excel ya existen. Lo que casi no existe es una
-            herramienta que haga <em>una sola cosa pesada</em> —diez
-            presupuestos, diez recordatorios— sin pedirte que metas la empresa
-            entera en un sistema. Entras, pegas una lista, te llevas los
-            papeles. Google puede encontrar esto. Tú no tienes que venderlo en
-            un chat.
+            Presupuestos en lote y recordatorios de cobro: pegas una lista, te
+            llevas papeles o textos. Sin meter la empresa en un sistema. Sin
+            perseguir a nadie por chat.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/presupuestos" />}
+              render={<Link href="/cobros" />}
               nativeButton={false}
             >
-              Probar la tanda de presupuestos
+              Recordatorios de cobro
               <ArrowRight />
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/como-funciona" />}
+              render={<Link href="/presupuestos" />}
               nativeButton={false}
             >
-              Cómo se posiciona esto
+              Tanda de presupuestos
             </Button>
           </div>
         </div>
         <div className="rounded-3xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8">
-          <p className="font-heading text-2xl">La primera herramienta</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Tanda de presupuestos: los mismos servicios, muchos destinatarios.
-            Imprime o guarda PDF. Los datos se quedan en tu navegador.
-          </p>
+          <p className="font-heading text-2xl">Ahora mismo</p>
           <ul className="mt-5 space-y-3 text-sm">
             <li className="flex gap-3">
+              <Copy className="mt-0.5 size-4 shrink-0 text-primary" />
+              Recordatorios: 10 textos de cobro, serios, listos para pegar.
+            </li>
+            <li className="flex gap-3">
               <FileStack className="mt-0.5 size-4 shrink-0 text-primary" />
-              Hasta 30 documentos de una lista pegada.
+              Presupuestos: los mismos servicios, muchos destinatarios.
             </li>
             <li className="flex gap-3">
               <Printer className="mt-0.5 size-4 shrink-0 text-primary" />
-              Un clic para imprimir o “Guardar como PDF”.
+              Imprimir PDF o copiar. Los datos se quedan en tu navegador.
             </li>
             <li className="flex gap-3">
               <ShieldOff className="mt-0.5 size-4 shrink-0 text-primary" />
-              Cero cuenta, cero pipeline, cero base de datos nuestra.
+              Cero cuenta, cero pipeline.
             </li>
           </ul>
         </div>
@@ -67,36 +64,13 @@ export default function HomePage() {
 
       <section className="border-y border-border/80 bg-card/60">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-          <h2 className="font-heading text-3xl">Las siguientes (cuando esta se use)</h2>
+          <h2 className="font-heading text-3xl">La que aún no está</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            No son un CRM a trozos. Cada una ataca un atasco que hoy se hace a
-            mano, copiando un Word diez veces.
+            <strong>Versiones de un mismo trabajo</strong> no es diez clientes.
+            Es un solo cliente y un solo encargo, con varias ofertas: básico /
+            completo, con o sin urgencia. Hoy eso son seis Word. Cuando la
+            montemos, saldrá en esta misma web.
           </p>
-          <ol className="mt-8 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                n: "02",
-                title: "Diez versiones de un mismo trabajo",
-                text: "Bueno / mejor / completo, con y sin urgencia, para un solo cliente. Hoy eso son 6 Word.",
-              },
-              {
-                n: "03",
-                title: "Tanda de recordatorios de cobro",
-                text: "Pegas quién te debe y desde cuándo. Sales con 10 textos de WhatsApp o correo, serios, no agresivos.",
-              },
-              {
-                n: "04",
-                title: "De horas a presupuesto",
-                text: "Pegar un registro semanal y salir con conceptos e importes, no con una hoja ilegible.",
-              },
-            ].map((item) => (
-              <li key={item.n} className="rounded-2xl bg-background p-5 ring-1 ring-foreground/10">
-                <p className="font-heading text-xl text-primary">{item.n}</p>
-                <p className="mt-2 font-medium">{item.title}</p>
-                <p className="mt-2 text-sm text-muted-foreground">{item.text}</p>
-              </li>
-            ))}
-          </ol>
         </div>
       </section>
     </div>

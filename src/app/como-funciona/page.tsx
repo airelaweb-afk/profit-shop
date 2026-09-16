@@ -17,9 +17,9 @@ export default function ComoFuncionaPage() {
       </h1>
       <p className="mt-4 text-lg text-muted-foreground">
         Un CRM te pide agenda, clientes, facturas y hábitos nuevos. Un autónomo
-        lo que quiere el martes es: “tengo que mandar diez presupuestos iguales
-        a diez sitios”. Eso no es un CRM. Es una herramienta de un solo
-        propósito.
+        lo que quiere el martes es: “tengo que mandar diez presupuestos” o
+        “tengo que recordar diez cobros”. Eso no es un CRM. Es una herramienta
+        de un solo propósito.
       </p>
 
       <div className="mt-10 space-y-8">
@@ -52,13 +52,23 @@ export default function ComoFuncionaPage() {
         </section>
       </div>
 
-      <Button
-        className="mt-10 h-11 px-5"
-        render={<Link href="/presupuestos" />}
-        nativeButton={false}
-      >
-        Abrir la tanda de presupuestos
-      </Button>
+      <div className="mt-10 flex flex-wrap gap-3">
+        <Button
+          className="h-11 px-5"
+          render={<Link href="/cobros" />}
+          nativeButton={false}
+        >
+          Recordatorios de cobro
+        </Button>
+        <Button
+          variant="outline"
+          className="h-11 px-5"
+          render={<Link href="/presupuestos" />}
+          nativeButton={false}
+        >
+          Tanda de presupuestos
+        </Button>
+      </div>
     </div>
   );
 }
