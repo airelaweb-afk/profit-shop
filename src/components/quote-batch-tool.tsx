@@ -418,7 +418,7 @@ export function QuoteBatchTool() {
             {stored.services.map((line) => (
               <li
                 key={line.id}
-                className="grid gap-2 sm:grid-cols-[1fr_5rem_7rem_2rem]"
+                className="grid gap-2 rounded-xl border border-border p-3 sm:border-0 sm:p-0 sm:grid-cols-[1fr_5rem_7rem_2rem]"
               >
                 <Input
                   className="h-10"
@@ -429,44 +429,53 @@ export function QuoteBatchTool() {
                   }
                   aria-label="Concepto"
                 />
-                <Input
-                  className="h-10"
-                  type="number"
-                  min={1}
-                  value={line.quantity}
-                  onChange={(event) =>
-                    setService(line.id, {
-                      quantity: Number(event.target.value) || 0,
-                    })
-                  }
-                  aria-label="Cantidad"
-                />
-                <Input
-                  className="h-10"
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={line.price / 100}
-                  onChange={(event) =>
-                    setService(line.id, {
-                      price: Math.round(Number(event.target.value) * 100) || 0,
-                    })
-                  }
-                  aria-label="Precio en euros"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Quitar línea"
-                  onClick={() =>
-                    patch({
-                      services: stored.services.filter((item) => item.id !== line.id),
-                    })
-                  }
-                >
-                  <Trash2 />
-                </Button>
+                <div className="grid grid-cols-[1fr_1fr_auto] items-end gap-2 sm:contents">
+                  <Field label="Cant." htmlFor={`qty-${line.id}`} labelClassName="sm:sr-only">
+                    <Input
+                      id={`qty-${line.id}`}
+                      className="h-10"
+                      type="number"
+                      min={1}
+                      value={line.quantity}
+                      onChange={(event) =>
+                        setService(line.id, {
+                          quantity: Number(event.target.value) || 0,
+                        })
+                      }
+                    />
+                  </Field>
+                  <Field label="P. unitario" htmlFor={`price-${line.id}`} labelClassName="sm:sr-only">
+                    <Input
+                      id={`price-${line.id}`}
+                      className="h-10"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={line.price / 100}
+                      onChange={(event) =>
+                        setService(line.id, {
+                          price: Math.round(Number(event.target.value) * 100) || 0,
+                        })
+                      }
+                    />
+                  </Field>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="mb-0.5"
+                    aria-label="Quitar línea"
+                    onClick={() =>
+                      patch({
+                        services: stored.services.filter(
+                          (item) => item.id !== line.id,
+                        ),
+                      })
+                    }
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>
@@ -539,7 +548,7 @@ export function QuoteBatchTool() {
             </label>
           ) : null}
         </div>
-        <div className="quote-preview-screen overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_-24px_rgba(60,40,20,0.45)] ring-1 ring-foreground/10">
+        <div className="quote-preview-screen overflow-x-auto rounded-2xl bg-white shadow-[0_20px_50px_-24px_rgba(60,40,20,0.45)] ring-1 ring-foreground/10">
           <QuoteDocument
             issuer={stored.issuer}
             client={previewClient}
@@ -569,14 +578,18 @@ function Field({
   label,
   htmlFor,
   children,
+  labelClassName,
 }: {
   label: string;
   htmlFor: string;
   children: ReactNode;
+  labelClassName?: string;
 }) {
   return (
     <div className="grid gap-1.5">
-      <Label htmlFor={htmlFor}>{label}</Label>
+      <Label htmlFor={htmlFor} className={labelClassName}>
+        {label}
+      </Label>
       {children}
     </div>
   );

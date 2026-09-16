@@ -98,6 +98,14 @@
   }
 }
 
+.quote-preview-screen {
+  overflow-x: auto;
+}
+
+.quote-preview-screen .quote-doc {
+  min-width: 640px;
+}
+
 .quote-doc {
   position: relative;
   padding: 28px 28px 24px;
