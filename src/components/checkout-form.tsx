@@ -70,7 +70,7 @@ export function CheckoutForm() {
       createdAt: new Date().toISOString(),
     });
     clear();
-    router.push(`/pedido/${id}`);
+    router.push(`/pedido/?id=${encodeURIComponent(id)}`);
   }
 
   return (

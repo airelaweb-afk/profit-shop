@@ -7,13 +7,7 @@ export const metadata: Metadata = {
     "Planners, kits de marca, facturas y packs para Instagram. Descarga inmediata.",
 };
 
-export default async function TiendaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ categoria?: string }>;
-}) {
-  const { categoria } = await searchParams;
-
+export default function TiendaPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="text-sm tracking-wide text-primary uppercase">Catálogo</p>
@@ -25,7 +19,7 @@ export default async function TiendaPage({
         negocio de servicios, empieza por el Bundle Emprendedor.
       </p>
       <div className="mt-10">
-        <Catalog initialCategory={categoria} />
+        <Catalog />
       </div>
     </div>
   );

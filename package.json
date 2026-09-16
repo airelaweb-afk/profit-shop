@@ -2,10 +2,13 @@
   "name": "luna-atelier",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev --port 43147",
     "build": "next build",
-    "start": "next start --port 43147",
+    "start": "npx --yes serve out -p 43147",
     "lint": "eslint"
   },
   "dependencies": {
