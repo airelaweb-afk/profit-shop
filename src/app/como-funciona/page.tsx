@@ -55,18 +55,18 @@ export default function ComoFuncionaPage() {
       <div className="mt-10 flex flex-wrap gap-3">
         <Button
           className="h-11 px-5"
-          render={<Link href="/cobros" />}
+          render={<Link href="/versiones" />}
           nativeButton={false}
         >
-          Recordatorios de cobro
+          Versiones de un trabajo
         </Button>
         <Button
           variant="outline"
           className="h-11 px-5"
-          render={<Link href="/presupuestos" />}
+          render={<Link href="/cobros" />}
           nativeButton={false}
         >
-          Tanda de presupuestos
+          Recordatorios de cobro
         </Button>
       </div>
     </div>

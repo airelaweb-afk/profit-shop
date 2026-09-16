@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Copy, FileStack, Printer, ShieldOff } from "lucide-react";
+import { ArrowRight, Copy, FileStack, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
@@ -14,63 +14,62 @@ export default function HomePage() {
             No otro CRM. Un trabajo feo, resuelto de un tirón.
           </h1>
           <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-            Presupuestos en lote y recordatorios de cobro: pegas una lista, te
-            llevas papeles o textos. Sin meter la empresa en un sistema. Sin
-            perseguir a nadie por chat.
+            Tres atascos de copiar Word: muchos clientes, muchos cobros, o un
+            solo trabajo con varios precios. Entras, pegas, imprimes o copias.
+            Nadie te pide dar de alta la empresa.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/cobros" />}
+              render={<Link href="/versiones" />}
               nativeButton={false}
             >
-              Recordatorios de cobro
+              Versiones de un trabajo
               <ArrowRight />
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/presupuestos" />}
+              render={<Link href="/cobros" />}
               nativeButton={false}
             >
-              Tanda de presupuestos
+              Recordatorios de cobro
             </Button>
           </div>
         </div>
         <div className="rounded-3xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8">
-          <p className="font-heading text-2xl">Ahora mismo</p>
-          <ul className="mt-5 space-y-3 text-sm">
+          <p className="font-heading text-2xl">Las tres</p>
+          <ul className="mt-5 space-y-4 text-sm">
+            <li className="flex gap-3">
+              <Layers className="mt-0.5 size-4 shrink-0 text-primary" />
+              <span>
+                <Link href="/versiones" className="font-medium hover:underline">
+                  Versiones
+                </Link>
+                : un cliente, básico / completo, con o sin urgencia.
+              </span>
+            </li>
             <li className="flex gap-3">
               <Copy className="mt-0.5 size-4 shrink-0 text-primary" />
-              Recordatorios: 10 textos de cobro, serios, listos para pegar.
+              <span>
+                <Link href="/cobros" className="font-medium hover:underline">
+                  Cobros
+                </Link>
+                : quién te debe → textos de WhatsApp o correo.
+              </span>
             </li>
             <li className="flex gap-3">
               <FileStack className="mt-0.5 size-4 shrink-0 text-primary" />
-              Presupuestos: los mismos servicios, muchos destinatarios.
-            </li>
-            <li className="flex gap-3">
-              <Printer className="mt-0.5 size-4 shrink-0 text-primary" />
-              Imprimir PDF o copiar. Los datos se quedan en tu navegador.
-            </li>
-            <li className="flex gap-3">
-              <ShieldOff className="mt-0.5 size-4 shrink-0 text-primary" />
-              Cero cuenta, cero pipeline.
+              <span>
+                <Link href="/presupuestos" className="font-medium hover:underline">
+                  Presupuestos
+                </Link>
+                : los mismos servicios, muchos destinatarios.
+              </span>
             </li>
           </ul>
-        </div>
-      </section>
-
-      <section className="border-y border-border/80 bg-card/60">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-          <h2 className="font-heading text-3xl">La que aún no está</h2>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            <strong>Versiones de un mismo trabajo</strong> no es diez clientes.
-            Es un solo cliente y un solo encargo, con varias ofertas: básico /
-            completo, con o sin urgencia. Hoy eso son seis Word. Cuando la
-            montemos, saldrá en esta misma web.
-          </p>
         </div>
       </section>
     </div>
