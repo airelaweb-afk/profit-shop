@@ -113,10 +113,12 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 24px 50px -18px rgba(40, 24, 10, 0.45);
+  container-type: inline-size;
+  container-name: paper;
 }
 
 .quote-preview-screen .quote-doc {
-  min-width: 680px;
+  min-width: 0;
 }
 
 .quote-doc {
@@ -269,6 +271,7 @@
 .quote-doc-facts dd {
   margin: 0;
   font-weight: 500;
+  text-align: right;
 }
 
 .quote-doc-intro {
@@ -432,6 +435,50 @@
   border-top: 1px solid var(--rule);
   font-size: 11px;
   color: var(--muted);
+}
+
+@container paper (max-width: 760px) {
+  .quote-doc {
+    min-height: 0;
+    padding: 28px 20px 22px 28px;
+  }
+
+  .quote-doc-top {
+    flex-direction: column;
+  }
+
+  .quote-doc-stamp {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .quote-doc-stamp strong {
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+
+  .quote-doc-title-row,
+  .quote-doc-bottom {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .quote-doc-client {
+    font-size: 1.7rem;
+  }
+
+  .quote-doc-table {
+    font-size: 12px;
+  }
+
+  .quote-doc-table thead th,
+  .quote-doc-table tbody td {
+    padding: 10px 8px;
+  }
 }
 
 @media print {
