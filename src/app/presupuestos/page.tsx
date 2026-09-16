@@ -14,12 +14,11 @@ export default function PresupuestosPage() {
         Herramienta · sin CRM
       </p>
       <h1 className="no-print mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        Una lista de clientes. Una tanda de presupuestos.
+        Presupuestos que se pueden mandar.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Esto no es “versiones”: aquí los servicios son los mismos y cambia el
-        destinatario. Sube el logo, rellena tus datos, pega la lista e imprime
-        (o guarda PDF). Cada papel lleva cabecera, IVA y condiciones.
+        Membrete, IVA, condiciones y firma. Sube el logo, pega a quién se lo
+        envías y guarda el PDF. No es un CRM: es el papel de un estudio.
       </p>
       <div className="mt-10">
         <QuoteBatchTool />

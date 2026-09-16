@@ -133,7 +133,7 @@ export function QuoteBatchTool() {
     patch({
       services: [
         ...stored.services,
-        { id: newId(), name: "", quantity: 1, price: 0 },
+        { id: newId(), name: "", detail: "", quantity: 1, price: 0 },
       ],
     });
   }
@@ -408,8 +408,8 @@ export function QuoteBatchTool() {
               Línea
             </Button>
           </div>
-          <div className="mt-4 hidden grid-cols-[1fr_5rem_7rem_2rem] gap-2 text-xs text-muted-foreground sm:grid">
-            <span>Concepto</span>
+          <div className="mt-4 hidden grid-cols-[minmax(0,1fr)_4.5rem_7rem_2.5rem] gap-2 text-xs text-muted-foreground sm:grid">
+            <span>Concepto y detalle</span>
             <span>Cant.</span>
             <span>P. unitario</span>
             <span />
@@ -418,17 +418,28 @@ export function QuoteBatchTool() {
             {stored.services.map((line) => (
               <li
                 key={line.id}
-                className="grid gap-2 rounded-xl border border-border p-3 sm:border-0 sm:p-0 sm:grid-cols-[1fr_5rem_7rem_2rem]"
+                className="grid gap-2 rounded-xl border border-border p-3 sm:border-0 sm:p-0 sm:grid-cols-[minmax(0,1fr)_4.5rem_7rem_2.5rem]"
               >
-                <Input
-                  className="h-10"
-                  placeholder="Concepto"
-                  value={line.name}
-                  onChange={(event) =>
-                    setService(line.id, { name: event.target.value })
-                  }
-                  aria-label="Concepto"
-                />
+                <div className="grid gap-2">
+                  <Input
+                    className="h-10"
+                    placeholder="Concepto"
+                    value={line.name}
+                    onChange={(event) =>
+                      setService(line.id, { name: event.target.value })
+                    }
+                    aria-label="Concepto"
+                  />
+                  <Input
+                    className="h-10"
+                    placeholder="Qué incluye, en una frase"
+                    value={line.detail ?? ""}
+                    onChange={(event) =>
+                      setService(line.id, { detail: event.target.value })
+                    }
+                    aria-label="Detalle del servicio"
+                  />
+                </div>
                 <div className="grid grid-cols-[1fr_1fr_auto] items-end gap-2 sm:contents">
                   <Field label="Cant." htmlFor={`qty-${line.id}`} labelClassName="sm:sr-only">
                     <Input
@@ -526,9 +537,14 @@ export function QuoteBatchTool() {
 
       <aside className="no-print lg:sticky lg:top-20 lg:self-start">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs tracking-wide text-primary uppercase">
-            Vista previa
-          </p>
+          <div>
+            <p className="text-xs tracking-wide text-primary uppercase">
+              Así se ve el PDF
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Papel A4. Lo que ves es lo que se imprime.
+            </p>
+          </div>
           {clients.length > 1 ? (
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
               Cliente
@@ -548,13 +564,15 @@ export function QuoteBatchTool() {
             </label>
           ) : null}
         </div>
-        <div className="quote-preview-screen overflow-x-auto rounded-2xl bg-white shadow-[0_20px_50px_-24px_rgba(60,40,20,0.45)] ring-1 ring-foreground/10">
-          <QuoteDocument
-            issuer={stored.issuer}
-            client={previewClient}
-            services={activeServices}
-            index={Math.min(previewIndex, Math.max(clients.length - 1, 0))}
-          />
+        <div className="quote-preview-desk">
+          <div className="quote-preview-screen">
+            <QuoteDocument
+              issuer={stored.issuer}
+              client={previewClient}
+              services={activeServices}
+              index={Math.min(previewIndex, Math.max(clients.length - 1, 0))}
+            />
+          </div>
         </div>
       </aside>
 

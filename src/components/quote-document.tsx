@@ -10,6 +10,16 @@ import {
   type ServiceLine,
 } from "@/lib/quotes";
 
+function initials(name: string) {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2);
+  if (parts.length === 0) return "P";
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
+
 export function QuoteDocument({
   issuer,
   client,
@@ -26,13 +36,12 @@ export function QuoteDocument({
     prefix: issuer.quotePrefix,
     start: issuer.quoteStart,
   });
-  const addressLine = [issuer.address, issuer.city].filter(Boolean).join(", ");
+  const addressLine = [issuer.address, issuer.city].filter(Boolean).join(" · ");
 
   return (
     <article className="quote-doc">
-      <div className="quote-doc-accent" />
-      <header className="flex items-start justify-between gap-6">
-        <div className="flex min-w-0 items-start gap-4">
+      <header className="quote-doc-top">
+        <div className="quote-doc-brand">
           {issuer.logoDataUrl ? (
             <img
               src={issuer.logoDataUrl}
@@ -40,129 +49,129 @@ export function QuoteDocument({
               className="quote-doc-logo"
             />
           ) : (
-            <div className="quote-doc-logo-fallback" aria-hidden>
-              {(issuer.name || "P").slice(0, 1).toUpperCase()}
+            <div className="quote-doc-mark" aria-hidden>
+              {initials(issuer.name)}
             </div>
           )}
-          <div className="min-w-0">
-            <p className="font-heading text-2xl leading-tight">
-              {issuer.name || "Tu negocio"}
-            </p>
-            <p className="mt-1 text-[13px] leading-5 text-neutral-600">
+          <div>
+            <p className="quote-doc-studio">{issuer.name || "Tu negocio"}</p>
+            <p className="quote-doc-meta">
               {[issuer.taxId && `NIF ${issuer.taxId}`, addressLine]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
-            <p className="text-[13px] leading-5 text-neutral-600">
+            <p className="quote-doc-meta">
               {[issuer.email, issuer.phone, issuer.website]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
           </div>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="text-[11px] tracking-[0.16em] text-neutral-500 uppercase">
-            Presupuesto
-          </p>
-          <p className="mt-1 font-heading text-xl">{number}</p>
-          <p className="mt-2 text-[13px] text-neutral-600">
-            Fecha {formatLongDate()}
-          </p>
-          <p className="text-[13px] text-neutral-600">
-            Válido hasta {validUntil(issuer.validDays)}
-          </p>
+        <div className="quote-doc-stamp">
+          <p>Presupuesto</p>
+          <strong>{number}</strong>
         </div>
       </header>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg bg-neutral-50 px-4 py-3">
-          <p className="text-[11px] tracking-[0.14em] text-neutral-500 uppercase">
-            Cliente
-          </p>
-          <p className="mt-1 font-medium">{client.company || "—"}</p>
-          {client.contact ? (
-            <p className="text-[13px] text-neutral-600">{client.contact}</p>
-          ) : null}
-          {client.email ? (
-            <p className="text-[13px] text-neutral-600">{client.email}</p>
-          ) : null}
-        </div>
-        <div className="rounded-lg bg-neutral-50 px-4 py-3">
-          <p className="text-[11px] tracking-[0.14em] text-neutral-500 uppercase">
-            Emisor
-          </p>
-          <p className="mt-1 font-medium">{issuer.name || "—"}</p>
-          <p className="text-[13px] text-neutral-600">
-            {issuer.taxId ? `NIF / CIF ${issuer.taxId}` : "Sin NIF todavía"}
+      <div className="quote-doc-title-row">
+        <div>
+          <p className="quote-doc-kicker">Preparado para</p>
+          <h1 className="quote-doc-client">{client.company || "Cliente"}</h1>
+          <p className="quote-doc-meta">
+            {[client.contact, client.email].filter(Boolean).join(" · ") ||
+              "Añada contacto o correo si quiere que figure."}
           </p>
         </div>
+        <dl className="quote-doc-facts">
+          <div>
+            <dt>Fecha</dt>
+            <dd>{formatLongDate()}</dd>
+          </div>
+          <div>
+            <dt>Válido hasta</dt>
+            <dd>{validUntil(issuer.validDays)}</dd>
+          </div>
+          <div>
+            <dt>IVA</dt>
+            <dd>{issuer.taxPercent} %</dd>
+          </div>
+        </dl>
       </div>
 
-      {issuer.intro ? (
-        <p className="mt-6 text-sm leading-6 text-neutral-700">{issuer.intro}</p>
-      ) : null}
+      {issuer.intro ? <p className="quote-doc-intro">{issuer.intro}</p> : null}
 
-      <table className="mt-6 w-full border-collapse text-sm">
+      <table className="quote-doc-table">
         <thead>
-          <tr className="border-b border-neutral-300 text-left text-[11px] tracking-[0.12em] text-neutral-500 uppercase">
-            <th className="py-2 pr-3 font-medium">Concepto</th>
-            <th className="w-16 py-2 pr-3 font-medium">Cant.</th>
-            <th className="w-28 py-2 pr-3 text-right font-medium">P. unitario</th>
-            <th className="w-28 py-2 text-right font-medium">Importe</th>
+          <tr>
+            <th className="quote-doc-num">#</th>
+            <th>Descripción</th>
+            <th>Cant.</th>
+            <th>Precio</th>
+            <th>Importe</th>
           </tr>
         </thead>
         <tbody>
           {services.length === 0 ? (
             <tr>
-              <td colSpan={4} className="py-6 text-neutral-500">
-                Añade servicios para completar el presupuesto.
+              <td colSpan={5} className="quote-doc-empty">
+                Añada servicios para completar el presupuesto.
               </td>
             </tr>
           ) : (
-            services.map((line) => (
-              <tr key={line.id} className="border-b border-neutral-200">
-                <td className="py-2.5 pr-3">{line.name}</td>
-                <td className="py-2.5 pr-3">{line.quantity}</td>
-                <td className="py-2.5 pr-3 text-right">
-                  {formatEuro(line.price)}
+            services.map((line, lineIndex) => (
+              <tr key={line.id}>
+                <td className="quote-doc-num">
+                  {String(lineIndex + 1).padStart(2, "0")}
                 </td>
-                <td className="py-2.5 text-right">{formatEuro(lineTotal(line))}</td>
+                <td>
+                  <span className="quote-doc-line-name">{line.name}</span>
+                  {line.detail ? (
+                    <span className="quote-doc-line-detail">{line.detail}</span>
+                  ) : null}
+                </td>
+                <td>{line.quantity}</td>
+                <td>{formatEuro(line.price)}</td>
+                <td>{formatEuro(lineTotal(line))}</td>
               </tr>
             ))
           )}
         </tbody>
       </table>
 
-      <dl className="mt-6 ml-auto w-64 text-sm">
-        <div className="flex justify-between py-1">
-          <dt className="text-neutral-600">Base imponible</dt>
-          <dd>{formatEuro(totals.subtotal)}</dd>
-        </div>
-        <div className="flex justify-between py-1">
-          <dt className="text-neutral-600">IVA {issuer.taxPercent}%</dt>
-          <dd>{formatEuro(totals.tax)}</dd>
-        </div>
-        <div className="mt-1 flex justify-between border-t border-neutral-300 pt-2 font-medium">
-          <dt>Total</dt>
-          <dd>{formatEuro(totals.total)}</dd>
-        </div>
-      </dl>
-
-      {issuer.conditions ? (
-        <section className="mt-8 border-t border-neutral-200 pt-4">
-          <p className="text-[11px] tracking-[0.14em] text-neutral-500 uppercase">
-            Condiciones
-          </p>
-          <p className="mt-2 whitespace-pre-wrap text-[13px] leading-6 text-neutral-700">
-            {issuer.conditions}
-          </p>
+      <div className="quote-doc-bottom">
+        <section className="quote-doc-notes">
+          <p className="quote-doc-kicker">Condiciones</p>
+          <p>{issuer.conditions || "—"}</p>
+          <div className="quote-doc-sign">
+            <p>Aceptación del cliente</p>
+            <div className="quote-doc-sign-lines">
+              <span>Fecha</span>
+              <span>Firma y NIF</span>
+            </div>
+          </div>
         </section>
-      ) : null}
+        <aside className="quote-doc-totals">
+          <div>
+            <span>Base imponible</span>
+            <strong>{formatEuro(totals.subtotal)}</strong>
+          </div>
+          <div>
+            <span>IVA {issuer.taxPercent} %</span>
+            <strong>{formatEuro(totals.tax)}</strong>
+          </div>
+          <div className="quote-doc-grand">
+            <span>Total</span>
+            <strong>{formatEuro(totals.total)}</strong>
+          </div>
+        </aside>
+      </div>
 
-      <p className="mt-8 text-[11px] text-neutral-500">
-        Este documento es un presupuesto. No es una factura ni un justificante
-        de pago.
-      </p>
+      <footer className="quote-doc-foot">
+        <span>
+          Documento informativo. No es una factura ni un justificante de pago.
+        </span>
+        <span>{issuer.website || issuer.email || issuer.name}</span>
+      </footer>
     </article>
   );
 }

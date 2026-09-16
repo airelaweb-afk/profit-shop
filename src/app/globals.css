@@ -98,49 +98,340 @@
   }
 }
 
+.quote-preview-desk {
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(1200px 400px at 20% 0%, rgba(177, 92, 56, 0.08), transparent),
+    linear-gradient(180deg, #efe6d8 0%, #e4d5c3 100%);
+}
+
 .quote-preview-screen {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: min(920px, 78vh);
+  border-radius: 4px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 24px 50px -18px rgba(40, 24, 10, 0.45);
 }
 
 .quote-preview-screen .quote-doc {
-  min-width: 640px;
+  min-width: 680px;
 }
 
 .quote-doc {
+  --ink: #1f1812;
+  --muted: #6b5e53;
+  --rule: #e6d9cc;
+  --paper: #fffaf3;
+  --stamp: #8c4630;
+  --band: #2b211b;
   position: relative;
-  padding: 28px 28px 24px;
-  color: #1c1917;
-  background: #fff;
+  min-height: 980px;
+  padding: 40px 44px 32px 52px;
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, #fffdf9 0%, var(--paper) 48%, #f7f0e6 100%);
 }
 
-.quote-doc-accent {
+.quote-doc::before {
+  content: "";
   position: absolute;
   top: 0;
-  right: 0;
+  bottom: 0;
   left: 0;
-  height: 6px;
-  background: #b15c38;
+  width: 10px;
+  background: linear-gradient(180deg, #c46a45 0%, #8c4630 100%);
+}
+
+.quote-doc-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.quote-doc-brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
 }
 
 .quote-doc-logo {
-  height: 72px;
-  width: 72px;
+  height: 64px;
+  width: auto;
+  max-width: 140px;
   object-fit: contain;
-  border-radius: 8px;
-  background: #faf7f2;
 }
 
-.quote-doc-logo-fallback {
+.quote-doc-mark {
   display: flex;
-  height: 72px;
-  width: 72px;
+  height: 58px;
+  width: 58px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: #f3ebe3;
+  border: 1px solid #d7c4b3;
+  background: #2b211b;
   font-family: var(--font-heading), ui-serif, Georgia, serif;
-  font-size: 1.6rem;
-  color: #b15c38;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  color: #f6eadc;
+}
+
+.quote-doc-studio {
+  margin: 0;
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-size: 1.7rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.quote-doc-meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.quote-doc-stamp {
+  flex-shrink: 0;
+  min-width: 168px;
+  padding: 12px 16px 14px;
+  background: var(--band);
+  color: #f8efe6;
+  text-align: right;
+}
+
+.quote-doc-stamp p {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #e2c4b0;
+}
+
+.quote-doc-stamp strong {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.quote-doc-title-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+}
+
+.quote-doc-kicker {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stamp);
+}
+
+.quote-doc-client {
+  margin: 6px 0 4px;
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-size: 2.15rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.quote-doc-facts {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 4px 0 0;
+}
+
+.quote-doc-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+}
+
+.quote-doc-facts dt {
+  color: var(--muted);
+}
+
+.quote-doc-facts dd {
+  margin: 0;
+  font-weight: 500;
+}
+
+.quote-doc-intro {
+  margin: 26px 0 0;
+  max-width: 46rem;
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.55;
+  color: #3d342c;
+}
+
+.quote-doc-table {
+  width: 100%;
+  margin-top: 28px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.quote-doc-table thead th {
+  padding: 10px 12px;
+  background: var(--band);
+  color: #f4ebe3;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.quote-doc-table thead th:nth-child(3),
+.quote-doc-table thead th:nth-child(4),
+.quote-doc-table thead th:nth-child(5),
+.quote-doc-table tbody td:nth-child(3),
+.quote-doc-table tbody td:nth-child(4),
+.quote-doc-table tbody td:nth-child(5) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.quote-doc-table tbody td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.quote-doc-table tbody tr:nth-child(even) td {
+  background: rgba(139, 70, 48, 0.035);
+}
+
+.quote-doc-num {
+  width: 42px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.quote-doc-line-name {
+  display: block;
+  font-weight: 600;
+}
+
+.quote-doc-line-detail {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.quote-doc-empty {
+  color: var(--muted);
+}
+
+.quote-doc-bottom {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  margin-top: 28px;
+  align-items: start;
+}
+
+.quote-doc-notes p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #3f352d;
+}
+
+.quote-doc-sign {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--rule);
+}
+
+.quote-doc-sign > p {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.quote-doc-sign-lines {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.quote-doc-sign-lines span {
+  display: block;
+  padding-top: 8px;
+  border-top: 1px solid var(--ink);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.quote-doc-totals {
+  padding: 8px 0 0;
+}
+
+.quote-doc-totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.quote-doc-totals strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.quote-doc-grand {
+  margin-top: 8px;
+  padding: 14px 16px !important;
+  background: var(--stamp);
+  color: #fffaf3 !important;
+}
+
+.quote-doc-grand span,
+.quote-doc-grand strong {
+  color: #fffaf3;
+  font-size: 1.05rem;
+}
+
+.quote-doc-grand strong {
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 500;
+}
+
+.quote-doc-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 36px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 11px;
+  color: var(--muted);
 }
 
 @media print {
@@ -165,7 +456,7 @@
 
   .quote-sheet {
     break-after: page;
-    color: #1c1917;
+    color: #1f1812;
   }
 
   .quote-sheet:last-child {
@@ -173,7 +464,9 @@
   }
 
   .quote-doc {
-    padding: 0;
+    min-height: auto;
+    padding: 8px 10px 0 18px;
+    background: #fff;
   }
 
   body {

@@ -45,6 +45,7 @@ export type Issuer = {
 export type ServiceLine = {
   id: string;
   name: string;
+  detail?: string;
   quantity: number;
   price: number;
 };
@@ -65,9 +66,9 @@ export const blankIssuer: Issuer = {
   website: "",
   logoDataUrl: "",
   conditions:
-    "50% al aceptar. El resto contra entrega. Dos rondas de revisión incluidas.",
+    "Forma de pago: 50 % al aceptar y 50 % contra entrega.\nRevisiones: dos rondas incluidas. Los cambios de alcance se presupuestan aparte.\nAceptación: responda a este documento por correo con “aceptado” o fírmelo más abajo.",
   intro:
-    "Gracias por su interés. Este documento detalla los servicios, importes e IVA.",
+    "Gracias por su interés. A continuación, el detalle de los servicios, plazos e importes.",
   taxPercent: 21,
   validDays: 14,
   quotePrefix: "PRE",
@@ -89,25 +90,29 @@ export const sampleServices: ServiceLine[] = [
   {
     id: "svc-redes",
     name: "Dirección de redes · 4 semanas",
+    detail:
+      "Calendario, copys, publicación y un informe breve al cierre. Reuniones de 20 min cada lunes.",
     quantity: 1,
     price: 45000,
   },
   {
     id: "svc-estrategia",
     name: "Sesión de estrategia (90 min)",
+    detail: "Diagnóstico, prioridades del trimestre y un documento de acuerdos.",
     quantity: 1,
     price: 12000,
   },
   {
     id: "svc-feed",
     name: "Diseño de 8 piezas para feed",
+    detail: "Formatos 1:1 y 4:5, textos colocados, exportadas listas para publicar.",
     quantity: 8,
     price: 2500,
   },
 ];
 
 export const emptyServices: ServiceLine[] = [
-  { id: "svc-1", name: "", quantity: 1, price: 0 },
+  { id: "svc-1", name: "", detail: "", quantity: 1, price: 0 },
 ];
 
 export const sampleClientText = `Academia Norte, Marta Gil, marta@norte.com
