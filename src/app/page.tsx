@@ -18,6 +18,11 @@ export default function HomePage() {
             solo trabajo con varios precios. Entras, pegas, imprimes o copias.
             Nadie te pide dar de alta la empresa.
           </p>
+          <ol className="mt-6 max-w-xl list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+            <li>Abre Versiones y pulsa “Cargar ejemplo” o escribe los tuyos.</li>
+            <li>Revisa IVA, NIF y los tres paquetes.</li>
+            <li>Genera e imprime (o “guardar como PDF”).</li>
+          </ol>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button
               size="lg"

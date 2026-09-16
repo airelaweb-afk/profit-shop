@@ -17,6 +17,7 @@ import {
 } from "@/lib/quotes";
 import {
   buildVersions,
+  emptyVersionJob,
   sampleVersionJob,
   type JobPackage,
   type VersionJob,
@@ -36,7 +37,7 @@ function subscribe(listener: () => void) {
 }
 
 function parseStored(json: string): VersionJob {
-  if (!json) return sampleVersionJob;
+  if (!json) return emptyVersionJob;
   try {
     const parsed = JSON.parse(json) as Partial<VersionJob>;
     return {
@@ -127,10 +128,31 @@ export function VersionQuoteTool() {
         }}
       >
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">El trabajo y el cliente</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Un encargo. Un destinatario. Varias ofertas, no varias empresas.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-2xl">El trabajo y el cliente</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Un encargo. Un destinatario. Varias ofertas, no varias empresas.
+                Los datos se quedan en este navegador.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => write(structuredClone(sampleVersionJob))}
+              >
+                Cargar ejemplo
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => write(structuredClone(emptyVersionJob))}
+              >
+                Empezar de cero
+              </Button>
+            </div>
+          </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <Field label="Título del trabajo" htmlFor="job-title">

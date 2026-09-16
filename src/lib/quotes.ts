@@ -48,13 +48,23 @@ export type ClientRow = {
   email: string;
 };
 
+export const blankIssuer: Issuer = {
+  name: "",
+  taxId: "",
+  email: "",
+  phone: "",
+  conditions:
+    "50% al aceptar. El resto contra entrega. Dos rondas de revisión incluidas.",
+  taxPercent: 21,
+  validDays: 14,
+};
+
 export const sampleIssuer: Issuer = {
   name: "Estudio Clara López",
   taxId: "12345678Z",
   email: "clara@estudio.com",
   phone: "+34 600 000 000",
-  conditions:
-    "50% al aceptar. El resto contra entrega. Dos rondas de revisión incluidas.",
+  conditions: blankIssuer.conditions,
   taxPercent: 21,
   validDays: 14,
 };

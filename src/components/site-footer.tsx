@@ -30,8 +30,8 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/tienda" className="hover:text-foreground">
-                Plantillas descargables
+              <Link href="/como-funciona" className="hover:text-foreground">
+                Cómo funciona
               </Link>
             </li>
           </ul>

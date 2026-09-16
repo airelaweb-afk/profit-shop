@@ -17,9 +17,10 @@ export default function VersionesPage() {
         Un trabajo. Varias ofertas. El cliente elige.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        No es una lista de empresas. Es Taller Sur pidiendo la web, y tú
-        mandando básico, recomendado y completo —y si quieres, cada uno con
-        recargo de urgencia. Seis papeles. Un clic.
+        Escribe tu negocio, el cliente y tres paquetes (básico, recomendado,
+        completo). Si quieres, cada uno también con recargo de urgencia. Luego
+        imprime o guarda como PDF. Si es la primera vez, pulsa “Cargar ejemplo”
+        y cambia los nombres.
       </p>
       <div className="mt-10">
         <VersionQuoteTool />

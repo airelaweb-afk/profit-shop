@@ -10,7 +10,9 @@ Los datos se quedan en el navegador (`localStorage`). No hay cuentas, ni base de
 - **Recordatorios de cobro** (`/cobros`): pegas quién te debe y copias una tanda de mensajes de WhatsApp o correo.
 - **Presupuestos en lote** (`/presupuestos`): varios presupuestos de una vez, listos para copiar.
 
-La tienda de plantillas (`/tienda`) sigue disponible como extra.
+La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el menú: el producto son las herramientas.
+
+El orden de trabajo está en [`PLAN.md`](PLAN.md): un paso, se prueba en Hostinger, luego el siguiente.
 
 ## Cómo correrla en local
 

@@ -1,7 +1,7 @@
 import {
+  blankIssuer,
   lineTotal,
   quoteTotals,
-  type Issuer,
   type ServiceLine,
   sampleIssuer,
 } from "./quotes";
@@ -27,6 +27,41 @@ export type VersionJob = {
   packages: JobPackage[];
   rush: boolean;
   rushPercent: number;
+};
+
+function emptyLine(id: string): ServiceLine {
+  return { id, name: "", quantity: 1, price: 0 };
+}
+
+export const emptyVersionJob: VersionJob = {
+  title: "",
+  client: { company: "", contact: "", email: "" },
+  issuer: { ...blankIssuer },
+  rush: true,
+  rushPercent: 30,
+  packages: [
+    {
+      id: "pkg-basico",
+      name: "Básico",
+      enabled: true,
+      includes: "",
+      lines: [emptyLine("b1")],
+    },
+    {
+      id: "pkg-recomendado",
+      name: "Recomendado",
+      enabled: true,
+      includes: "",
+      lines: [emptyLine("r1")],
+    },
+    {
+      id: "pkg-completo",
+      name: "Completo",
+      enabled: true,
+      includes: "",
+      lines: [emptyLine("c1")],
+    },
+  ],
 };
 
 export const sampleVersionJob: VersionJob = {
