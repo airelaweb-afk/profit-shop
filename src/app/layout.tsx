@@ -17,11 +17,11 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: "Luna Atelier — productos digitales para vender mejor",
-    template: "%s · Luna Atelier",
+    default: "Luna Oficio — herramientas admin sin CRM",
+    template: "%s · Luna Oficio",
   },
   description:
-    "Tienda de planners, plantillas y kits descargables. Un modelo de negocio sin inventario ni envíos, listo para publicar.",
+    "Presupuestos en lote y otras herramientas para autónomos y empresas pequeñas. Sin cuentas ni pipelines.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

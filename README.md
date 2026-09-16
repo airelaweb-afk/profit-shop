@@ -1,10 +1,12 @@
-# Luna Atelier
+# Luna Oficio
 
-Tienda de **productos digitales** (planners, plantillas, kits) pensada para vender por internet sin inventario ni envíos. Incluye catálogo, carrito, checkout de demostración y descarga inmediata del archivo.
+Herramientas de administración para **autónomos y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (por ejemplo, generar muchos presupuestos de una vez) y se puede encontrar en Google.
 
-## Por qué este proyecto
+## Herramienta lista
 
-Vender descargas es uno de los caminos más realistas para facturar en línea: el archivo se produce una vez y cada venta extra casi no cuesta nada. Esta web es el mostrador. Tú sustituyes los productos de ejemplo por los tuyos y, cuando quieras cobrar de verdad, conectas Stripe, Lemon Squeezy o Mercado Pago.
+**Tanda de presupuestos** (`/presupuestos`): pegas una lista de clientes, defines tus servicios una vez e imprimes o guardas cada presupuesto en PDF. Los datos se quedan en el navegador.
+
+La tienda de plantillas (`/tienda`) sigue disponible como extra.
 
 ## Cómo correrla en local
 
@@ -13,11 +15,7 @@ npm install
 npm run dev
 ```
 
-Abre [http://localhost:43147](http://localhost:43147).
-
-- **Tienda:** `/tienda`
-- **Checkout demo:** no pide tarjeta; el pedido se guarda en este navegador
-- **Descargas:** archivos de texto con el contenido de cada kit
+Abre [http://localhost:43147](http://localhost:43147). En producción: `npm run build && npm run start`.
 
 ## Scripts
 

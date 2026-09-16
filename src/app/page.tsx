@@ -1,122 +1,102 @@
 import Link from "next/link";
-import { ArrowRight, Download, Package, Wallet } from "lucide-react";
-import { ProductCard } from "@/components/product-card";
+import { ArrowRight, FileStack, Printer, ShieldOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getFeaturedProducts, getProduct } from "@/lib/products";
-import { formatPrice } from "@/lib/money";
-import { ProductCover } from "@/components/product-cover";
 
 export default function HomePage() {
-  const featured = getFeaturedProducts();
-  const bundle = getProduct("bundle-emprendedor");
-
   return (
     <div>
-      <section className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
+      <section className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-20">
         <div>
           <p className="text-sm tracking-wide text-primary uppercase">
-            Tienda de descargas digitales
+            Herramientas admin · autónomos y empresas pequeñas
           </p>
           <h1 className="mt-3 font-heading text-4xl leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-            Vende por internet sin inventario ni paquetería.
+            No otro CRM. Un trabajo feo, resuelto de un tirón.
           </h1>
           <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-            Luna Atelier es una tienda lista: planners, plantillas y kits que
-            el cliente paga y descarga al momento. El mismo modelo con el que
-            miles de personas facturan desde casa — Etsy, Gumroad, su propia
-            web — sin comprar stock.
+            Holded, Notion y Excel ya existen. Lo que casi no existe es una
+            herramienta que haga <em>una sola cosa pesada</em> —diez
+            presupuestos, diez recordatorios— sin pedirte que metas la empresa
+            entera en un sistema. Entras, pegas una lista, te llevas los
+            papeles. Google puede encontrar esto. Tú no tienes que venderlo en
+            un chat.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/tienda" />}
+              render={<Link href="/presupuestos" />}
               nativeButton={false}
             >
-              Entrar a la tienda
+              Probar la tanda de presupuestos
               <ArrowRight />
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/como-vender" />}
+              render={<Link href="/como-funciona" />}
               nativeButton={false}
             >
-              Cómo se gana dinero
+              Cómo se posiciona esto
             </Button>
           </div>
         </div>
-
-        {bundle ? (
-          <Link
-            href={`/producto/${bundle.slug}`}
-            className="relative block rounded-3xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5"
-          >
-            <ProductCover
-              style={bundle.cover}
-              title={bundle.shortName}
-              className="max-h-[420px]"
-            />
-            <div className="mt-4 flex items-end justify-between gap-3">
-              <div>
-                <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                  El atajo
-                </p>
-                <p className="font-heading text-2xl">{bundle.name}</p>
-              </div>
-              <p className="text-sm font-medium">{formatPrice(bundle.price)}</p>
-            </div>
-          </Link>
-        ) : null}
+        <div className="rounded-3xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8">
+          <p className="font-heading text-2xl">La primera herramienta</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Tanda de presupuestos: los mismos servicios, muchos destinatarios.
+            Imprime o guarda PDF. Los datos se quedan en tu navegador.
+          </p>
+          <ul className="mt-5 space-y-3 text-sm">
+            <li className="flex gap-3">
+              <FileStack className="mt-0.5 size-4 shrink-0 text-primary" />
+              Hasta 30 documentos de una lista pegada.
+            </li>
+            <li className="flex gap-3">
+              <Printer className="mt-0.5 size-4 shrink-0 text-primary" />
+              Un clic para imprimir o “Guardar como PDF”.
+            </li>
+            <li className="flex gap-3">
+              <ShieldOff className="mt-0.5 size-4 shrink-0 text-primary" />
+              Cero cuenta, cero pipeline, cero base de datos nuestra.
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section className="border-y border-border/80 bg-card/60">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
-          {[
-            {
-              icon: Package,
-              title: "Cero stock",
-              text: "El producto es un archivo. Lo haces una vez y se vende mientras duermes.",
-            },
-            {
-              icon: Download,
-              title: "Entrega al instante",
-              text: "El cliente paga y descarga. No hay correos de “¿dónde va el paquete?”.",
-            },
-            {
-              icon: Wallet,
-              title: "Margen alto",
-              text: "Un planner a 12 USD. Un bundle a 39. Casi todo es ganancia neta.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="flex gap-4">
-              <item.icon className="mt-1 size-5 shrink-0 text-primary" />
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{item.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="font-heading text-3xl sm:text-4xl">Destacados</h2>
-            <p className="mt-2 text-muted-foreground">
-              Lo que un freelancer o un estudio pequeño compra el primer mes.
-            </p>
-          </div>
-          <Button variant="link" render={<Link href="/tienda" />} nativeButton={false}>
-            Ver todo
-          </Button>
-        </div>
-        <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.slice(0, 6).map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))}
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <h2 className="font-heading text-3xl">Las siguientes (cuando esta se use)</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            No son un CRM a trozos. Cada una ataca un atasco que hoy se hace a
+            mano, copiando un Word diez veces.
+          </p>
+          <ol className="mt-8 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                n: "02",
+                title: "Diez versiones de un mismo trabajo",
+                text: "Bueno / mejor / completo, con y sin urgencia, para un solo cliente. Hoy eso son 6 Word.",
+              },
+              {
+                n: "03",
+                title: "Tanda de recordatorios de cobro",
+                text: "Pegas quién te debe y desde cuándo. Sales con 10 textos de WhatsApp o correo, serios, no agresivos.",
+              },
+              {
+                n: "04",
+                title: "De horas a presupuesto",
+                text: "Pegar un registro semanal y salir con conceptos e importes, no con una hoja ilegible.",
+              },
+            ].map((item) => (
+              <li key={item.n} className="rounded-2xl bg-background p-5 ring-1 ring-foreground/10">
+                <p className="font-heading text-xl text-primary">{item.n}</p>
+                <p className="mt-2 font-medium">{item.title}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{item.text}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
     </div>

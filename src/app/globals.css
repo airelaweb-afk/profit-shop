@@ -97,3 +97,33 @@
     font-family: var(--font-heading), ui-serif, Georgia, serif;
   }
 }
+
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    display: block !important;
+  }
+
+  .quote-print {
+    display: block !important;
+  }
+
+  .quote-sheet {
+    break-after: page;
+    padding: 12mm;
+    color: #1c1917;
+  }
+
+  .quote-sheet:last-child {
+    break-after: auto;
+  }
+
+  body {
+    background: white !important;
+  }
+}

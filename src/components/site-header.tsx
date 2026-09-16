@@ -14,8 +14,9 @@ import { useCart } from "@/lib/cart";
 import { CartDrawer } from "@/components/cart-drawer";
 
 const links = [
-  { href: "/tienda", label: "Tienda" },
-  { href: "/como-vender", label: "Cómo vender" },
+  { href: "/presupuestos", label: "Presupuestos" },
+  { href: "/como-funciona", label: "Cómo funciona" },
+  { href: "/tienda", label: "Plantillas" },
 ];
 
 export function SiteHeader() {
@@ -24,10 +25,10 @@ export function SiteHeader() {
   const [cartOpen, setCartOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
+    <header className="no-print sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="font-heading text-xl tracking-tight">
-          Luna Atelier
+          Luna Oficio
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm md:flex">
@@ -43,21 +44,21 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="relative"
-            aria-label="Abrir carrito"
-            onClick={() => setCartOpen(true)}
-          >
-            <ShoppingBag />
-            {count > 0 ? (
+          {count > 0 ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative"
+              aria-label="Abrir carrito"
+              onClick={() => setCartOpen(true)}
+            >
+              <ShoppingBag />
               <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                 {count}
               </span>
-            ) : null}
-          </Button>
+            </Button>
+          ) : null}
 
           <Button
             type="button"
