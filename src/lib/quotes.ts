@@ -30,9 +30,16 @@ export type Issuer = {
   taxId: string;
   email: string;
   phone: string;
+  address: string;
+  city: string;
+  website: string;
+  logoDataUrl: string;
   conditions: string;
+  intro: string;
   taxPercent: number;
   validDays: number;
+  quotePrefix: string;
+  quoteStart: number;
 };
 
 export type ServiceLine = {
@@ -53,20 +60,29 @@ export const blankIssuer: Issuer = {
   taxId: "",
   email: "",
   phone: "",
+  address: "",
+  city: "",
+  website: "",
+  logoDataUrl: "",
   conditions:
     "50% al aceptar. El resto contra entrega. Dos rondas de revisión incluidas.",
+  intro:
+    "Gracias por su interés. Este documento detalla los servicios, importes e IVA.",
   taxPercent: 21,
   validDays: 14,
+  quotePrefix: "PRE",
+  quoteStart: 1,
 };
 
 export const sampleIssuer: Issuer = {
+  ...blankIssuer,
   name: "Estudio Clara López",
   taxId: "12345678Z",
   email: "clara@estudio.com",
   phone: "+34 600 000 000",
-  conditions: blankIssuer.conditions,
-  taxPercent: 21,
-  validDays: 14,
+  address: "Carrer de la Pau 18, 2º",
+  city: "46001 Valencia",
+  website: "estudioclara.es",
 };
 
 export const sampleServices: ServiceLine[] = [
@@ -90,16 +106,15 @@ export const sampleServices: ServiceLine[] = [
   },
 ];
 
+export const emptyServices: ServiceLine[] = [
+  { id: "svc-1", name: "", quantity: 1, price: 0 },
+];
+
 export const sampleClientText = `Academia Norte, Marta Gil, marta@norte.com
 Taller Sur, Diego Paredes, diego@tallersur.es
 Clínica Alma, Noelia Castro
 Estudio Pino
-Residencia El Olivo, Administración, admin@elolivo.es
-Colegio Santa Isabel, Jefa de extraescolares
-Café Lumen, Andrés Molina, andres@cafelumen.com
-Gimnasio Ronda, Recepción
-Hotel Bruma, Eventos, eventos@hotelbruma.es
-Asesoría Vives, Laura Méndez`;
+Residencia El Olivo, Administración, admin@elolivo.es`;
 
 export function parseClients(raw: string): ClientRow[] {
   return raw
@@ -127,10 +142,22 @@ export function quoteTotals(lines: ServiceLine[], taxPercent: number) {
   return { subtotal, tax, total: subtotal + tax };
 }
 
-export function quoteNumber(index: number, when = new Date()) {
+export function formatLongDate(when = new Date()) {
+  return `${when.getUTCDate()} de ${MONTHS_ES[when.getUTCMonth()]} de ${when.getUTCFullYear()}`;
+}
+
+export function quoteNumber(
+  index: number,
+  options: { when?: Date; prefix?: string; start?: number } = {},
+) {
+  const when = options.when ?? new Date();
   const year = when.getUTCFullYear();
-  const n = String(index + 1).padStart(3, "0");
-  return `PRE-${year}-${n}`;
+  const start = Math.max(1, Math.round(options.start ?? 1));
+  const n = String(start + index).padStart(3, "0");
+  const prefix =
+    (options.prefix ?? "PRE").replace(/[^A-Za-z0-9-]/g, "").slice(0, 12) ||
+    "PRE";
+  return `${prefix}-${year}-${n}`;
 }
 
 export function validUntil(days: number, when = new Date()) {
@@ -141,5 +168,5 @@ export function validUntil(days: number, when = new Date()) {
       when.getUTCDate() + Math.max(1, days),
     ),
   );
-  return `${date.getUTCDate()} de ${MONTHS_ES[date.getUTCMonth()]} de ${date.getUTCFullYear()}`;
+  return formatLongDate(date);
 }

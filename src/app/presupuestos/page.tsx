@@ -17,9 +17,9 @@ export default function PresupuestosPage() {
         Una lista de clientes. Una tanda de presupuestos.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Pega 10 nombres, define tus servicios una vez e imprime o guarda cada
-        presupuesto en PDF. No hay pipeline, ni contactos, ni suscripción: el
-        archivo sale de su navegador.
+        Esto no es “versiones”: aquí los servicios son los mismos y cambia el
+        destinatario. Sube el logo, rellena tus datos, pega la lista e imprime
+        (o guarda PDF). Cada papel lleva cabecera, IVA y condiciones.
       </p>
       <div className="mt-10">
         <QuoteBatchTool />

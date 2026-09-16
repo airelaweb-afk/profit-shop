@@ -15,6 +15,11 @@ export function SiteFooter() {
           <p className="text-sm font-medium">Usar</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
+              <Link href="/presupuestos" className="hover:text-foreground">
+                Tanda de presupuestos
+              </Link>
+            </li>
+            <li>
               <Link href="/versiones" className="hover:text-foreground">
                 Versiones de un trabajo
               </Link>
@@ -22,11 +27,6 @@ export function SiteFooter() {
             <li>
               <Link href="/cobros" className="hover:text-foreground">
                 Recordatorios de cobro
-              </Link>
-            </li>
-            <li>
-              <Link href="/presupuestos" className="hover:text-foreground">
-                Tanda de presupuestos
               </Link>
             </li>
             <li>

@@ -2,6 +2,7 @@ import {
   blankIssuer,
   lineTotal,
   quoteTotals,
+  type Issuer,
   type ServiceLine,
   sampleIssuer,
 } from "./quotes";

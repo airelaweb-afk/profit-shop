@@ -17,10 +17,9 @@ export default function VersionesPage() {
         Un trabajo. Varias ofertas. El cliente elige.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Escribe tu negocio, el cliente y tres paquetes (básico, recomendado,
-        completo). Si quieres, cada uno también con recargo de urgencia. Luego
-        imprime o guarda como PDF. Si es la primera vez, pulsa “Cargar ejemplo”
-        y cambia los nombres.
+        Distinto de la tanda: aquí hay un solo cliente y varias ofertas (básico,
+        recomendado, completo, con o sin urgencia). El de “Presupuestos” es el
+        mismo pack para mucha gente.
       </p>
       <div className="mt-10">
         <VersionQuoteTool />

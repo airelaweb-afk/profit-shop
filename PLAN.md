@@ -14,25 +14,19 @@ Los datos siguen en el navegador. Sin cuentas todavía.
 
 ## Pasos
 
-### Paso 1 — Probar sin líos (este)
+### Paso 1 — Probar sin líos
 
-- Quitar la tienda del producto visible.
-- En **Versiones**: empezar en blanco, con “Cargar ejemplo” y “Empezar de cero”.
-- Textos de portada y de la herramienta para que se entienda en un minuto.
+Hecho: tienda fuera del menú, Versiones en blanco con ejemplo.
 
-**Prueba:** abre `/versiones`, pon tu negocio y un cliente inventado, imprime. ¿Saldría eso en un correo a un cliente? Anota lo que falle.
+### Paso 2 — Presupuestos que se puedan enviar (en curso)
 
-### Paso 2 — Que el presupuesto se pueda enviar
+Logo de empresa, cabecera completa (NIF, dirección, IVA, numeración), vista previa = el papel, imprimir / PDF. Distinto de Versiones: mismos servicios, muchos clientes.
 
-IVA, NIF, validez, condiciones y numeración claros. Vista de impresión que parezca un presupuesto, no una web. Botón de guardar PDF (imprimir → guardar).
+**Prueba:** `/presupuestos` → logo + tus datos + 2 clientes de mentira → ¿se lo mandarías?
 
-**Prueba:** un PDF (o “guardar como PDF”) mandado a alguien. ¿Lo entendería sin explicaciones?
+### Paso 3 — Pulir lo que falle al probar
 
-### Paso 3 — La tanda de presupuestos
-
-Misma calidad que Versiones, pero para varios destinatarios. Pegar lista sin romperse. Límite claro. Los tuyos datos de emisor se recuerdan.
-
-**Prueba:** 5 clientes de mentira, 5 papeles. ¿Repetirías el proceso el lunes?
+Lo que no convenza en el PDF (márgenes, textos, IVA 0, más campos) se corrige aquí antes de tocar Cobros.
 
 ### Paso 4 — Cobros que se mandan de un toque
 

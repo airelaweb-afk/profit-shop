@@ -2,26 +2,29 @@
 
 import {
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
+  type ChangeEvent,
   type ReactNode,
 } from "react";
-import { Printer, Plus, Trash2 } from "lucide-react";
+import { ImagePlus, Printer, Plus, Trash2 } from "lucide-react";
+import { QuoteDocument } from "@/components/quote-document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { readLogoFile } from "@/lib/logo";
 import {
+  blankIssuer,
+  emptyServices,
   formatEuro,
-  lineTotal,
   newId,
   parseClients,
-  quoteNumber,
   quoteTotals,
   sampleClientText,
   sampleIssuer,
   sampleServices,
-  validUntil,
   type Issuer,
   type ServiceLine,
 } from "@/lib/quotes";
@@ -36,6 +39,18 @@ type Stored = {
   clientsText: string;
 };
 
+const emptyStored: Stored = {
+  issuer: blankIssuer,
+  services: emptyServices,
+  clientsText: "",
+};
+
+const sampleStored: Stored = {
+  issuer: sampleIssuer,
+  services: sampleServices,
+  clientsText: sampleClientText,
+};
+
 function emit() {
   for (const listener of listeners) listener();
 }
@@ -46,29 +61,19 @@ function subscribe(listener: () => void) {
 }
 
 function parseStored(json: string): Stored {
-  if (!json) {
-    return {
-      issuer: sampleIssuer,
-      services: sampleServices,
-      clientsText: sampleClientText,
-    };
-  }
+  if (!json) return structuredClone(emptyStored);
   try {
     const parsed = JSON.parse(json) as Partial<Stored>;
     return {
-      issuer: { ...sampleIssuer, ...parsed.issuer },
+      issuer: { ...blankIssuer, ...parsed.issuer },
       services:
         Array.isArray(parsed.services) && parsed.services.length > 0
           ? parsed.services
-          : sampleServices,
-      clientsText: parsed.clientsText ?? sampleClientText,
+          : emptyServices,
+      clientsText: parsed.clientsText ?? "",
     };
   } catch {
-    return {
-      issuer: sampleIssuer,
-      services: sampleServices,
-      clientsText: sampleClientText,
-    };
+    return structuredClone(emptyStored);
   }
 }
 
@@ -88,8 +93,11 @@ function getServerSnapshot() {
 export function QuoteBatchTool() {
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const stored = useMemo(() => parseStored(json), [json]);
+  const logoInput = useRef<HTMLInputElement>(null);
 
   const [error, setError] = useState("");
+  const [logoError, setLogoError] = useState("");
+  const [previewIndex, setPreviewIndex] = useState(0);
   const clients = useMemo(
     () => parseClients(stored.clientsText).slice(0, 30),
     [stored.clientsText],
@@ -98,6 +106,12 @@ export function QuoteBatchTool() {
     (line) => line.name.trim() && line.price > 0 && line.quantity > 0,
   );
   const totals = quoteTotals(activeServices, stored.issuer.taxPercent);
+  const previewClient =
+    clients[Math.min(previewIndex, Math.max(clients.length - 1, 0))] ?? {
+      company: "Nombre del cliente",
+      contact: "",
+      email: "",
+    };
 
   function patch(partial: Partial<Stored>) {
     write({ ...stored, ...partial });
@@ -124,6 +138,21 @@ export function QuoteBatchTool() {
     });
   }
 
+  async function onLogo(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setLogoError("");
+    try {
+      const logoDataUrl = await readLogoFile(file);
+      patchIssuer({ logoDataUrl });
+    } catch (caught) {
+      setLogoError(
+        caught instanceof Error ? caught.message : "No se pudo usar ese logo.",
+      );
+    }
+  }
+
   function printQuotes() {
     setError("");
     if (!stored.issuer.name.trim()) {
@@ -142,7 +171,7 @@ export function QuoteBatchTool() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
+    <div className="grid gap-8 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
       <form
         className="no-print flex flex-col gap-8"
         onSubmit={(event) => {
@@ -151,83 +180,216 @@ export function QuoteBatchTool() {
         }}
       >
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Tus datos</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Se copian en los {clients.length || "—"} presupuestos. No se envían
-            a ningún servidor.
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="Negocio / autónomo" htmlFor="issuer-name">
-              <Input
-                id="issuer-name"
-                className="h-10"
-                value={stored.issuer.name}
-                onChange={(event) => patchIssuer({ name: event.target.value })}
-                placeholder="Estudio Clara López"
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-2xl">Tu negocio</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Logo, NIF y datos que salen en todos los papeles. Se quedan en
+                este navegador.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => write(structuredClone(sampleStored))}
+              >
+                Cargar ejemplo
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => write(structuredClone(emptyStored))}
+              >
+                Empezar de cero
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="flex shrink-0 flex-col items-start gap-2">
+              <input
+                ref={logoInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="sr-only"
+                onChange={onLogo}
               />
-            </Field>
-            <Field label="NIF / CIF / RFC" htmlFor="issuer-tax">
-              <Input
-                id="issuer-tax"
-                className="h-10"
-                value={stored.issuer.taxId}
-                onChange={(event) => patchIssuer({ taxId: event.target.value })}
-              />
-            </Field>
-            <Field label="Correo" htmlFor="issuer-email">
-              <Input
-                id="issuer-email"
-                className="h-10"
-                type="email"
-                value={stored.issuer.email}
-                onChange={(event) => patchIssuer({ email: event.target.value })}
-              />
-            </Field>
-            <Field label="Teléfono" htmlFor="issuer-phone">
-              <Input
-                id="issuer-phone"
-                className="h-10"
-                value={stored.issuer.phone}
-                onChange={(event) => patchIssuer({ phone: event.target.value })}
-              />
-            </Field>
-            <Field label="IVA %" htmlFor="issuer-taxp">
-              <Input
-                id="issuer-taxp"
-                className="h-10"
-                type="number"
-                min={0}
-                max={30}
-                value={stored.issuer.taxPercent}
-                onChange={(event) =>
-                  patchIssuer({ taxPercent: Number(event.target.value) || 0 })
-                }
-              />
-            </Field>
-            <Field label="Validez (días)" htmlFor="issuer-valid">
-              <Input
-                id="issuer-valid"
-                className="h-10"
-                type="number"
-                min={1}
-                max={90}
-                value={stored.issuer.validDays}
-                onChange={(event) =>
-                  patchIssuer({ validDays: Number(event.target.value) || 14 })
-                }
-              />
-            </Field>
-            <div className="sm:col-span-2">
-              <Field label="Condiciones" htmlFor="issuer-terms">
-                <Textarea
-                  id="issuer-terms"
-                  rows={3}
-                  value={stored.issuer.conditions}
+              <button
+                type="button"
+                onClick={() => logoInput.current?.click()}
+                className="flex size-28 items-center justify-center overflow-hidden rounded-xl border border-dashed border-foreground/20 bg-muted/40 text-muted-foreground hover:border-foreground/40"
+              >
+                {stored.issuer.logoDataUrl ? (
+                  <img
+                    src={stored.issuer.logoDataUrl}
+                    alt="Logo de tu negocio"
+                    className="size-full object-contain p-2"
+                  />
+                ) : (
+                  <span className="flex flex-col items-center gap-1 text-xs">
+                    <ImagePlus className="size-5" />
+                    Logo
+                  </span>
+                )}
+              </button>
+              {stored.issuer.logoDataUrl ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => patchIssuer({ logoDataUrl: "" })}
+                >
+                  Quitar logo
+                </Button>
+              ) : null}
+              {logoError ? (
+                <p className="max-w-28 text-xs text-destructive">{logoError}</p>
+              ) : (
+                <p className="max-w-28 text-xs text-muted-foreground">
+                  PNG o JPG. Se ve en cada presupuesto.
+                </p>
+              )}
+            </div>
+
+            <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
+              <Field label="Negocio / autónomo" htmlFor="issuer-name">
+                <Input
+                  id="issuer-name"
+                  className="h-10"
+                  value={stored.issuer.name}
+                  onChange={(event) => patchIssuer({ name: event.target.value })}
+                  placeholder="Tu nombre comercial"
+                />
+              </Field>
+              <Field label="NIF / CIF" htmlFor="issuer-tax">
+                <Input
+                  id="issuer-tax"
+                  className="h-10"
+                  value={stored.issuer.taxId}
+                  onChange={(event) => patchIssuer({ taxId: event.target.value })}
+                />
+              </Field>
+              <Field label="Dirección" htmlFor="issuer-address">
+                <Input
+                  id="issuer-address"
+                  className="h-10"
+                  value={stored.issuer.address}
                   onChange={(event) =>
-                    patchIssuer({ conditions: event.target.value })
+                    patchIssuer({ address: event.target.value })
                   }
                 />
               </Field>
+              <Field label="CP y ciudad" htmlFor="issuer-city">
+                <Input
+                  id="issuer-city"
+                  className="h-10"
+                  value={stored.issuer.city}
+                  onChange={(event) => patchIssuer({ city: event.target.value })}
+                />
+              </Field>
+              <Field label="Correo" htmlFor="issuer-email">
+                <Input
+                  id="issuer-email"
+                  className="h-10"
+                  type="email"
+                  value={stored.issuer.email}
+                  onChange={(event) => patchIssuer({ email: event.target.value })}
+                />
+              </Field>
+              <Field label="Teléfono" htmlFor="issuer-phone">
+                <Input
+                  id="issuer-phone"
+                  className="h-10"
+                  value={stored.issuer.phone}
+                  onChange={(event) => patchIssuer({ phone: event.target.value })}
+                />
+              </Field>
+              <Field label="Web" htmlFor="issuer-web">
+                <Input
+                  id="issuer-web"
+                  className="h-10"
+                  value={stored.issuer.website}
+                  onChange={(event) =>
+                    patchIssuer({ website: event.target.value })
+                  }
+                  placeholder="tuweb.es"
+                />
+              </Field>
+              <Field label="IVA %" htmlFor="issuer-taxp">
+                <Input
+                  id="issuer-taxp"
+                  className="h-10"
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={stored.issuer.taxPercent}
+                  onChange={(event) =>
+                    patchIssuer({ taxPercent: Number(event.target.value) || 0 })
+                  }
+                />
+              </Field>
+              <Field label="Prefijo nº" htmlFor="issuer-prefix">
+                <Input
+                  id="issuer-prefix"
+                  className="h-10"
+                  value={stored.issuer.quotePrefix}
+                  onChange={(event) =>
+                    patchIssuer({ quotePrefix: event.target.value })
+                  }
+                />
+              </Field>
+              <Field label="Empieza en" htmlFor="issuer-start">
+                <Input
+                  id="issuer-start"
+                  className="h-10"
+                  type="number"
+                  min={1}
+                  value={stored.issuer.quoteStart}
+                  onChange={(event) =>
+                    patchIssuer({
+                      quoteStart: Number(event.target.value) || 1,
+                    })
+                  }
+                />
+              </Field>
+              <Field label="Validez (días)" htmlFor="issuer-valid">
+                <Input
+                  id="issuer-valid"
+                  className="h-10"
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={stored.issuer.validDays}
+                  onChange={(event) =>
+                    patchIssuer({ validDays: Number(event.target.value) || 14 })
+                  }
+                />
+              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Texto de apertura" htmlFor="issuer-intro">
+                  <Textarea
+                    id="issuer-intro"
+                    rows={2}
+                    value={stored.issuer.intro}
+                    onChange={(event) =>
+                      patchIssuer({ intro: event.target.value })
+                    }
+                  />
+                </Field>
+              </div>
+              <div className="sm:col-span-2">
+                <Field label="Condiciones" htmlFor="issuer-terms">
+                  <Textarea
+                    id="issuer-terms"
+                    rows={3}
+                    value={stored.issuer.conditions}
+                    onChange={(event) =>
+                      patchIssuer({ conditions: event.target.value })
+                    }
+                  />
+                </Field>
+              </div>
             </div>
           </div>
         </section>
@@ -246,7 +408,13 @@ export function QuoteBatchTool() {
               Línea
             </Button>
           </div>
-          <ul className="mt-4 flex flex-col gap-3">
+          <div className="mt-4 hidden grid-cols-[1fr_5rem_7rem_2rem] gap-2 text-xs text-muted-foreground sm:grid">
+            <span>Concepto</span>
+            <span>Cant.</span>
+            <span>P. unitario</span>
+            <span />
+          </div>
+          <ul className="mt-1 flex flex-col gap-3">
             {stored.services.map((line) => (
               <li
                 key={line.id}
@@ -303,8 +471,8 @@ export function QuoteBatchTool() {
             ))}
           </ul>
           <p className="mt-3 text-sm text-muted-foreground">
-            Subtotal {formatEuro(totals.subtotal)} · IVA {formatEuro(totals.tax)}{" "}
-            · Total {formatEuro(totals.total)}
+            Base {formatEuro(totals.subtotal)} · IVA {formatEuro(totals.tax)} ·
+            Total {formatEuro(totals.total)}
           </p>
         </section>
 
@@ -316,10 +484,11 @@ export function QuoteBatchTool() {
             El contacto y el correo son opcionales.
           </p>
           <Textarea
-            className="mt-4 min-h-48 font-mono text-sm"
+            className="mt-4 min-h-40 font-mono text-sm"
             value={stored.clientsText}
             onChange={(event) => patch({ clientsText: event.target.value })}
             aria-label="Lista de clientes"
+            placeholder={"Taller Sur, Diego Paredes, diego@tallersur.es"}
           />
           <p className="mt-2 text-sm text-muted-foreground">
             {clients.length === 0
@@ -340,108 +509,56 @@ export function QuoteBatchTool() {
             Generar e imprimir {clients.length || ""} presupuestos
           </Button>
           <p className="max-w-sm self-center text-xs text-muted-foreground">
-            En el diálogo de impresión puedes “Guardar como PDF”. Cada
-            presupuesto sale en su página.
+            En el diálogo de impresión elige “Guardar como PDF”. Cada
+            presupuesto sale en su página, con logo.
           </p>
         </div>
       </form>
 
-      <aside className="no-print lg:sticky lg:top-24 lg:self-start">
-        <div className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10">
+      <aside className="no-print lg:sticky lg:top-20 lg:self-start">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs tracking-wide text-primary uppercase">
             Vista previa
           </p>
-          <h2 className="mt-1 font-heading text-2xl">
-            {clients[0]?.company || "Primer cliente"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {quoteNumber(0)} · válido hasta {validUntil(stored.issuer.validDays)}
-          </p>
-          <ul className="mt-4 space-y-2 text-sm">
-            {activeServices.length === 0 ? (
-              <li className="text-muted-foreground">Añade un servicio.</li>
-            ) : (
-              activeServices.map((line) => (
-                <li key={line.id} className="flex justify-between gap-3">
-                  <span>
-                    {line.name}
-                    {line.quantity > 1 ? ` ×${line.quantity}` : ""}
-                  </span>
-                  <span>{formatEuro(lineTotal(line))}</span>
-                </li>
-              ))
-            )}
-          </ul>
-          <div className="mt-4 flex justify-between border-t border-border pt-3 text-sm font-medium">
-            <span>Total</span>
-            <span>{formatEuro(totals.total)}</span>
-          </div>
+          {clients.length > 1 ? (
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Cliente
+              <select
+                className="h-8 rounded-md border border-border bg-background px-2 text-foreground"
+                value={Math.min(previewIndex, clients.length - 1)}
+                onChange={(event) =>
+                  setPreviewIndex(Number(event.target.value))
+                }
+              >
+                {clients.map((client, index) => (
+                  <option key={`${client.company}-${index}`} value={index}>
+                    {client.company}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
         </div>
-        {clients.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Cuando pegues clientes, aquí ves el primero. El resto sale al
-            imprimir.
-          </p>
-        ) : null}
+        <div className="quote-preview-screen overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_-24px_rgba(60,40,20,0.45)] ring-1 ring-foreground/10">
+          <QuoteDocument
+            issuer={stored.issuer}
+            client={previewClient}
+            services={activeServices}
+            index={Math.min(previewIndex, Math.max(clients.length - 1, 0))}
+          />
+        </div>
       </aside>
 
       <div className="quote-print hidden">
         {clients.map((client, index) => (
-          <article key={`${client.company}-${index}`} className="quote-sheet">
-            <header className="flex items-start justify-between gap-6">
-              <div>
-                <p className="font-heading text-2xl">{stored.issuer.name}</p>
-                <p className="mt-1 text-sm text-neutral-600">
-                  {[stored.issuer.taxId, stored.issuer.email, stored.issuer.phone]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
-              </div>
-              <div className="text-right text-sm">
-                <p className="font-medium">{quoteNumber(index)}</p>
-                <p>Válido hasta {validUntil(stored.issuer.validDays)}</p>
-              </div>
-            </header>
-            <h1 className="mt-8 font-heading text-3xl">Presupuesto</h1>
-            <p className="mt-2 text-sm">
-              Para <strong>{client.company}</strong>
-              {client.contact ? ` · ${client.contact}` : ""}
-              {client.email ? ` · ${client.email}` : ""}
-            </p>
-            <table className="mt-6 w-full text-sm">
-              <thead>
-                <tr className="border-b text-left">
-                  <th className="py-2 font-medium">Concepto</th>
-                  <th className="py-2 font-medium">Cant.</th>
-                  <th className="py-2 text-right font-medium">Importe</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeServices.map((line) => (
-                  <tr key={line.id} className="border-b border-neutral-200">
-                    <td className="py-2">{line.name}</td>
-                    <td className="py-2">{line.quantity}</td>
-                    <td className="py-2 text-right">{formatEuro(lineTotal(line))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <dl className="mt-4 ml-auto w-56 text-sm">
-              <div className="flex justify-between">
-                <dt>Base</dt>
-                <dd>{formatEuro(totals.subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>IVA {stored.issuer.taxPercent}%</dt>
-                <dd>{formatEuro(totals.tax)}</dd>
-              </div>
-              <div className="mt-1 flex justify-between border-t pt-1 font-medium">
-                <dt>Total</dt>
-                <dd>{formatEuro(totals.total)}</dd>
-              </div>
-            </dl>
-            <p className="mt-8 text-sm text-neutral-600">{stored.issuer.conditions}</p>
-          </article>
+          <div key={`${client.company}-${index}`} className="quote-sheet">
+            <QuoteDocument
+              issuer={stored.issuer}
+              client={client}
+              services={activeServices}
+              index={index}
+            />
+          </div>
         ))}
       </div>
     </div>

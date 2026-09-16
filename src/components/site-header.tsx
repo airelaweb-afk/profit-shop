@@ -14,9 +14,9 @@ import { useCart } from "@/lib/cart";
 import { CartDrawer } from "@/components/cart-drawer";
 
 const links = [
+  { href: "/presupuestos", label: "Presupuestos" },
   { href: "/versiones", label: "Versiones" },
   { href: "/cobros", label: "Cobros" },
-  { href: "/presupuestos", label: "Presupuestos" },
   { href: "/como-funciona", label: "Cómo funciona" },
 ];
 

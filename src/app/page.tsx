@@ -19,28 +19,28 @@ export default function HomePage() {
             Nadie te pide dar de alta la empresa.
           </p>
           <ol className="mt-6 max-w-xl list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
-            <li>Abre Versiones y pulsa “Cargar ejemplo” o escribe los tuyos.</li>
-            <li>Revisa IVA, NIF y los tres paquetes.</li>
-            <li>Genera e imprime (o “guardar como PDF”).</li>
+            <li>Abre Presupuestos. Sube el logo o pulsa “Cargar ejemplo”.</li>
+            <li>Revisa NIF, IVA y servicios. Pega a quién se lo mandas.</li>
+            <li>Mira la vista previa. Imprime o “guardar como PDF”.</li>
           </ol>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/versiones" />}
+              render={<Link href="/presupuestos" />}
               nativeButton={false}
             >
-              Versiones de un trabajo
+              Tanda de presupuestos
               <ArrowRight />
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="h-11 px-5"
-              render={<Link href="/cobros" />}
+              render={<Link href="/versiones" />}
               nativeButton={false}
             >
-              Recordatorios de cobro
+              Un cliente, varias ofertas
             </Button>
           </div>
         </div>
@@ -48,12 +48,21 @@ export default function HomePage() {
           <p className="font-heading text-2xl">Las tres</p>
           <ul className="mt-5 space-y-4 text-sm">
             <li className="flex gap-3">
+              <FileStack className="mt-0.5 size-4 shrink-0 text-primary" />
+              <span>
+                <Link href="/presupuestos" className="font-medium hover:underline">
+                  Presupuestos
+                </Link>
+                : los mismos servicios, muchos clientes. Con logo.
+              </span>
+            </li>
+            <li className="flex gap-3">
               <Layers className="mt-0.5 size-4 shrink-0 text-primary" />
               <span>
                 <Link href="/versiones" className="font-medium hover:underline">
                   Versiones
                 </Link>
-                : un cliente, básico / completo, con o sin urgencia.
+                : un solo cliente, varias ofertas (básico / completo).
               </span>
             </li>
             <li className="flex gap-3">
@@ -63,15 +72,6 @@ export default function HomePage() {
                   Cobros
                 </Link>
                 : quién te debe → textos de WhatsApp o correo.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <FileStack className="mt-0.5 size-4 shrink-0 text-primary" />
-              <span>
-                <Link href="/presupuestos" className="font-medium hover:underline">
-                  Presupuestos
-                </Link>
-                : los mismos servicios, muchos destinatarios.
               </span>
             </li>
           </ul>

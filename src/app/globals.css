@@ -98,7 +98,49 @@
   }
 }
 
+.quote-doc {
+  position: relative;
+  padding: 28px 28px 24px;
+  color: #1c1917;
+  background: #fff;
+}
+
+.quote-doc-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 6px;
+  background: #b15c38;
+}
+
+.quote-doc-logo {
+  height: 72px;
+  width: 72px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #faf7f2;
+}
+
+.quote-doc-logo-fallback {
+  display: flex;
+  height: 72px;
+  width: 72px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #f3ebe3;
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-size: 1.6rem;
+  color: #b15c38;
+}
+
 @media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
   header,
   footer,
   .no-print {
@@ -115,12 +157,15 @@
 
   .quote-sheet {
     break-after: page;
-    padding: 12mm;
     color: #1c1917;
   }
 
   .quote-sheet:last-child {
     break-after: auto;
+  }
+
+  .quote-doc {
+    padding: 0;
   }
 
   body {

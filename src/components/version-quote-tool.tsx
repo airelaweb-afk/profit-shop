@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  blankIssuer,
   formatEuro,
   lineTotal,
   newId,
@@ -43,7 +44,7 @@ function parseStored(json: string): VersionJob {
     return {
       title: parsed.title ?? sampleVersionJob.title,
       client: { ...sampleVersionJob.client, ...parsed.client },
-      issuer: { ...sampleVersionJob.issuer, ...parsed.issuer },
+      issuer: { ...blankIssuer, ...parsed.issuer },
       packages:
         Array.isArray(parsed.packages) && parsed.packages.length > 0
           ? parsed.packages
