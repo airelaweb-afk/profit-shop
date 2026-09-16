@@ -45,17 +45,16 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-function read(): Stored {
+function parseStored(json: string): Stored {
+  if (!json) {
+    return {
+      issuer: sampleIssuer,
+      services: sampleServices,
+      clientsText: sampleClientText,
+    };
+  }
   try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) {
-      return {
-        issuer: sampleIssuer,
-        services: sampleServices,
-        clientsText: sampleClientText,
-      };
-    }
-    const parsed = JSON.parse(raw) as Partial<Stored>;
+    const parsed = JSON.parse(json) as Partial<Stored>;
     return {
       issuer: { ...sampleIssuer, ...parsed.issuer },
       services:
@@ -88,16 +87,7 @@ function getServerSnapshot() {
 
 export function QuoteBatchTool() {
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const stored = useMemo(() => {
-    if (json === EMPTY && typeof window === "undefined") {
-      return {
-        issuer: sampleIssuer,
-        services: sampleServices,
-        clientsText: sampleClientText,
-      };
-    }
-    return read();
-  }, [json]);
+  const stored = useMemo(() => parseStored(json), [json]);
 
   const [error, setError] = useState("");
   const clients = useMemo(

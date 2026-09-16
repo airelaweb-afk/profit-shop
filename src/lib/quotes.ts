@@ -1,8 +1,21 @@
+const MONTHS_ES = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+];
+
 export function formatEuro(cents: number) {
-  return new Intl.NumberFormat("es-ES", {
-    style: "currency",
-    currency: "EUR",
-  }).format(cents / 100);
+  const euros = (Math.round(cents) / 100).toFixed(2).replace(".", ",");
+  return `${euros} €`;
 }
 
 export function newId() {
@@ -105,17 +118,18 @@ export function quoteTotals(lines: ServiceLine[], taxPercent: number) {
 }
 
 export function quoteNumber(index: number, when = new Date()) {
-  const year = when.getFullYear();
+  const year = when.getUTCFullYear();
   const n = String(index + 1).padStart(3, "0");
   return `PRE-${year}-${n}`;
 }
 
 export function validUntil(days: number, when = new Date()) {
-  const date = new Date(when);
-  date.setDate(date.getDate() + Math.max(1, days));
-  return date.toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const date = new Date(
+    Date.UTC(
+      when.getUTCFullYear(),
+      when.getUTCMonth(),
+      when.getUTCDate() + Math.max(1, days),
+    ),
+  );
+  return `${date.getUTCDate()} de ${MONTHS_ES[date.getUTCMonth()]} de ${date.getUTCFullYear()}`;
 }
