@@ -17,8 +17,9 @@ export default function PresupuestosPage() {
         Presupuestos que se pueden mandar.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Membrete, IVA, condiciones y firma. Sube el logo, pega a quién se lo
-        envías y guarda el PDF. No es un CRM: es el papel de un estudio.
+        La web no manda el presupuesto por ti: no tiene tu correo ni WhatsApp.
+        Guardas el PDF, copias el mensaje y lo adjuntas tú, como harías con un
+        Word. Abajo tienes los botones de cada cliente.
       </p>
       <div className="mt-10">
         <QuoteBatchTool />

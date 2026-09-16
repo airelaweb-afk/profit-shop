@@ -175,3 +175,33 @@ export function validUntil(days: number, when = new Date()) {
   );
   return formatLongDate(date);
 }
+
+export function quoteSendMessage({
+  issuer,
+  client,
+  number,
+  total,
+  valid,
+}: {
+  issuer: Issuer;
+  client: ClientRow;
+  number: string;
+  total: number;
+  valid: string;
+}) {
+  const first = client.contact.trim().split(/\s+/)[0];
+  const hello = first ? `Hola ${first}` : `Hola`;
+  const sign = [issuer.name, issuer.phone, issuer.email]
+    .filter(Boolean)
+    .join("\n");
+  return `${hello},
+
+Te envío el presupuesto ${number} de ${issuer.name || "mi estudio"} para ${client.company}.
+Total: ${formatEuro(total)} (IVA ${issuer.taxPercent} % incluido).
+Válido hasta el ${valid}.
+
+El PDF va adjunto. Si te encaja, responde a este mensaje con “aceptado”.
+
+Un saludo,
+${sign}`;
+}

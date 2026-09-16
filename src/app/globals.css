@@ -506,6 +506,10 @@
     color: #1f1812;
   }
 
+  .quote-sheet.skip-print {
+    display: none !important;
+  }
+
   .quote-sheet:last-child {
     break-after: auto;
   }

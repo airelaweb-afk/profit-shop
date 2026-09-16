@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -8,7 +9,16 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from "react";
-import { ImagePlus, Printer, Plus, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Mail,
+  MessageCircle,
+  Printer,
+  Plus,
+  Trash2,
+  ImagePlus,
+} from "lucide-react";
 import { QuoteDocument } from "@/components/quote-document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,10 +31,13 @@ import {
   formatEuro,
   newId,
   parseClients,
+  quoteNumber,
+  quoteSendMessage,
   quoteTotals,
   sampleClientText,
   sampleIssuer,
   sampleServices,
+  validUntil,
   type Issuer,
   type ServiceLine,
 } from "@/lib/quotes";
@@ -98,6 +111,8 @@ export function QuoteBatchTool() {
   const [error, setError] = useState("");
   const [logoError, setLogoError] = useState("");
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [printOnly, setPrintOnly] = useState<number | null>(null);
+  const [copied, setCopied] = useState("");
   const clients = useMemo(
     () => parseClients(stored.clientsText).slice(0, 30),
     [stored.clientsText],
@@ -153,7 +168,7 @@ export function QuoteBatchTool() {
     }
   }
 
-  function printQuotes() {
+  function printQuotes(onlyIndex?: number) {
     setError("");
     if (!stored.issuer.name.trim()) {
       setError("Pon el nombre de tu negocio: sale en la cabecera de cada presupuesto.");
@@ -167,7 +182,38 @@ export function QuoteBatchTool() {
       setError("Pega una lista de clientes. Una línea por presupuesto.");
       return;
     }
-    window.print();
+    setPrintOnly(onlyIndex ?? null);
+    window.setTimeout(() => window.print(), 50);
+  }
+
+  useEffect(() => {
+    function done() {
+      setPrintOnly(null);
+    }
+    window.addEventListener("afterprint", done);
+    return () => window.removeEventListener("afterprint", done);
+  }, []);
+
+  async function copyMessage(index: number) {
+    const client = clients[index];
+    if (!client) return;
+    const text = quoteSendMessage({
+      issuer: stored.issuer,
+      client,
+      number: quoteNumber(index, {
+        prefix: stored.issuer.quotePrefix,
+        start: stored.issuer.quoteStart,
+      }),
+      total: totals.total,
+      valid: validUntil(stored.issuer.validDays),
+    });
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(`copy-${index}`);
+      window.setTimeout(() => setCopied(""), 2000);
+    } catch {
+      setError("No se pudo copiar. Selecciona el texto a mano.");
+    }
   }
 
   return (
@@ -523,16 +569,116 @@ export function QuoteBatchTool() {
           </p>
         ) : null}
 
-        <div className="flex flex-wrap gap-3">
-          <Button type="submit" size="lg" className="h-11 px-5">
-            <Printer />
-            Generar e imprimir {clients.length || ""} presupuestos
-          </Button>
-          <p className="max-w-sm self-center text-xs text-muted-foreground">
-            En el diálogo de impresión elige “Guardar como PDF”. Cada
-            presupuesto sale en su página, con logo.
+        <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
+          <h2 className="font-heading text-2xl">Cómo se mandan</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Esta página no envía correos sola: no tiene tu Gmail ni WhatsApp.
+            Prepara el PDF y el mensaje; tú los adjuntas, como con Word.
           </p>
-        </div>
+          <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm">
+            <li>
+              <span className="font-medium">Guarda el PDF.</span> Se abre el
+              diálogo del navegador: elige “Guardar como PDF” (no la impresora).
+              Si hay varios clientes, salen uno por página en el mismo archivo.
+            </li>
+            <li>
+              <span className="font-medium">Copia el mensaje</span> o ábrelo en
+              WhatsApp / correo. El PDF no viaja solo: adjúntalo tú.
+            </li>
+            <li>
+              <span className="font-medium">Si aceptan,</span> te responden.
+              El presupuesto no cobra ni factura.
+            </li>
+          </ol>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button type="submit" size="lg" className="h-11 px-5">
+              <Printer />
+              Guardar PDF
+              {clients.length
+                ? ` · ${clients.length} presupuesto${clients.length === 1 ? "" : "s"}`
+                : ""}
+            </Button>
+          </div>
+
+          {clients.length > 0 ? (
+            <ul className="mt-6 divide-y divide-border rounded-xl border border-border">
+              {clients.map((client, index) => {
+                const number = quoteNumber(index, {
+                  prefix: stored.issuer.quotePrefix,
+                  start: stored.issuer.quoteStart,
+                });
+                const message = quoteSendMessage({
+                  issuer: stored.issuer,
+                  client,
+                  number,
+                  total: totals.total,
+                  valid: validUntil(stored.issuer.validDays),
+                });
+                const mailHref = client.email
+                  ? `mailto:${encodeURIComponent(client.email)}?subject=${encodeURIComponent(`Presupuesto ${number} · ${stored.issuer.name}`)}&body=${encodeURIComponent(`${message}\n\n(Adjunta el PDF que acabas de guardar.)`)}`
+                  : "";
+                const waHref = `https://wa.me/?text=${encodeURIComponent(`${message}\n\n(Adjunta el PDF.)`)}`;
+                return (
+                  <li
+                    key={`${client.company}-${index}`}
+                    className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium">{client.company}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {number}
+                        {client.email ? ` · ${client.email}` : " · sin correo"}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => printQuotes(index)}
+                      >
+                        <Printer />
+                        PDF
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyMessage(index)}
+                      >
+                        {copied === `copy-${index}` ? <Check /> : <Copy />}
+                        {copied === `copy-${index}` ? "Copiado" : "Mensaje"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        nativeButton={false}
+                        render={<a href={waHref} target="_blank" rel="noreferrer" />}
+                      >
+                        <MessageCircle />
+                        WhatsApp
+                      </Button>
+                      {mailHref ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          nativeButton={false}
+                          render={<a href={mailHref} />}
+                        >
+                          <Mail />
+                          Correo
+                        </Button>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+        </section>
       </form>
 
       <aside className="no-print lg:sticky lg:top-20 lg:self-start">
@@ -578,7 +724,14 @@ export function QuoteBatchTool() {
 
       <div className="quote-print hidden">
         {clients.map((client, index) => (
-          <div key={`${client.company}-${index}`} className="quote-sheet">
+          <div
+            key={`${client.company}-${index}`}
+            className={
+              printOnly !== null && printOnly !== index
+                ? "quote-sheet skip-print"
+                : "quote-sheet"
+            }
+          >
             <QuoteDocument
               issuer={stored.issuer}
               client={client}
