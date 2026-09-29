@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Download, FileUp, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowDown, ArrowUp, Download, Trash2 } from "lucide-react";
+import { FileDrop } from "@/components/file-drop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PdfKitSlug } from "@/lib/pdf-kit";
 import { newId } from "@/lib/quotes";
+import { noticeForSave, type SaveResult } from "@/lib/save-file";
 import {
   MAX_IMAGE_FILES,
   MAX_PDF_BYTES,
@@ -34,40 +36,64 @@ type Item = {
 };
 
 function acceptFor(kind: PdfKitSlug) {
-  if (kind === "images") return "image/jpeg,image/png,.jpg,.jpeg,.png";
+  if (kind === "images") return "image/*,image/jpeg,image/png,.jpg,.jpeg,.png";
   return "application/pdf,.pdf";
 }
 
-function titleFor(kind: PdfKitSlug) {
+function copyFor(kind: Exclude<PdfKitSlug, "sign">) {
   switch (kind) {
     case "merge":
-      return "Suelta los PDF, en el orden que quieras";
+      return {
+        drop: "Suelta los PDF, en el orden que quieras",
+        tap: "Elige los PDF, en el orden que quieras",
+        cta: "Elegir PDF",
+      };
     case "split":
-      return "Suelta el PDF que quieres partir";
+      return {
+        drop: "Suelta el PDF que quieres partir",
+        tap: "Elige el PDF que quieres partir",
+        cta: "Elegir PDF",
+      };
     case "compress":
-      return "Suelta el PDF que pesa demasiado";
+      return {
+        drop: "Suelta el PDF que pesa demasiado",
+        tap: "Elige el PDF que pesa demasiado",
+        cta: "Elegir PDF",
+      };
     case "images":
-      return "Suelta fotos o capturas (JPG o PNG)";
+      return {
+        drop: "Suelta fotos o capturas (JPG o PNG)",
+        tap: "Elige fotos o capturas",
+        cta: "Elegir fotos",
+        camera: "Hacer foto ahora",
+      };
     case "to-images":
-      return "Suelta el PDF para sacar las páginas en JPG";
+      return {
+        drop: "Suelta el PDF para sacar las páginas en JPG",
+        tap: "Elige el PDF para sacar las páginas en JPG",
+        cta: "Elegir PDF",
+      };
     default:
-      return "Suelta el archivo";
+      return {
+        drop: "Suelta el archivo",
+        tap: "Elige el archivo",
+        cta: "Elegir archivo",
+      };
   }
 }
 
 export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
-  const input = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [dragging, setDragging] = useState(false);
   const [range, setRange] = useState("");
   const [perPage, setPerPage] = useState(false);
   const [strength, setStrength] = useState<"light" | "strong">("light");
 
   const multiple = kind === "merge" || kind === "images";
   const wantsPdf = kind !== "images";
+  const copy = copyFor(kind);
 
   async function addFiles(list: File[]) {
     setError("");
@@ -109,21 +135,15 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
     });
   }
 
-  function onFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const list = [...(event.target.files ?? [])];
-    event.target.value = "";
-    void addFiles(list);
-  }
-
   function move(id: string, direction: -1 | 1) {
     setItems((current) => {
       const index = current.findIndex((item) => item.id === id);
       const target = index + direction;
       if (index < 0 || target < 0 || target >= current.length) return current;
-      const copy = [...current];
-      const [row] = copy.splice(index, 1);
-      copy.splice(target, 0, row);
-      return copy;
+      const copyItems = [...current];
+      const [row] = copyItems.splice(index, 1);
+      copyItems.splice(target, 0, row);
+      return copyItems;
     });
   }
 
@@ -132,18 +152,18 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
     setError("");
     setNotice("");
     try {
+      let result: SaveResult = "saved";
+      let ready = "";
       if (kind === "merge") {
         if (items.length < 2) throw new Error("Elige al menos dos PDF.");
         const buffers = await Promise.all(items.map((item) => item.file.arrayBuffer()));
         const bytes = await mergePdfs(buffers);
-        downloadBytes(
+        result = await downloadBytes(
           bytes,
           suggestedOutName(items[0].file.name, "unido", "pdf"),
           "application/pdf",
         );
-        setNotice(
-          `Listo: ${items.length} archivos, ${formatBytes(bytes.byteLength)}.`,
-        );
+        ready = `Listo: ${items.length} archivos, ${formatBytes(bytes.byteLength)}.`;
       } else if (kind === "split") {
         const file = items[0]?.file;
         if (!file) throw new Error("Sube un PDF.");
@@ -151,30 +171,28 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         const pageCount = items[0].pages ?? (await countPdfPages(data));
         if (perPage) {
           const files = await splitPdfPerPage(data);
-          downloadBytes(
+          result = await downloadBytes(
             zipFiles(files),
             suggestedOutName(file.name, "paginas", "zip"),
             "application/zip",
           );
-          setNotice(`Listo: ${files.length} PDF en un zip.`);
+          ready = `Listo: ${files.length} PDF en un zip.`;
         } else {
           const indices = parsePageRanges(range, pageCount);
           const bytes = await extractPdfPages(data, indices);
-          downloadBytes(
+          result = await downloadBytes(
             bytes,
             suggestedOutName(file.name, "extracto", "pdf"),
             "application/pdf",
           );
-          setNotice(
-            `Listo: ${indices.length} página${indices.length === 1 ? "" : "s"}, ${formatBytes(bytes.byteLength)}.`,
-          );
+          ready = `Listo: ${indices.length} página${indices.length === 1 ? "" : "s"}, ${formatBytes(bytes.byteLength)}.`;
         }
       } else if (kind === "compress") {
         const file = items[0]?.file;
         if (!file) throw new Error("Sube un PDF.");
         const data = await file.arrayBuffer();
         const { bytes, rasterized } = await compressPdf(data, strength);
-        downloadBytes(
+        result = await downloadBytes(
           bytes,
           suggestedOutName(file.name, "comprimido", "pdf"),
           "application/pdf",
@@ -182,13 +200,11 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         const before = file.size;
         const after = bytes.byteLength;
         const ratio = after < before ? Math.round((1 - after / before) * 100) : 0;
-        setNotice(
-          rasterized
-            ? `Listo: ${formatBytes(before)} → ${formatBytes(after)}. El texto ya no se puede seleccionar (va como foto).`
-            : after < before
-              ? `Listo: ${formatBytes(before)} → ${formatBytes(after)} (${ratio} % menos).`
-              : `Se ha reescrito el PDF (${formatBytes(after)}). Si casi no baja, prueba la compresión fuerte.`,
-        );
+        ready = rasterized
+          ? `Listo: ${formatBytes(before)} → ${formatBytes(after)}. El texto ya no se puede seleccionar (va como foto).`
+          : after < before
+            ? `Listo: ${formatBytes(before)} → ${formatBytes(after)} (${ratio} % menos).`
+            : `Se ha reescrito el PDF (${formatBytes(after)}). Si casi no baja, prueba la compresión fuerte.`;
       } else if (kind === "images") {
         if (items.length === 0) throw new Error("Elige al menos una imagen.");
         const images = await Promise.all(
@@ -203,25 +219,24 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
           }),
         );
         const bytes = await imagesToPdf(images);
-        downloadBytes(
+        result = await downloadBytes(
           bytes,
           suggestedOutName(items[0].file.name, "fotos", "pdf"),
           "application/pdf",
         );
-        setNotice(
-          `Listo: ${items.length} imagen${items.length === 1 ? "" : "es"} en un PDF A4.`,
-        );
+        ready = `Listo: ${items.length} imagen${items.length === 1 ? "" : "es"} en un PDF A4.`;
       } else {
         const file = items[0]?.file;
         if (!file) throw new Error("Sube un PDF.");
         const bytes = await pdfToJpegZip(await file.arrayBuffer());
-        downloadBytes(
+        result = await downloadBytes(
           bytes,
           suggestedOutName(file.name, "jpg", "zip"),
           "application/zip",
         );
-        setNotice("Listo: un JPG por página, en un zip.");
+        ready = "Listo: un JPG por página, en un zip.";
       }
+      setNotice(noticeForSave(result, ready));
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "No se pudo terminar.",
@@ -233,64 +248,31 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
 
   const actionLabel =
     kind === "merge"
-      ? "Unir y descargar"
+      ? "Unir y guardar"
       : kind === "split"
         ? perPage
-          ? "Dividir y descargar zip"
-          : "Extraer y descargar"
+          ? "Dividir y guardar zip"
+          : "Extraer y guardar"
         : kind === "compress"
-          ? "Comprimir y descargar"
+          ? "Comprimir y guardar"
           : kind === "images"
             ? "Crear PDF"
             : "Sacar JPG";
 
   return (
     <div className="mx-auto max-w-2xl">
-      <input
-        ref={input}
-        type="file"
+      <FileDrop
         accept={acceptFor(kind)}
         multiple={multiple}
-        className="sr-only"
-        onChange={onFile}
+        busy={busy}
+        dropTitle={copy.drop}
+        tapTitle={copy.tap}
+        cta={copy.cta}
+        cameraCta={"camera" in copy ? copy.camera : undefined}
+        hint="No se envía a ningún servidor. Con cuenta, en este navegador."
+        busyHint="Un archivo grande tarda un momento."
+        onFiles={(list) => void addFiles(list)}
       />
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => input.current?.click()}
-        onDragOver={(event) => {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "copy";
-          setDragging(true);
-        }}
-        onDragLeave={(event) => {
-          if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-          setDragging(false);
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          setDragging(false);
-          void addFiles([...event.dataTransfer.files]);
-        }}
-        className={`flex w-full flex-col items-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors ${
-          dragging
-            ? "border-primary bg-primary/10"
-            : "border-foreground/20 bg-card hover:border-primary/50 hover:bg-muted/40"
-        }`}
-      >
-        <FileUp className="size-10 text-primary" />
-        <p className="mt-4 font-heading text-2xl">{titleFor(kind)}</p>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          {busy
-            ? "Trabajando en este ordenador. Un archivo grande tarda un momento."
-            : "No se envía a ningún servidor. Con cuenta, en este navegador."}
-        </p>
-        {!busy ? (
-          <span className="mt-6 inline-flex h-11 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground">
-            Elegir del ordenador
-          </span>
-        ) : null}
-      </button>
 
       {items.length > 0 ? (
         <ul className="mt-6 grid gap-2">
@@ -313,8 +295,9 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
                 <>
                   <Button
                     type="button"
-                    size="icon-sm"
+                    size="icon"
                     variant="ghost"
+                    className="size-11"
                     aria-label="Subir"
                     disabled={index === 0}
                     onClick={() => move(item.id, -1)}
@@ -323,8 +306,9 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
                   </Button>
                   <Button
                     type="button"
-                    size="icon-sm"
+                    size="icon"
                     variant="ghost"
+                    className="size-11"
                     aria-label="Bajar"
                     disabled={index === items.length - 1}
                     onClick={() => move(item.id, 1)}
@@ -335,8 +319,9 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
               ) : null}
               <Button
                 type="button"
-                size="icon-sm"
+                size="icon"
                 variant="ghost"
+                className="size-11"
                 aria-label="Quitar"
                 onClick={() =>
                   setItems((current) => current.filter((row) => row.id !== item.id))
@@ -351,7 +336,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
 
       {kind === "split" && items[0] ? (
         <div className="mt-6 grid gap-3 rounded-2xl bg-card p-4 ring-1 ring-foreground/10">
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex min-h-12 items-center gap-3 text-sm">
             <input
               type="checkbox"
               checked={perPage}
@@ -366,7 +351,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
               </Label>
               <Input
                 id="pdf-range"
-                className="h-10"
+                className="h-12"
                 value={range}
                 onChange={(event) => setRange(event.target.value)}
                 placeholder={
@@ -379,9 +364,10 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
       ) : null}
 
       {kind === "compress" ? (
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
           <Button
             type="button"
+            className="h-12"
             variant={strength === "light" ? "default" : "outline"}
             onClick={() => setStrength("light")}
           >
@@ -389,6 +375,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
           </Button>
           <Button
             type="button"
+            className="h-12"
             variant={strength === "strong" ? "default" : "outline"}
             onClick={() => setStrength("strong")}
           >
@@ -397,11 +384,11 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         </div>
       ) : null}
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-6">
         <Button
           type="button"
           size="lg"
-          className="h-11 px-5"
+          className="h-12 w-full px-5 sm:w-auto"
           disabled={busy || items.length === 0}
           onClick={() => void run()}
         >

@@ -227,7 +227,7 @@ export function ExpenseTool() {
             Guardas el PDF y se lo adjuntas al gestor. La web no envía nada.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button type="submit" size="lg" className="h-11 px-5">
+            <Button type="submit" size="lg" className="h-12 w-full px-5 sm:w-auto">
               <Printer />
               Guardar PDF
             </Button>

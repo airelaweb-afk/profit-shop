@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
+import { MobileDock } from "@/components/mobile-dock";
 import { Providers } from "@/components/providers";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -24,6 +25,13 @@ export const metadata: Metadata = {
     "Presupuestos, unir PDF, comprimir imagen y firmar para autónomos y administración. Con cuenta en este navegador, sin CRM.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f4ebdd",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -33,8 +41,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <Providers>
           <SiteHeader />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 pb-dock">{children}</main>
           <SiteFooter />
+          <MobileDock />
         </Providers>
       </body>
     </html>

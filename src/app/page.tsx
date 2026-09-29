@@ -55,7 +55,7 @@ export default function HomePage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Button
             size="lg"
-            className="h-11 px-5"
+            className="h-12 w-full px-5 sm:w-auto"
             render={<Link href="/entrar/?tab=crear" />}
             nativeButton={false}
           >
@@ -65,7 +65,7 @@ export default function HomePage() {
           <Button
             variant="outline"
             size="lg"
-            className="h-11 px-5"
+            className="h-12 w-full px-5 sm:w-auto"
             render={<Link href="/entrar/" />}
             nativeButton={false}
           >
@@ -74,7 +74,7 @@ export default function HomePage() {
           <Button
             variant="outline"
             size="lg"
-            className="h-11 px-5"
+            className="h-12 w-full px-5 sm:w-auto"
             render={<Link href="/unir-pdf" />}
             nativeButton={false}
           >

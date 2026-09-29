@@ -1,6 +1,7 @@
 import { PDFDocument } from "pdf-lib";
 import { zipSync } from "fflate";
 import { MAX_PDF_BYTES } from "@/lib/pdf-fill";
+import { saveBytes } from "@/lib/save-file";
 
 export { MAX_PDF_BYTES };
 
@@ -39,19 +40,10 @@ export function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function downloadBytes(
-  bytes: Uint8Array,
-  filename: string,
-  mime: string,
+export async function downloadBytes(
+  bytes: Uint8Array, filename: string, mime: string,
 ) {
-  const copy = new Uint8Array(bytes);
-  const blob = new Blob([copy], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  return saveBytes(bytes, filename, mime);
 }
 
 function friendlyLoadError(caught: unknown): never {

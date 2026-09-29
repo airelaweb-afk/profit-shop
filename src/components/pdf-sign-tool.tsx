@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Check,
   Download,
@@ -14,9 +14,11 @@ import {
   Undo2,
   X,
 } from "lucide-react";
+import { FileDrop } from "@/components/file-drop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { noticeForSave, saveBlob } from "@/lib/save-file";
 import {
   MAX_PDF_BYTES,
   TEXT_SIZE,
@@ -116,7 +118,7 @@ export function PdfSignTool() {
   const [fields, setFields] = useState<PdfFormField[]>([]);
   const [stamps, setStamps] = useState<PdfStamp[]>([]);
   const [mode, setMode] = useState<Mode>("check");
-  const [markSize, setMarkSize] = useState<MarkSize>("S");
+  const [markSize, setMarkSize] = useState<MarkSize>("M");
   const [textValue, setTextValue] = useState("");
   const [signature, setSignature] = useState("");
   const [busy, setBusy] = useState(false);
@@ -124,7 +126,7 @@ export function PdfSignTool() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [dragging, setDragging] = useState(false);
-  const [zoom, setZoom] = useState(1.2);
+  const [zoom, setZoom] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [typing, setTyping] = useState<Typing | null>(null);
   const typingRef = useRef<Typing | null>(null);
@@ -182,6 +184,7 @@ export function PdfSignTool() {
       }
 
       function down(event: PointerEvent) {
+        event.preventDefault();
         drawing.current = true;
         surface.setPointerCapture(event.pointerId);
         const { x, y } = point(event);
@@ -466,7 +469,7 @@ export function PdfSignTool() {
     }
     if (mode === "sign") {
       if (!signature) {
-        setError("Dibuja la firma a la izquierda y luego pulsa en el PDF.");
+        setError("Dibuja la firma en el recuadro y luego pulsa en el PDF.");
         return;
       }
       setError("");
@@ -667,13 +670,10 @@ export function PdfSignTool() {
       });
       const copy = new Uint8Array(bytes);
       const blob = new Blob([copy], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = suggestedFileName(fileName);
-      link.click();
-      URL.revokeObjectURL(url);
-      setNotice("Listo. El archivo se ha descargado en este ordenador.");
+      const result = await saveBlob(blob, suggestedFileName(fileName));
+      setNotice(
+        noticeForSave(result, "Listo. El PDF firmado está guardado."),
+      );
     } catch {
       setError("No se pudo guardar. Prueba con otro PDF (sin contraseña).");
     } finally {
@@ -708,39 +708,21 @@ export function PdfSignTool() {
     return (
       <div className="mx-auto max-w-2xl">
         {filePicker}
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => fileInput.current?.click()}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDrop={(event) => void onDrop(event)}
-          className={`flex w-full flex-col items-center rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors sm:py-16 ${
-            dragging
-              ? "border-primary bg-primary/10"
-              : "border-foreground/20 bg-card hover:border-primary/50 hover:bg-muted/40"
-          }`}
-        >
-          <FileUp className="size-10 text-primary" />
-          <p className="mt-4 font-heading text-2xl sm:text-3xl">
-            {busy ? "Abriendo el PDF…" : "Sube tu PDF"}
-          </p>
-          <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            {busy
-              ? "Se abre en este ordenador. Un archivo grande tarda un momento."
-              : "Arrástralo aquí o elige el que te han mandado. Rellenas, firmas y te lo descargas. No se envía a ningún servidor."}
-          </p>
-          {!busy ? (
-            <span className="mt-6 inline-flex h-11 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground">
-              Elegir PDF del ordenador
-            </span>
-          ) : null}
-        </button>
+        <FileDrop
+          accept="application/pdf,.pdf"
+          busy={busy}
+          dropTitle="Sube tu PDF"
+          tapTitle="Elige el PDF del teléfono"
+          cta="Elegir PDF"
+          hint="El que te han mandado. Lo rellenas, lo firmas y te lo guardas. No se envía a ningún servidor."
+          busyHint="Abriendo el PDF. Un archivo grande tarda un momento."
+          onFiles={(list) => void takeFile(list[0])}
+        />
         <p className="mt-4 text-center text-sm text-muted-foreground">
           ¿No tienes archivo?{" "}
           <button
             type="button"
-            className="text-primary underline-offset-4 hover:underline"
+            className="min-h-11 text-primary underline-offset-4 hover:underline"
             onClick={() => void openBlank()}
             disabled={busy}
           >
@@ -756,78 +738,49 @@ export function PdfSignTool() {
     );
   }
 
-  const tools = (
-    <>
-      <Button
-        type="button"
-        size="sm"
-        variant={mode === "check" ? "default" : "outline"}
-        onClick={() => setMode("check")}
-      >
-        <Check />
-        ✓
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={mode === "cross" ? "default" : "outline"}
-        onClick={() => setMode("cross")}
-      >
-        <X />
-        X
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={mode === "text" ? "default" : "outline"}
-        onClick={() => setMode("text")}
-      >
-        <Type />
-        Texto
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={mode === "date" ? "default" : "outline"}
-        onClick={() => setMode("date")}
-      >
-        Fecha
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={mode === "sign" ? "default" : "outline"}
-        onClick={() => setMode("sign")}
-      >
-        <PenLine />
-        Firma
-      </Button>
-      <span className="mx-1 hidden h-5 w-px bg-border sm:block" />
-      {(["S", "M", "L"] as MarkSize[]).map((value) => (
-        <Button
-          key={value}
-          type="button"
-          size="sm"
-          variant={markSize === value ? "default" : "outline"}
-          onClick={() => applyMarkSize(value)}
-        >
-          {value}
-        </Button>
-      ))}
-    </>
-  );
+  const modeButtons: { id: Mode; label: string; icon: ReactNode }[] = [
+    { id: "check", label: "✓", icon: <Check className="size-4" /> },
+    { id: "cross", label: "X", icon: <X className="size-4" /> },
+    { id: "text", label: "Texto", icon: <Type className="size-4" /> },
+    { id: "date", label: "Fecha", icon: null },
+    { id: "sign", label: "Firma", icon: <PenLine className="size-4" /> },
+  ];
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 pb-24 xl:pb-0">
       {filePicker}
-      <div className="no-print sticky top-16 z-30 rounded-2xl bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 backdrop-blur-md sm:p-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          {tools}
-          <span className="mx-1 hidden h-5 w-px bg-border lg:block" />
+      <div className="no-print sticky top-14 z-30 rounded-2xl bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 backdrop-blur-md sm:top-16 sm:p-3">
+        <div className="grid grid-cols-5 gap-1 sm:flex sm:flex-wrap sm:items-center sm:gap-1.5">
+          {modeButtons.map((item) => (
+            <Button
+              key={item.id}
+              type="button"
+              variant={mode === item.id ? "default" : "outline"}
+              className="h-12 flex-col gap-0 px-1 text-[11px] sm:h-9 sm:flex-row sm:gap-1.5 sm:px-2.5 sm:text-sm"
+              onClick={() => setMode(item.id)}
+            >
+              {item.icon}
+              {item.label}
+            </Button>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {(["S", "M", "L"] as MarkSize[]).map((value) => (
+            <Button
+              key={value}
+              type="button"
+              variant={markSize === value ? "default" : "outline"}
+              className="h-11 min-w-11 sm:h-8"
+              onClick={() => applyMarkSize(value)}
+            >
+              {value}
+            </Button>
+          ))}
+          <span className="mx-1 hidden h-5 w-px bg-border sm:block" />
           <Button
             type="button"
-            size="sm"
             variant="outline"
+            className="size-11 sm:size-8"
             aria-label="Alejar"
             onClick={() => setZoom((current) => clampZoom(current - 0.15))}
           >
@@ -838,8 +791,8 @@ export function PdfSignTool() {
           </span>
           <Button
             type="button"
-            size="sm"
             variant="outline"
+            className="size-11 sm:size-8"
             aria-label="Acercar"
             onClick={() => setZoom((current) => clampZoom(current + 0.15))}
           >
@@ -847,13 +800,13 @@ export function PdfSignTool() {
           </Button>
           <Button
             type="button"
-            size="sm"
             variant="ghost"
+            className="h-11 sm:h-8"
             onClick={() => setZoom(1)}
           >
             Caber
           </Button>
-          <span className="ml-auto flex flex-wrap gap-1.5">
+          <span className="ml-auto hidden flex-wrap gap-1.5 xl:flex">
             {stamps.length > 0 ? (
               <>
                 <Button type="button" size="sm" variant="ghost" onClick={undoStamp}>
@@ -883,38 +836,35 @@ export function PdfSignTool() {
               disabled={busy}
             >
               {busy ? "Preparando…" : <Download />}
-              {busy ? "" : "Descargar"}
+              {busy ? "" : "Guardar PDF"}
             </Button>
           </span>
         </div>
         <p className="mt-2 px-1 text-xs text-muted-foreground sm:text-sm">
-          {modeHint}{" "}
-          {previews.length > 1 ? (
-            <span className="hidden sm:inline">
-              Ir a{" "}
-              {previews.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="text-primary underline-offset-2 hover:underline"
-                  onClick={() =>
-                    document
-                      .getElementById(`pdf-page-${index}`)
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" })
-                  }
-                >
-                  pág. {index + 1}
-                  {index < previews.length - 1 ? ", " : ""}
-                </button>
-              ))}
-              .
-            </span>
-          ) : null}
+          {modeHint}
         </p>
+        {previews.length > 1 ? (
+          <div className="mt-2 flex gap-1 overflow-x-auto pb-1">
+            {previews.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                className="h-10 shrink-0 rounded-lg bg-muted px-3 text-sm"
+                onClick={() =>
+                  document
+                    .getElementById(`pdf-page-${index}`)
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+              >
+                Pág. {index + 1}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(16rem,19rem)_minmax(0,1fr)]">
-        <div className="no-print order-2 flex flex-col gap-4 xl:order-1">
+        <div className="no-print flex flex-col gap-4 xl:order-1">
           <section
             className={`rounded-2xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5 ${
               dragging ? "ring-2 ring-primary" : ""
@@ -930,10 +880,10 @@ export function PdfSignTool() {
                 ? ` · ${pageCount} página${pageCount === 1 ? "" : "s"}`
                 : ""}
             </p>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <Button
                 type="button"
-                size="sm"
+                className="h-12"
                 onClick={() => fileInput.current?.click()}
                 disabled={busy}
               >
@@ -942,7 +892,7 @@ export function PdfSignTool() {
               </Button>
               <Button
                 type="button"
-                size="sm"
+                className="h-12"
                 variant="outline"
                 onClick={() => void openBlank()}
                 disabled={busy}
@@ -957,7 +907,7 @@ export function PdfSignTool() {
               <Label htmlFor="pdf-text">Texto para repetir (opcional)</Label>
               <Input
                 id="pdf-text"
-                className="mt-2 h-10"
+                className="mt-2 h-12"
                 value={textValue}
                 onChange={(event) => setTextValue(event.target.value)}
                 placeholder="NIF, población… cada clic lo pega"
@@ -972,13 +922,12 @@ export function PdfSignTool() {
               ref={signCanvas}
               width={640}
               height={200}
-              className="mt-2 h-28 w-full touch-none rounded-xl border border-dashed border-foreground/20 bg-background"
+              className="mt-2 h-36 w-full touch-none rounded-xl border border-dashed border-foreground/20 bg-background sm:h-28"
             />
             <Button
               type="button"
               variant="ghost"
-              size="sm"
-              className="mt-2"
+              className="mt-2 h-11"
               onClick={resetPad}
             >
               <Eraser />
@@ -1069,13 +1018,13 @@ export function PdfSignTool() {
               {notice}
             </p>
           ) : null}
-          <p className="text-xs text-muted-foreground">
+          <p className="hidden text-xs text-muted-foreground lg:block">
             Atajos: 1 ✓ · 2 X · 3 texto · F firma · Ctrl+Z deshacer ·
             flechas mover · Supr quitar · Ctrl+rueda ampliar.
           </p>
         </div>
 
-        <div className="order-1 min-w-0 xl:order-2" ref={previewRef}>
+        <div className="min-w-0 xl:order-2" ref={previewRef}>
           {busy && previews.length === 0 ? (
             <div className="rounded-2xl bg-card p-8 ring-1 ring-foreground/10">
               <p className="font-heading text-2xl">Abriendo el PDF…</p>
@@ -1104,7 +1053,7 @@ export function PdfSignTool() {
                         <img
                           src={src}
                           alt={`Página ${pageIndex + 1} del PDF`}
-                          className="block w-full cursor-crosshair select-none"
+                          className="block w-full cursor-crosshair touch-manipulation select-none"
                           draggable={false}
                           onClick={(event) => {
                             placeStamp(
@@ -1219,7 +1168,7 @@ export function PdfSignTool() {
                             )}
                             <button
                               type="button"
-                              className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-foreground text-[10px] leading-none text-background"
+                              className="absolute -right-3 -top-3 flex size-8 items-center justify-center rounded-full bg-foreground text-base leading-none text-background"
                               aria-label="Quitar marca"
                               onPointerDown={(event) => event.stopPropagation()}
                               onClick={(event) => {
@@ -1279,6 +1228,36 @@ export function PdfSignTool() {
               </ol>
             </div>
           )}
+        </div>
+      </div>
+
+      <div
+        className="no-print fixed inset-x-0 z-40 border-t border-border/80 bg-background/95 p-3 backdrop-blur-md xl:hidden"
+        style={{
+          bottom: "calc(3.75rem + env(safe-area-inset-bottom, 0px))",
+        }}
+      >
+        <div className="mx-auto flex max-w-2xl gap-2">
+          {stamps.length > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 shrink-0 px-4"
+              onClick={undoStamp}
+            >
+              <Undo2 />
+              Deshacer
+            </Button>
+          ) : null}
+          <Button
+            type="button"
+            className="h-12 flex-1"
+            onClick={() => void download()}
+            disabled={busy}
+          >
+            {busy ? "Preparando…" : <Download />}
+            {busy ? "" : "Guardar PDF"}
+          </Button>
         </div>
       </div>
     </div>

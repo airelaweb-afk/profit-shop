@@ -153,11 +153,4 @@ export function zipBlobs(files: { name: string; bytes: Uint8Array }[]) {
   return zipSync(record);
 }
 
-export function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
+export { saveBlob as downloadBlob } from "@/lib/save-file";

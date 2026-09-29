@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer className="no-print mt-auto border-t border-border/80">
+    <footer className="no-print mt-auto border-t border-border/80 pb-dock">
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
         <div>
           <p className="font-heading text-xl">Luna Oficio</p>

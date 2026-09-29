@@ -12,8 +12,8 @@ const copy: Record<
     metaTitle: "Unir PDF",
     meta: "Une varios PDF en uno solo, en el navegador. Sin subir el archivo a un servidor.",
     kicker: "Unir PDF · con cuenta",
-    title: "Unir PDF. En este ordenador.",
-    lead: "Arrastra dos o más PDF, ordénalos y descargas uno. No pasa por nuestros servidores. No convertimos a Word: eso, en el navegador, queda mal.",
+    title: "Unir PDF. En este aparato.",
+    lead: "Elige dos o más PDF, ordénalos y te bajas uno. En el teléfono, pulsa Elegir PDF. No pasa por nuestros servidores. No convertimos a Word: eso, en el navegador, queda mal.",
   },
   split: {
     metaTitle: "Dividir PDF",

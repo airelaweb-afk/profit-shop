@@ -75,6 +75,8 @@ Hecho: comprimir, PNG/JPG/WebP, HEIC a JPG, redimensionar, recortar, girar, audi
 
 Lo que falle en PDF o en el móvil, se corrige. Siguiente atasco concreto (albarán, aplazamientos), no un panel de “todo”.
 
+Hecho (móvil): barra inferior, textos “elegir del teléfono”, recorte sin mover la página, botones de 44 px, guardar con compartir en iPhone.
+
 ### Paso 10 — Que Google las encuentre
 
 Una URL, un título, un problema. Textos para búsquedas reales.

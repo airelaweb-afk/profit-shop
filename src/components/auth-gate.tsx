@@ -31,19 +31,18 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!session) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-lg px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-sm tracking-wide text-primary uppercase">Cuenta</p>
         <h1 className="mt-2 font-heading text-4xl tracking-tight">
-          Entra para usar las herramientas.
+          Entra para usar esta herramienta.
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Presupuestos, cobros, PDF e imágenes son para quien tiene cuenta.
-          La creas aquí. Los datos (y tus PDF) se quedan en este navegador: no
-          hay servidor nuestro.
+          La creas aquí, en este teléfono o este ordenador. Los PDF y las fotos
+          no salen del navegador.
         </p>
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
           <Button
-            className="h-11 px-5"
+            className="h-12 w-full sm:w-auto sm:px-5"
             render={<Link href={`/entrar/?next=${encodeURIComponent(next)}`} />}
             nativeButton={false}
           >
@@ -51,7 +50,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           </Button>
           <Button
             variant="outline"
-            className="h-11 px-5"
+            className="h-12 w-full sm:w-auto sm:px-5"
             render={
               <Link
                 href={`/entrar/?tab=crear&next=${encodeURIComponent(next)}`}

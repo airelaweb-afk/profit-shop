@@ -32,7 +32,7 @@ export const imageKit = [
     slug: "heic" as const,
     name: "HEIC a JPG",
     problem: "La foto del iPhone no se abre en el Windows del gestor.",
-    does: "HEIC/HEIF a JPG. El archivo no sale de este ordenador.",
+    does: "HEIC/HEIF a JPG. El archivo no sale de este aparato.",
   },
   {
     href: "/redimensionar-imagen",

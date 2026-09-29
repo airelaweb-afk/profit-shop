@@ -20,7 +20,7 @@ const copy: Record<
     meta: "Convierte PNG, WebP o HEIC a JPG en el navegador, sin subir el archivo.",
     kicker: "PNG a JPG · con cuenta",
     title: "Pásalo a JPG y listo para enviar.",
-    lead: "PNG, WebP o HEIC. El transparente se rellena de blanco. El archivo no sale de este ordenador.",
+    lead: "PNG, WebP o HEIC. El transparente se rellena de blanco. El archivo no sale de este aparato.",
   },
   "to-png": {
     metaTitle: "JPG a PNG",
@@ -55,7 +55,7 @@ const copy: Record<
     meta: "Recorta una foto en el navegador. Marca el recuadro y descargas.",
     kicker: "Recortar imagen · con cuenta",
     title: "Quédate con el trozo que vale.",
-    lead: "Arrastra sobre la foto. DNI, ticket, captura. Sin subirla a ningún sitio.",
+    lead: "Pulsa y arrastra sobre la foto. Si pulsas dentro del recuadro, lo mueves. DNI, ticket, captura. Sin subirla a ningún sitio.",
   },
   rotate: {
     metaTitle: "Girar imagen",

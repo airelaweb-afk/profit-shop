@@ -1,15 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Download, FileUp } from "lucide-react";
+import { useState } from "react";
+import { Download } from "lucide-react";
+import { FileDrop } from "@/components/file-drop";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { AudioKitSlug } from "@/lib/image-kit";
 import { decodeAudio, encodeWav, isAudioFile } from "@/lib/audio-ops";
-import { downloadBlob, suggestedOutName } from "@/lib/image-ops";
+import { suggestedOutName } from "@/lib/image-ops";
+import { noticeForSave, saveBlob } from "@/lib/save-file";
 
 export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
-  const input = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [start, setStart] = useState(0);
@@ -17,7 +18,6 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [dragging, setDragging] = useState(false);
 
   async function take(next: File | undefined) {
     if (!next) return;
@@ -55,12 +55,15 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
         kind === "trim"
           ? encodeWav(buffer, start, end)
           : encodeWav(buffer);
-      downloadBlob(blob, suggestedOutName(file.name, kind === "trim" ? "recorte" : "audio", "wav"));
-      setNotice(
+      const result = await saveBlob(
+        blob,
+        suggestedOutName(file.name, kind === "trim" ? "recorte" : "audio", "wav"),
+      );
+      const ready =
         kind === "trim"
           ? `Listo: de ${start.toFixed(1)} s a ${end.toFixed(1)} s, en WAV.`
-          : "Listo: WAV en este ordenador. Codificar a MP3 queda aparcado.",
-      );
+          : "Listo: WAV. Codificar a MP3 queda aparcado.";
+      setNotice(noticeForSave(result, ready));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo guardar.");
     } finally {
@@ -72,50 +75,15 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <input
-        ref={input}
-        type="file"
+      <FileDrop
         accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav,.webm"
-        className="sr-only"
-        onChange={(event) => {
-          const next = event.target.files?.[0];
-          event.target.value = "";
-          void take(next);
-        }}
+        busy={busy}
+        dropTitle={kind === "trim" ? "Suelta la nota de voz" : "Suelta el audio"}
+        tapTitle={kind === "trim" ? "Elige la nota de voz" : "Elige el audio"}
+        cta="Elegir audio"
+        hint="MP3, M4A, OGG o WAV. Sale un WAV. Extraer el audio de un MP4 o convertir a MP3 queda para más adelante."
+        onFiles={(list) => void take(list[0])}
       />
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => input.current?.click()}
-        onDragOver={(event) => {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "copy";
-          setDragging(true);
-        }}
-        onDragLeave={(event) => {
-          if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-          setDragging(false);
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          setDragging(false);
-          void take(event.dataTransfer.files[0]);
-        }}
-        className={`flex w-full flex-col items-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors ${
-          dragging
-            ? "border-primary bg-primary/10"
-            : "border-foreground/20 bg-card hover:border-primary/50 hover:bg-muted/40"
-        }`}
-      >
-        <FileUp className="size-10 text-primary" />
-        <p className="mt-4 font-heading text-2xl">
-          {kind === "trim" ? "Suelta la nota de voz" : "Suelta el audio"}
-        </p>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          MP3, M4A, OGG o WAV. Sale un WAV. Extraer el audio de un MP4 o
-          convertir a MP3 queda para más adelante.
-        </p>
-      </button>
       {file && buffer ? (
         <div className="mt-6 rounded-2xl bg-card p-4 ring-1 ring-foreground/10">
           <p className="text-sm">
@@ -159,12 +127,12 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
         <Button
           type="button"
           size="lg"
-          className="h-11 px-5"
+          className="h-12 w-full px-5 sm:w-auto"
           disabled={busy || !buffer}
           onClick={() => void run()}
         >
           {busy ? "Preparando…" : <Download />}
-          {busy ? "" : kind === "trim" ? "Recortar a WAV" : "Descargar WAV"}
+          {busy ? "" : kind === "trim" ? "Recortar a WAV" : "Guardar WAV"}
         </Button>
       </div>
       {error ? (

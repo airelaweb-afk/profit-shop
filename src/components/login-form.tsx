@@ -64,9 +64,10 @@ export function LoginForm() {
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="grid gap-4">
-      <div className="flex gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <Button
           type="button"
+          className="h-12"
           variant={active === "entrar" ? "default" : "outline"}
           onClick={() => setTab("entrar")}
         >
@@ -74,6 +75,7 @@ export function LoginForm() {
         </Button>
         <Button
           type="button"
+          className="h-12"
           variant={active === "crear" ? "default" : "outline"}
           onClick={() => setTab("crear")}
         >
@@ -85,7 +87,7 @@ export function LoginForm() {
           <Label htmlFor="auth-name">Nombre</Label>
           <Input
             id="auth-name"
-            className="h-10"
+          className="h-12"
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoComplete="name"
@@ -98,7 +100,7 @@ export function LoginForm() {
         <Input
           id="auth-email"
           type="email"
-          className="h-10"
+          className="h-12"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
@@ -110,7 +112,7 @@ export function LoginForm() {
         <Input
           id="auth-password"
           type="password"
-          className="h-10"
+          className="h-12"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete={active === "crear" ? "new-password" : "current-password"}
@@ -123,7 +125,7 @@ export function LoginForm() {
           {error}
         </p>
       ) : null}
-      <Button type="submit" className="h-11" disabled={busy}>
+      <Button type="submit" className="h-12" disabled={busy}>
         {busy
           ? "Un momento…"
           : active === "crear"
@@ -132,8 +134,8 @@ export function LoginForm() {
       </Button>
       <p className="text-sm text-muted-foreground">
         La cuenta vive en este navegador. No se envía a ningún servidor. Si
-        cambias de ordenador o borras los datos del sitio, hay que crearla otra
-        vez.
+        cambias de teléfono u ordenador, o borras los datos del sitio, hay que
+        crearla otra vez.
       </p>
     </form>
   );

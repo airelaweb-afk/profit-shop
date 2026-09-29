@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Download, FileUp, Trash2 } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
+import { FileDrop } from "@/components/file-drop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ import {
   type Turn,
 } from "@/lib/image-ops";
 import { newId } from "@/lib/quotes";
+import { noticeForSave } from "@/lib/save-file";
 
 type Item = {
   id: string;
@@ -34,7 +36,7 @@ type Item = {
 };
 
 const acceptAll =
-  "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif";
+  "image/*,image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif";
 
 function targetFormat(kind: ImageKitSlug, file: File): OutFormat {
   if (kind === "to-png") return "png";
@@ -58,25 +60,69 @@ function targetFormat(kind: ImageKitSlug, file: File): OutFormat {
   return "jpeg";
 }
 
-function dropTitle(kind: ImageKitSlug) {
-  if (kind === "heic") return "Suelta las fotos HEIC del iPhone";
-  if (kind === "compress") return "Suelta las fotos que pesan demasiado";
-  if (kind === "to-jpg") return "Suelta PNG, WebP o HEIC para pasarlos a JPG";
-  if (kind === "to-png") return "Suelta JPG o WebP para pasarlos a PNG";
-  if (kind === "to-webp") return "Suelta JPG o PNG para pasarlos a WebP";
-  if (kind === "resize") return "Suelta la imagen a redimensionar";
-  if (kind === "crop") return "Suelta la imagen a recortar";
-  return "Suelta la imagen que está de lado";
+function titles(kind: ImageKitSlug) {
+  if (kind === "heic") {
+    return {
+      drop: "Suelta las fotos HEIC del iPhone",
+      tap: "Elige las fotos HEIC del carrete",
+      cta: "Elegir fotos",
+    };
+  }
+  if (kind === "compress") {
+    return {
+      drop: "Suelta las fotos que pesan demasiado",
+      tap: "Elige las fotos que pesan demasiado",
+      cta: "Elegir fotos",
+    };
+  }
+  if (kind === "to-jpg") {
+    return {
+      drop: "Suelta PNG, WebP o HEIC para pasarlos a JPG",
+      tap: "Elige PNG, WebP o HEIC para pasarlos a JPG",
+      cta: "Elegir fotos",
+    };
+  }
+  if (kind === "to-png") {
+    return {
+      drop: "Suelta JPG o WebP para pasarlos a PNG",
+      tap: "Elige JPG o WebP para pasarlos a PNG",
+      cta: "Elegir fotos",
+    };
+  }
+  if (kind === "to-webp") {
+    return {
+      drop: "Suelta JPG o PNG para pasarlos a WebP",
+      tap: "Elige JPG o PNG para pasarlos a WebP",
+      cta: "Elegir fotos",
+    };
+  }
+  if (kind === "resize") {
+    return {
+      drop: "Suelta la imagen a redimensionar",
+      tap: "Elige la imagen a redimensionar",
+      cta: "Elegir foto",
+    };
+  }
+  if (kind === "crop") {
+    return {
+      drop: "Suelta la imagen a recortar",
+      tap: "Elige la imagen a recortar",
+      cta: "Elegir foto",
+    };
+  }
+  return {
+    drop: "Suelta la imagen que está de lado",
+    tap: "Elige la imagen que está de lado",
+    cta: "Elegir fotos",
+  };
 }
 
 export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
-  const input = useRef<HTMLInputElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [dragging, setDragging] = useState(false);
   const [quality, setQuality] = useState(0.72);
   const [width, setWidth] = useState(1200);
   const [height, setHeight] = useState(800);
@@ -108,7 +154,9 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
     if (kind === "heic") {
       picked = picked.filter(isHeicFile);
       if (picked.length === 0) {
-        setError("Sube un HEIC o HEIF (fotos de iPhone). El resto usa PNG a JPG.");
+        setError(
+          "Sube un HEIC o HEIF. Si el iPhone ya te lo abre como JPG, no hace falta esta herramienta.",
+        );
         return;
       }
     }
@@ -165,31 +213,89 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
     });
   }
 
-  function onPointer(event: React.PointerEvent<HTMLDivElement>, moving: boolean) {
-    if (kind !== "crop") return;
+  function pointInStage(event: React.PointerEvent<HTMLDivElement>) {
     const box = stage.current?.getBoundingClientRect();
-    if (!box) return;
-    const px = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
-    const py = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height));
-    if (!moving) {
-      event.currentTarget.setPointerCapture(event.pointerId);
-      drag.current = {
-        x: px,
-        y: py,
-        mode: "new",
-        start: crop,
-      };
+    if (!box) return null;
+    return {
+      px: Math.min(1, Math.max(0, (event.clientX - box.left) / box.width)),
+      py: Math.min(1, Math.max(0, (event.clientY - box.top) / box.height)),
+    };
+  }
+
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (kind !== "crop") return;
+    event.preventDefault();
+    const point = pointInStage(event);
+    if (!point) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const inside =
+      point.px >= crop.x &&
+      point.px <= crop.x + crop.w &&
+      point.py >= crop.y &&
+      point.py <= crop.y + crop.h;
+    drag.current = {
+      x: point.px,
+      y: point.py,
+      mode: inside ? "move" : "new",
+      start: crop,
+    };
+  }
+
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!drag.current) return;
+    event.preventDefault();
+    const point = pointInStage(event);
+    if (!point) return;
+    if (drag.current.mode === "move") {
+      const dx = point.px - drag.current.x;
+      const dy = point.py - drag.current.y;
+      const nx = Math.min(
+        1 - drag.current.start.w,
+        Math.max(0, drag.current.start.x + dx),
+      );
+      const ny = Math.min(
+        1 - drag.current.start.h,
+        Math.max(0, drag.current.start.y + dy),
+      );
+      setCrop({ ...drag.current.start, x: nx, y: ny });
       return;
     }
-    if (!drag.current) return;
-    const x = Math.min(drag.current.x, px);
-    const y = Math.min(drag.current.y, py);
+    const x = Math.min(drag.current.x, point.px);
+    const y = Math.min(drag.current.y, point.py);
     setCrop({
       x,
       y,
-      w: Math.max(0.04, Math.abs(px - drag.current.x)),
-      h: Math.max(0.04, Math.abs(py - drag.current.y)),
+      w: Math.max(0.08, Math.abs(point.px - drag.current.x)),
+      h: Math.max(0.08, Math.abs(point.py - drag.current.y)),
     });
+  }
+
+  function applyCropPreset(preset: "full" | "square" | "wide") {
+    const first = items[0];
+    if (!first) return;
+    const ar = first.width / first.height;
+    if (preset === "full") {
+      setCrop({ x: 0, y: 0, w: 1, h: 1 });
+      return;
+    }
+    if (preset === "square") {
+      if (ar >= 1) {
+        const w = first.height / first.width;
+        setCrop({ x: (1 - w) / 2, y: 0, w, h: 1 });
+      } else {
+        const h = first.width / first.height;
+        setCrop({ x: 0, y: (1 - h) / 2, w: 1, h });
+      }
+      return;
+    }
+    const target = 16 / 9;
+    if (ar >= target) {
+      const w = (first.height * target) / first.width;
+      setCrop({ x: (1 - w) / 2, y: 0, w, h: 1 });
+    } else {
+      const h = first.width / first.height / target;
+      setCrop({ x: 0, y: (1 - h) / 2, w: 1, h });
+    }
   }
 
   async function run() {
@@ -227,30 +333,31 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
           bytes,
         });
       }
+      let result: Awaited<ReturnType<typeof downloadBlob>>;
       if (outputs.length === 1) {
         const file = outputs[0];
         const copy = new Uint8Array(file.bytes);
-        downloadBlob(
+        result = await downloadBlob(
           new Blob([copy], { type: mimeFor(targetFormat(kind, items[0].file)) }),
           file.name,
         );
       } else {
         const zipped = zipBlobs(outputs);
         const copy = new Uint8Array(zipped);
-        downloadBlob(
+        result = await downloadBlob(
           new Blob([copy], { type: "application/zip" }),
           "imagenes-luna-oficio.zip",
         );
       }
       const ratio =
         totalOut < totalIn ? Math.round((1 - totalOut / totalIn) * 100) : 0;
-      setNotice(
+      const ready =
         kind === "compress"
           ? totalOut < totalIn
             ? `Listo: ${formatBytes(totalIn)} → ${formatBytes(totalOut)} (${ratio} % menos).`
             : `Se ha reescrito (${formatBytes(totalOut)}). Si no baja, es un PNG: pásalo a JPG.`
-          : `Listo: ${outputs.length} archivo${outputs.length === 1 ? "" : "s"}.`,
-      );
+          : `Listo: ${outputs.length} archivo${outputs.length === 1 ? "" : "s"}.`;
+      setNotice(noticeForSave(result, ready));
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "No se pudo terminar.",
@@ -261,68 +368,32 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
   }
 
   const first = items[0];
+  const copy = titles(kind);
   const action =
     kind === "compress"
-      ? "Comprimir y descargar"
+      ? "Comprimir y guardar"
       : kind === "crop"
-        ? "Recortar y descargar"
+        ? "Recortar y guardar"
         : kind === "resize"
-          ? "Redimensionar y descargar"
+          ? "Redimensionar y guardar"
           : kind === "rotate"
-            ? "Girar y descargar"
-            : "Convertir y descargar";
+            ? "Girar y guardar"
+            : "Convertir y guardar";
+  const wantsCamera = kind !== "heic";
 
   return (
     <div className="mx-auto max-w-2xl">
-      <input
-        ref={input}
-        type="file"
+      <FileDrop
         accept={kind === "heic" ? ".heic,.heif,image/heic,image/heif" : acceptAll}
         multiple={kind !== "crop"}
-        className="sr-only"
-        onChange={(event) => {
-          const list = [...(event.target.files ?? [])];
-          event.target.value = "";
-          void addFiles(list);
-        }}
+        busy={busy}
+        dropTitle={copy.drop}
+        tapTitle={copy.tap}
+        cta={copy.cta}
+        cameraCta={wantsCamera ? "Hacer foto ahora" : undefined}
+        hint="No se envía a ningún servidor. Quitar fondo, ampliar con IA y PDF a Word siguen aparcados."
+        onFiles={(list) => void addFiles(list)}
       />
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => input.current?.click()}
-        onDragOver={(event) => {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "copy";
-          setDragging(true);
-        }}
-        onDragLeave={(event) => {
-          if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-          setDragging(false);
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          setDragging(false);
-          void addFiles([...event.dataTransfer.files]);
-        }}
-        className={`flex w-full flex-col items-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors ${
-          dragging
-            ? "border-primary bg-primary/10"
-            : "border-foreground/20 bg-card hover:border-primary/50 hover:bg-muted/40"
-        }`}
-      >
-        <FileUp className="size-10 text-primary" />
-        <p className="mt-4 font-heading text-2xl">{dropTitle(kind)}</p>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          {busy
-            ? "Trabajando en este ordenador…"
-            : "No se envía a ningún servidor. Quitar fondo, ampliar con IA y PDF a Word siguen aparcados."}
-        </p>
-        {!busy ? (
-          <span className="mt-6 inline-flex h-11 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground">
-            Elegir del ordenador
-          </span>
-        ) : null}
-      </button>
 
       {kind === "compress" ? (
         <div className="mt-6 grid gap-2">
@@ -351,8 +422,9 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
             <Input
               id="img-w"
               type="number"
+              inputMode="numeric"
               min={16}
-              className="h-10"
+              className="h-12"
               value={width}
               onChange={(event) => {
                 const next = Number(event.target.value) || 1;
@@ -368,8 +440,9 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
             <Input
               id="img-h"
               type="number"
+              inputMode="numeric"
               min={16}
-              className="h-10"
+              className="h-12"
               value={height}
               onChange={(event) => {
                 const next = Number(event.target.value) || 1;
@@ -380,7 +453,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
               }}
             />
           </div>
-          <label className="flex items-center gap-2 text-sm sm:col-span-2">
+          <label className="flex min-h-12 items-center gap-3 text-sm sm:col-span-2">
             <input
               type="checkbox"
               checked={lock}
@@ -392,11 +465,12 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
       ) : null}
 
       {kind === "rotate" ? (
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-6 grid grid-cols-3 gap-2">
           {([90, 180, 270] as Turn[]).map((value) => (
             <Button
               key={value}
               type="button"
+              className="h-12"
               variant={turn === value ? "default" : "outline"}
               onClick={() => setTurn(value)}
             >
@@ -417,7 +491,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
               <img
                 src={item.preview}
                 alt=""
-                className="size-12 rounded object-cover"
+                className="size-14 rounded object-cover"
               />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm">{item.file.name}</p>
@@ -427,8 +501,9 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
               </div>
               <Button
                 type="button"
-                size="icon-sm"
+                size="icon"
                 variant="ghost"
+                className="size-11"
                 aria-label="Quitar"
                 onClick={() => {
                   if (item.preview.startsWith("blob:")) {
@@ -448,16 +523,45 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
       {kind === "crop" && first ? (
         <div className="mt-6">
           <p className="mb-2 text-sm text-muted-foreground">
-            Arrastra sobre la foto para marcar el recorte.
+            Arrastra un recuadro nuevo. Si pulsas dentro, lo mueves. La página no
+            se desplaza.
           </p>
+          <div className="mb-3 grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              onClick={() => applyCropPreset("full")}
+            >
+              Toda
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              onClick={() => applyCropPreset("square")}
+            >
+              Cuadrado
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              onClick={() => applyCropPreset("wide")}
+            >
+              16:9
+            </Button>
+          </div>
           <div
             ref={stage}
-            className="relative inline-block max-w-full cursor-crosshair overflow-hidden rounded-xl ring-1 ring-foreground/10"
-            onPointerDown={(event) => onPointer(event, false)}
-            onPointerMove={(event) => {
-              if (drag.current) onPointer(event, true);
-            }}
+            className="relative mx-auto inline-block max-w-full cursor-crosshair touch-none overflow-hidden rounded-xl ring-1 ring-foreground/10 select-none"
+            style={{ touchAction: "none" }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
             onPointerUp={() => {
+              drag.current = null;
+            }}
+            onPointerCancel={() => {
               drag.current = null;
             }}
           >
@@ -465,7 +569,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
             <img
               src={first.preview}
               alt="Recortar"
-              className="block max-h-[28rem] max-w-full select-none"
+              className="pointer-events-none block max-h-[70dvh] max-w-full select-none"
               draggable={false}
             />
             <div
@@ -485,7 +589,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         <Button
           type="button"
           size="lg"
-          className="h-11 px-5"
+          className="h-12 w-full px-5 sm:w-auto"
           disabled={busy || items.length === 0}
           onClick={() => void run()}
         >

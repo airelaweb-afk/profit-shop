@@ -592,7 +592,7 @@ export function QuoteBatchTool() {
           </ol>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button type="submit" size="lg" className="h-11 px-5">
+            <Button type="submit" size="lg" className="h-12 w-full px-5 sm:w-auto">
               <Printer />
               Guardar PDF
               {clients.length

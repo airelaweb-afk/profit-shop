@@ -246,7 +246,7 @@ export function ReminderBatchTool() {
           </p>
         ) : null}
 
-        <Button type="submit" size="lg" className="h-11 px-5 self-start">
+        <Button type="submit" size="lg" className="h-12 w-full px-5 self-start sm:w-auto">
           {copied === "all" ? <Check /> : <Copy />}
           {copied === "all" ? "Tanda copiada" : "Copiar todos los mensajes"}
         </Button>

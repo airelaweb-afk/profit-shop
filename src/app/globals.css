@@ -481,6 +481,39 @@
   }
 }
 
+input[type="range"] {
+  width: 100%;
+  min-height: 2.75rem;
+  accent-color: var(--primary);
+}
+
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(
+      [type="file"]
+    ):not([type="hidden"]),
+  select,
+  textarea {
+    font-size: 16px;
+    min-height: 2.75rem;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.pb-dock {
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 1280px) {
+  .pb-dock {
+    padding-bottom: 0;
+  }
+}
+
 @media print {
   @page {
     size: A4;

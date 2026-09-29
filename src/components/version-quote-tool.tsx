@@ -420,7 +420,7 @@ export function VersionQuoteTool() {
           </p>
         ) : null}
 
-        <Button type="submit" size="lg" className="h-11 px-5 self-start">
+        <Button type="submit" size="lg" className="h-12 w-full px-5 self-start sm:w-auto">
           <Printer />
           Guardar PDF
           {versions.length

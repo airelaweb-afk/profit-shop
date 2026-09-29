@@ -55,7 +55,7 @@ export default function ComoFuncionaPage() {
             Las herramientas (presupuestos, cobros, horas, gastos y firmar PDF)
             solo se usan si has iniciado sesión. La cuenta se crea en el sitio y
             vive en este navegador: no hay Cl@ve, ni servidor de usuarios, ni
-            recuperación en otro ordenador. Si cambias de aparato, la creas otra
+            recuperación en otro aparato. Si cambias de teléfono u ordenador, la creas otra
             vez.
           </p>
         </section>
