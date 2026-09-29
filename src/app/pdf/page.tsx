@@ -18,8 +18,8 @@ export default function PdfPage() {
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
         Elige el archivo que te han mandado. Si trae cajas, las rellenas. Si no,
-        pulsas en la hoja y escribes. Dibujas la firma y la pones donde va. Te
-        lo descargas. El PDF no sale de este navegador. No es Cl@ve ni un
+        pulsas en la hoja: ✓ en las casillas, texto, fecha y firma. Te lo
+        descargas. El PDF no sale de este navegador. No es Cl@ve ni un
         certificado digital: es tu rúbrica, como en papel.
       </p>
       <div className="mt-10">

@@ -1,4 +1,5 @@
 import {
+  LineCapStyle,
   PDFCheckBox,
   PDFDocument,
   PDFDropdown,
@@ -19,17 +20,44 @@ export type PdfFormField = {
   options: string[];
 };
 
+export type PdfStampKind =
+  | "text"
+  | "date"
+  | "signature"
+  | "check"
+  | "cross";
+
+export type MarkSize = "S" | "M" | "L";
+
 export type PdfStamp = {
   id: string;
   pageIndex: number;
-  kind: "text" | "date" | "signature";
+  kind: PdfStampKind;
   x: number;
   y: number;
   width: number;
   height: number;
   text: string;
   imageDataUrl: string;
+  fontSize: number;
 };
+
+export const MARK_PX: Record<MarkSize, number> = {
+  S: 9,
+  M: 12,
+  L: 17,
+};
+
+export const TEXT_SIZE: Record<MarkSize, number> = {
+  S: 8,
+  M: 11,
+  L: 14,
+};
+
+export function markBox(size: MarkSize) {
+  const side = MARK_PX[size];
+  return { width: side, height: side };
+}
 
 export function clickToPdfPoint(
   event: { clientX: number; clientY: number },
@@ -182,6 +210,48 @@ export async function listPdfFields(data: ArrayBuffer): Promise<PdfFormField[]> 
   }
 }
 
+function ink() {
+  return rgb(0.07, 0.06, 0.05);
+}
+
+function drawCheck(page: PDFPage, stamp: PdfStamp) {
+  const { x, y, width: w, height: h } = stamp;
+  const t = Math.max(1.15, Math.min(w, h) * 0.16);
+  page.drawLine({
+    start: { x: x + w * 0.12, y: y + h * 0.48 },
+    end: { x: x + w * 0.4, y: y + h * 0.16 },
+    thickness: t,
+    color: ink(),
+    lineCap: LineCapStyle.Round,
+  });
+  page.drawLine({
+    start: { x: x + w * 0.4, y: y + h * 0.16 },
+    end: { x: x + w * 0.9, y: y + h * 0.84 },
+    thickness: t,
+    color: ink(),
+    lineCap: LineCapStyle.Round,
+  });
+}
+
+function drawCross(page: PDFPage, stamp: PdfStamp) {
+  const { x, y, width: w, height: h } = stamp;
+  const t = Math.max(1.05, Math.min(w, h) * 0.14);
+  page.drawLine({
+    start: { x: x + w * 0.14, y: y + h * 0.14 },
+    end: { x: x + w * 0.86, y: y + h * 0.86 },
+    thickness: t,
+    color: ink(),
+    lineCap: LineCapStyle.Round,
+  });
+  page.drawLine({
+    start: { x: x + w * 0.14, y: y + h * 0.86 },
+    end: { x: x + w * 0.86, y: y + h * 0.14 },
+    thickness: t,
+    color: ink(),
+    lineCap: LineCapStyle.Round,
+  });
+}
+
 function drawStamps(
   page: PDFPage,
   stamps: PdfStamp[],
@@ -200,13 +270,21 @@ function drawStamps(
       });
       continue;
     }
-    const size = 11;
+    if (stamp.kind === "check") {
+      drawCheck(page, stamp);
+      continue;
+    }
+    if (stamp.kind === "cross") {
+      drawCross(page, stamp);
+      continue;
+    }
+    const size = stamp.fontSize || 11;
     page.drawText(stamp.text.slice(0, 180), {
       x: stamp.x,
       y: stamp.y,
       size,
       font,
-      color: rgb(0.1, 0.08, 0.06),
+      color: ink(),
       maxWidth: Math.max(80, stamp.width),
     });
   }

@@ -2,30 +2,36 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Check,
   Download,
   Eraser,
   FileUp,
   PenLine,
   Trash2,
   Type,
+  Undo2,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   MAX_PDF_BYTES,
+  TEXT_SIZE,
   clickToPdfPoint,
   createBlankSheet,
   exportSignedPdf,
   formatPdfDate,
   listPdfFields,
+  markBox,
   suggestedFileName,
+  type MarkSize,
   type PdfFormField,
   type PdfStamp,
 } from "@/lib/pdf-fill";
 import { newId } from "@/lib/quotes";
 
-type Mode = "text" | "date" | "sign";
+type Mode = "text" | "date" | "sign" | "check" | "cross";
 type PageSize = { width: number; height: number };
 type Typing = {
   pageIndex: number;
@@ -63,7 +69,8 @@ export function PdfSignTool() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [fields, setFields] = useState<PdfFormField[]>([]);
   const [stamps, setStamps] = useState<PdfStamp[]>([]);
-  const [mode, setMode] = useState<Mode>("text");
+  const [mode, setMode] = useState<Mode>("check");
+  const [markSize, setMarkSize] = useState<MarkSize>("M");
   const [textValue, setTextValue] = useState("");
   const [signature, setSignature] = useState("");
   const [busy, setBusy] = useState(false);
@@ -73,6 +80,14 @@ export function PdfSignTool() {
   const [dragging, setDragging] = useState(false);
   const [typing, setTyping] = useState<Typing | null>(null);
   const typingRef = useRef<Typing | null>(null);
+  const drag = useRef<{
+    id: string;
+    originX: number;
+    originY: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+  } | null>(null);
 
   useEffect(() => {
     typingRef.current = typing;
@@ -147,6 +162,34 @@ export function PdfSignTool() {
     typingInput.current?.focus();
   }, [typing]);
 
+  useEffect(() => {
+    if (!loaded) return;
+    function onKey(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        setTyping(null);
+        setStamps((current) => current.slice(0, -1));
+        return;
+      }
+      if (event.key === "1" || event.key.toLowerCase() === "c") setMode("check");
+      if (event.key === "2" || event.key.toLowerCase() === "x") setMode("cross");
+      if (event.key === "3" || event.key.toLowerCase() === "t") setMode("text");
+      if (event.key.toLowerCase() === "d") setMode("date");
+      if (event.key.toLowerCase() === "f") setMode("sign");
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [loaded]);
+
   const renderPages = useCallback(async (data: ArrayBuffer) => {
     const pdfjs = await import("pdfjs-dist");
     pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
@@ -214,8 +257,8 @@ export function PdfSignTool() {
       setLoaded(true);
       setFileName(name);
       setStamps([]);
-      setMode("text");
       const found = await listPdfFields(data.slice(0));
+      setMode(found.length ? "text" : "check");
       setFields(found);
       const pages = await renderPages(data.slice(0));
       const extra =
@@ -225,7 +268,7 @@ export function PdfSignTool() {
       setNotice(
         (found.length
           ? `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} del formulario. Rellénalos a la izquierda, o pulsa en la hoja y escribe encima.`
-          : "Pulsa en el PDF y escribe donde haga falta. Dibuja la firma y pulsa donde va.") +
+          : "Este PDF no trae casillas interactivas (pasa con Hacienda). Elige ✓ y pulsa en cada recuadro. Arrastra si no cae en el sitio.") +
           extra,
       );
     } catch (caught) {
@@ -302,6 +345,7 @@ export function PdfSignTool() {
       height: current.height,
       text: current.text.trim(),
       imageDataUrl: "",
+      fontSize: TEXT_SIZE[markSize],
     };
   }
 
@@ -324,6 +368,26 @@ export function PdfSignTool() {
     if (typing) {
       flushTyping();
     }
+    if (mode === "check" || mode === "cross") {
+      setError("");
+      const box = markBox(markSize);
+      setStamps((current) => [
+        ...current,
+        {
+          id: newId(),
+          pageIndex,
+          kind: mode,
+          x: Math.min(size.width - box.width, Math.max(0, point.x - box.width / 2)),
+          y: Math.min(size.height - box.height, Math.max(0, point.y - box.height / 2)),
+          width: box.width,
+          height: box.height,
+          text: "",
+          imageDataUrl: "",
+          fontSize: 0,
+        },
+      ]);
+      return;
+    }
     if (mode === "sign") {
       if (!signature) {
         setError("Dibuja la firma a la izquierda y luego pulsa en el PDF.");
@@ -344,6 +408,7 @@ export function PdfSignTool() {
           height,
           text: "",
           imageDataUrl: signature,
+          fontSize: 0,
         },
       ]);
       return;
@@ -351,7 +416,8 @@ export function PdfSignTool() {
     if (mode === "date") {
       setError("");
       const text = formatPdfDate();
-      const width = Math.min(size.width - 24, Math.max(72, text.length * 6.2));
+      const fontSize = TEXT_SIZE[markSize];
+      const width = Math.min(size.width - 24, Math.max(72, text.length * fontSize * 0.56));
       setStamps((current) => [
         ...current,
         {
@@ -361,17 +427,19 @@ export function PdfSignTool() {
           x: Math.min(point.x, size.width - 12),
           y: Math.min(point.y, size.height - 12),
           width,
-          height: 14,
+          height: fontSize + 3,
           text,
           imageDataUrl: "",
+          fontSize,
         },
       ]);
       return;
     }
     setError("");
+    const fontSize = TEXT_SIZE[markSize];
     if (textValue.trim()) {
       const text = textValue.trim();
-      const width = Math.min(size.width - 24, Math.max(72, text.length * 6.2));
+      const width = Math.min(size.width - 24, Math.max(72, text.length * fontSize * 0.56));
       setStamps((current) => [
         ...current,
         {
@@ -381,9 +449,10 @@ export function PdfSignTool() {
           x: Math.min(point.x, size.width - 12),
           y: Math.min(point.y, size.height - 12),
           width,
-          height: 14,
+          height: fontSize + 3,
           text,
           imageDataUrl: "",
+          fontSize,
         },
       ]);
       return;
@@ -393,11 +462,16 @@ export function PdfSignTool() {
       x: Math.min(point.x, size.width - 80),
       y: Math.min(point.y, size.height - 16),
       width: Math.min(240, Math.max(120, size.width - point.x - 16)),
-      height: 16,
+      height: fontSize + 4,
       text: "",
     };
     typingRef.current = next;
     setTyping(next);
+  }
+
+  function undoStamp() {
+    setTyping(null);
+    setStamps((current) => current.slice(0, -1));
   }
 
   async function download() {
@@ -533,59 +607,91 @@ export function PdfSignTool() {
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Escribir y firmar</h2>
+          <h2 className="font-heading text-2xl">Herramientas</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Pulsa en el documento y escribe. O dibuja la firma y pulsa donde
-            debe ir.
+            En un modelo 145 y similares: ✓ en cada casilla, texto donde pida
+            datos, firma al final. Arrastra una marca si no cae en el recuadro.
           </p>
-          <div className="mt-4 grid gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="pdf-text">
-                Texto para repetir (opcional)
-              </Label>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={mode === "check" ? "default" : "outline"}
+              onClick={() => setMode("check")}
+            >
+              <Check />
+              Casilla ✓
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "cross" ? "default" : "outline"}
+              onClick={() => setMode("cross")}
+            >
+              <X />
+              Cruz
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "text" ? "default" : "outline"}
+              onClick={() => setMode("text")}
+            >
+              <Type />
+              Escribir
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "date" ? "default" : "outline"}
+              onClick={() => setMode("date")}
+            >
+              Fecha
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "sign" ? "default" : "outline"}
+              onClick={() => setMode("sign")}
+            >
+              <PenLine />
+              Firma
+            </Button>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-sm text-muted-foreground">Tamaño</span>
+            {(["S", "M", "L"] as MarkSize[]).map((value) => (
+              <Button
+                key={value}
+                type="button"
+                size="sm"
+                variant={markSize === value ? "default" : "outline"}
+                onClick={() => setMarkSize(value)}
+              >
+                {value}
+              </Button>
+            ))}
+          </div>
+          <p className="mt-3 text-sm text-primary">
+            {mode === "check"
+              ? "Pulsa en cada recuadro para marcar ✓. En Hacienda usa tamaño S o M."
+              : mode === "cross"
+                ? "Pulsa para poner una X."
+                : mode === "sign"
+                  ? "Dibuja la firma y pulsa en el PDF."
+                  : mode === "date"
+                    ? "Pulsa en el PDF para poner la fecha de hoy."
+                    : textValue.trim()
+                      ? "Pulsa en el PDF para pegar ese texto."
+                      : "Pulsa en el PDF y escribe ahí mismo."}
+          </p>
+          {mode === "text" ? (
+            <div className="mt-3 grid gap-1.5">
+              <Label htmlFor="pdf-text">Texto para repetir (opcional)</Label>
               <Input
                 id="pdf-text"
                 className="h-10"
                 value={textValue}
                 onChange={(event) => setTextValue(event.target.value)}
-                placeholder="Si lo rellenas, cada clic lo pega"
+                placeholder="NIF, población… cada clic lo pega"
               />
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant={mode === "text" ? "default" : "outline"}
-                onClick={() => setMode("text")}
-              >
-                <Type />
-                Escribir
-              </Button>
-              <Button
-                type="button"
-                variant={mode === "date" ? "default" : "outline"}
-                onClick={() => setMode("date")}
-              >
-                Fecha
-              </Button>
-              <Button
-                type="button"
-                variant={mode === "sign" ? "default" : "outline"}
-                onClick={() => setMode("sign")}
-              >
-                <PenLine />
-                Firma
-              </Button>
-            </div>
-            <p className="text-sm text-primary">
-              {mode === "sign"
-                ? "Dibuja la firma y pulsa en el PDF."
-                : mode === "date"
-                  ? "Pulsa en el PDF para poner la fecha de hoy."
-                  : textValue.trim()
-                    ? "Pulsa en el PDF para pegar ese texto."
-                    : "Pulsa en el PDF y escribe ahí mismo."}
-            </p>
-          </div>
+          ) : null}
           <div className="mt-4">
             <Label htmlFor="pdf-sign">
               Firma (dibuja con el dedo o el ratón)
@@ -706,17 +812,23 @@ export function PdfSignTool() {
             {busy ? "" : "Descargar PDF rellenado"}
           </Button>
           {stamps.length > 0 ? (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setTyping(null);
-                setStamps([]);
-              }}
-            >
-              <Trash2 />
-              Quitar textos y firmas
-            </Button>
+            <>
+              <Button type="button" variant="ghost" onClick={undoStamp}>
+                <Undo2 />
+                Deshacer
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setTyping(null);
+                  setStamps([]);
+                }}
+              >
+                <Trash2 />
+                Quitar marcas
+              </Button>
+            </>
           ) : null}
         </div>
       </div>
@@ -762,22 +874,69 @@ export function PdfSignTool() {
                       }}
                     />
                     {pageStamps.map((stamp) => (
-                      <button
+                      <div
                         key={stamp.id}
-                        type="button"
-                        className="absolute z-10 rounded-sm bg-amber-200/40 ring-1 ring-amber-700/40"
+                        className="absolute z-10 cursor-grab touch-none"
                         style={{
                           left: `${(stamp.x / size.width) * 100}%`,
                           top: `${((size.height - stamp.y - stamp.height) / size.height) * 100}%`,
                           width: `${(stamp.width / size.width) * 100}%`,
                           height: `${(stamp.height / size.height) * 100}%`,
                         }}
-                        title="Quitar"
-                        onClick={(event) => {
+                        onPointerDown={(event) => {
+                          event.preventDefault();
                           event.stopPropagation();
-                          setStamps((current) =>
-                            current.filter((item) => item.id !== stamp.id),
+                          const image = (
+                            event.currentTarget.parentElement as HTMLElement
+                          ).querySelector("img");
+                          if (!(image instanceof HTMLImageElement)) return;
+                          const start = clickToPdfPoint(
+                            event,
+                            image,
+                            size.width,
+                            size.height,
                           );
+                          drag.current = {
+                            id: stamp.id,
+                            originX: stamp.x,
+                            originY: stamp.y,
+                            startX: start.x,
+                            startY: start.y,
+                            moved: false,
+                          };
+                          event.currentTarget.setPointerCapture(event.pointerId);
+                        }}
+                        onPointerMove={(event) => {
+                          if (!drag.current || drag.current.id !== stamp.id) {
+                            return;
+                          }
+                          const image = (
+                            event.currentTarget.parentElement as HTMLElement
+                          ).querySelector("img");
+                          if (!(image instanceof HTMLImageElement)) return;
+                          const now = clickToPdfPoint(
+                            event,
+                            image,
+                            size.width,
+                            size.height,
+                          );
+                          const dx = now.x - drag.current.startX;
+                          const dy = now.y - drag.current.startY;
+                          if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+                            drag.current.moved = true;
+                          }
+                          const nextX = drag.current.originX + dx;
+                          const nextY = drag.current.originY + dy;
+                          setStamps((current) =>
+                            current.map((item) =>
+                              item.id === stamp.id
+                                ? { ...item, x: nextX, y: nextY }
+                                : item,
+                            ),
+                          );
+                        }}
+                        onPointerUp={() => {
+                          drag.current = null;
                         }}
                       >
                         {stamp.kind === "signature" ? (
@@ -786,13 +945,38 @@ export function PdfSignTool() {
                             src={stamp.imageDataUrl}
                             alt="Firma"
                             className="size-full object-contain"
+                            draggable={false}
                           />
+                        ) : stamp.kind === "check" ? (
+                          <span className="flex size-full items-center justify-center text-[11px] leading-none text-foreground">
+                            ✓
+                          </span>
+                        ) : stamp.kind === "cross" ? (
+                          <span className="flex size-full items-center justify-center text-[11px] leading-none text-foreground">
+                            ×
+                          </span>
                         ) : (
-                          <span className="block px-1 text-left text-[11px] leading-4 text-foreground">
+                          <span className="block px-0.5 text-left leading-tight text-foreground"
+                            style={{ fontSize: `${stamp.fontSize || 11}px` }}
+                          >
                             {stamp.text}
                           </span>
                         )}
-                      </button>
+                        <button
+                          type="button"
+                          className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-foreground text-[10px] leading-none text-background"
+                          aria-label="Quitar marca"
+                          onPointerDown={(event) => event.stopPropagation()}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setStamps((current) =>
+                              current.filter((item) => item.id !== stamp.id),
+                            );
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
                     ))}
                     {pageTyping ? (
                       <input
