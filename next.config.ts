@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // Cloud Agent preview and local checks hit 127.0.0.1, not localhost.
-  allowedDevOrigins: ["127.0.0.1", "localhost"],
+  // Keep the Next.js N badge off the phone dock during preview.
+  devIndicators: false,
   transpilePackages: ["heic-to"],
 };
 
