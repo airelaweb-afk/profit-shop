@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,22 +15,28 @@ function nextPath() {
   return safeNextPath(params.get("next"));
 }
 
-function initialTab(): "entrar" | "crear" {
-  if (typeof window === "undefined") return "entrar";
-  return new URLSearchParams(window.location.search).get("tab") === "crear"
-    ? "crear"
-    : "entrar";
+function useUrlTab() {
+  return useSyncExternalStore(
+    () => () => {},
+    () =>
+      new URLSearchParams(window.location.search).get("tab") === "crear"
+        ? "crear"
+        : "entrar",
+    () => "entrar",
+  );
 }
 
 export function LoginForm() {
   const router = useRouter();
   const session = useSession();
-  const [tab, setTab] = useState<"entrar" | "crear">(initialTab);
+  const urlTab = useUrlTab();
+  const [tab, setTab] = useState<"entrar" | "crear" | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const active = tab ?? urlTab;
 
   useEffect(() => {
     if (session) router.replace(nextPath());
@@ -41,7 +47,7 @@ export function LoginForm() {
     setBusy(true);
     setError("");
     try {
-      if (tab === "crear") {
+      if (active === "crear") {
         await registerAccount({ name, email, password });
       } else {
         await loginAccount({ email, password });
@@ -61,20 +67,20 @@ export function LoginForm() {
       <div className="flex gap-2">
         <Button
           type="button"
-          variant={tab === "entrar" ? "default" : "outline"}
+          variant={active === "entrar" ? "default" : "outline"}
           onClick={() => setTab("entrar")}
         >
           Entrar
         </Button>
         <Button
           type="button"
-          variant={tab === "crear" ? "default" : "outline"}
+          variant={active === "crear" ? "default" : "outline"}
           onClick={() => setTab("crear")}
         >
           Crear cuenta
         </Button>
       </div>
-      {tab === "crear" ? (
+      {active === "crear" ? (
         <div className="grid gap-1.5">
           <Label htmlFor="auth-name">Nombre</Label>
           <Input
@@ -107,7 +113,7 @@ export function LoginForm() {
           className="h-10"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          autoComplete={tab === "crear" ? "new-password" : "current-password"}
+          autoComplete={active === "crear" ? "new-password" : "current-password"}
           minLength={8}
           required
         />
@@ -120,7 +126,7 @@ export function LoginForm() {
       <Button type="submit" className="h-11" disabled={busy}>
         {busy
           ? "Un momento…"
-          : tab === "crear"
+          : active === "crear"
             ? "Crear cuenta y entrar"
             : "Entrar"}
       </Button>
