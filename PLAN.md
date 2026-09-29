@@ -58,21 +58,34 @@ Hecho: `/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`, `/jpg-a-pdf`, `/pdf-a-jpg`
 
 Aparcado a propósito. iLovePDF y Smallpdf sí lo hacen, pero **suben el archivo a un servidor** y corren un motor de maquetación (OCR, tablas, fuentes). En el navegador solo podríamos volcar texto a un .docx flojo. Cuando haya servidor o una API de pago (y se avise que el PDF viaja), se monta. No hay URL a medias.
 
-### Paso 8 — Pulir y la siguiente que duela
+### Paso 8 — Imagen y audio en el navegador
+
+Hecho: comprimir, PNG/JPG/WebP, HEIC a JPG, redimensionar, recortar, girar, audio a WAV y recortar audio.
+
+**Prueba:** `/comprimir-imagen` y `/heic-a-jpg`.
+
+### Pendiente — lo que pide servidor
+
+- **PDF a Word** (motor de maquetación).
+- **Vídeo** (comprimir, MP4, extraer audio) y **codificar a MP3**.
+- **Quitar fondo / ampliar con IA**.
+- Extraer audio de YouTube.
+
+### Paso 9 — Pulir y la siguiente que duela
 
 Lo que falle en PDF o en el móvil, se corrige. Siguiente atasco concreto (albarán, aplazamientos), no un panel de “todo”.
 
-### Paso 9 — Que Google las encuentre
+### Paso 10 — Que Google las encuentre
 
 Una URL, un título, un problema. Textos para búsquedas reales.
 
-### Paso 10 — Ofrecer algo, más adelante
+### Paso 11 — Ofrecer algo, más adelante
 
 Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue existiendo. No hay demo calls. No recoger datos de la gente hasta que haya consentimiento claro.
 
 ## Qué no hacemos ahora
 
-Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor. PDF a Word (hasta tener motor decente). Conversiones de vídeo pesadas (ffmpeg.wasm) y quitar fondo / ampliar con IA.
+Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor. PDF a Word. Vídeo y MP3 de salida. Quitar fondo / ampliar con IA.
 
 ## Dónde está cada cosa
 
@@ -90,5 +103,10 @@ Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. C
 | JPG a PDF | `/jpg-a-pdf` |
 | PDF a JPG | `/pdf-a-jpg` |
 | Hub PDF | `/herramientas-pdf` |
+| Comprimir imagen | `/comprimir-imagen` |
+| PNG a JPG | `/png-a-jpg` |
+| HEIC a JPG | `/heic-a-jpg` |
+| Hub imagen | `/herramientas-imagen` |
+| Audio a WAV | `/audio-a-wav` |
 | Entrar | `/entrar` |
 | Explicación | `/como-funciona` |

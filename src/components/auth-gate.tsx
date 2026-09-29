@@ -37,8 +37,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           Entra para usar las herramientas.
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Presupuestos, cobros, gastos y las herramientas PDF (unir, comprimir,
-          firmar) son para quien tiene cuenta.
+          Presupuestos, cobros, PDF e imágenes son para quien tiene cuenta.
           La creas aquí. Los datos (y tus PDF) se quedan en este navegador: no
           hay servidor nuestro.
         </p>

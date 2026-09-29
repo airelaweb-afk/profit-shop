@@ -44,6 +44,11 @@ export function SiteFooter() {
                 Unir, comprimir y firmar PDF
               </Link>
             </li>
+            <li>
+              <Link href="/herramientas-imagen" className="hover:text-foreground">
+                Comprimir imagen y HEIC a JPG
+              </Link>
+            </li>
           </ul>
         </div>
         <div>

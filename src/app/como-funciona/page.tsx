@@ -65,7 +65,15 @@ export default function ComoFuncionaPage() {
             Lo que más se busca: juntar varios PDF, partir páginas, bajar el
             peso, pasar fotos a PDF o al revés. Se hace en este navegador. No
             convertimos a Word: sin servidor el resultado sería un documento
-            feo, y no vale la pena.
+            feo, y no vale la pena. Queda aparcado.
+          </p>
+        </section>
+        <section>
+          <h2 className="font-heading text-2xl">Comprimir y convertir fotos</h2>
+          <p className="mt-2 text-muted-foreground">
+            Comprimir, PNG a JPG, HEIC del iPhone, recortar y girar. También
+            audio a WAV. Quitar el fondo, ampliar con IA, vídeo y PDF a Word
+            no: piden servidor o un motor que aquí no hay.
           </p>
         </section>
         <section>

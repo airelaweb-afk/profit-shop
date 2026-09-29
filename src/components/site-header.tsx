@@ -20,6 +20,7 @@ const links = [
   { href: "/horas", label: "Horas" },
   { href: "/gastos", label: "Gastos" },
   { href: "/herramientas-pdf", label: "PDF" },
+  { href: "/herramientas-imagen", label: "Imagen" },
 ];
 
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {

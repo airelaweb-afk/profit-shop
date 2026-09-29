@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pdfKit } from "@/lib/pdf-kit";
+import { imageKit } from "@/lib/image-kit";
 
 const tools = [
   {
@@ -90,6 +91,33 @@ export default function HomePage() {
         </p>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pdfKit.map((tool) => (
+            <li key={tool.href}>
+              <Link
+                href={tool.href}
+                className="flex h-full flex-col rounded-2xl bg-card p-5 ring-1 ring-foreground/10 transition-colors hover:bg-muted/40"
+              >
+                <p className="font-heading text-xl">{tool.name}</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {tool.problem}
+                </p>
+                <p className="mt-2 text-sm">{tool.does}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm text-primary">
+                  Abrir
+                  <ArrowRight className="size-3.5" />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+        <h2 className="font-heading text-2xl sm:text-3xl">Fotos, lo de cada martes</h2>
+        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+          Comprimir, PNG a JPG, HEIC del iPhone. Quitar fondo e IA, no.
+        </p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {imageKit.map((tool) => (
             <li key={tool.href}>
               <Link
                 href={tool.href}
