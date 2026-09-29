@@ -14,13 +14,13 @@ export default function PdfPage() {
         Herramienta · sin CRM
       </p>
       <h1 className="no-print mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        Rellenar y firmar un PDF, aquí mismo.
+        Sube tu PDF. Rellénalo. Fírmalo.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Abre el archivo que te han mandado, o una hoja en blanco. Escribes,
-        pones la fecha y dibujas la firma. Te lo descargas. El PDF no sale de
-        este navegador. No es una firma con certificado digital ni Cl@ve: es tu
-        rúbrica, como en papel.
+        Elige el archivo que te han mandado. Si trae cajas, las rellenas. Si no,
+        pulsas en la hoja y escribes. Dibujas la firma y la pones donde va. Te
+        lo descargas. El PDF no sale de este navegador. No es Cl@ve ni un
+        certificado digital: es tu rúbrica, como en papel.
       </p>
       <div className="mt-10">
         <PdfSignTool />

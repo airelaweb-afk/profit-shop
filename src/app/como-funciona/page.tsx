@@ -53,9 +53,9 @@ export default function ComoFuncionaPage() {
           <h2 className="font-heading text-2xl">Rellenar y firmar un PDF</h2>
           <p className="mt-2 text-muted-foreground">
             Adobe cobra. Los “firma gratis” de internet se quedan el archivo.
-            Aquí abres el PDF, rellenas si trae cajas, dibujas la rúbrica y te
-            lo llevas. No sale del navegador. No sustituye a Cl@ve ni a un
-            certificado digital.
+            Aquí subes el PDF que te han mandado, rellenas las cajas o escribes
+            encima, dibujas la rúbrica y te lo llevas. No sale del navegador.
+            No sustituye a Cl@ve ni a un certificado digital.
           </p>
         </section>
       </div>

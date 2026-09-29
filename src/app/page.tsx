@@ -37,7 +37,7 @@ const tools = [
     href: "/pdf",
     name: "Firmar PDF",
     problem: "Me mandan un PDF y no tengo Adobe para rellenarlo.",
-    does: "Lo abres aquí, escribes, firmas y te lo descargas. No se sube a ningún sitio.",
+    does: "Subes el que te han mandado. Escribes donde haga falta, firmas y te lo descargas.",
   },
 ];
 

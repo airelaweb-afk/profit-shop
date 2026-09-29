@@ -25,8 +25,16 @@ import {
 } from "@/lib/pdf-fill";
 import { newId } from "@/lib/quotes";
 
-type Mode = "idle" | "text" | "date" | "sign";
+type Mode = "text" | "date" | "sign";
 type PageSize = { width: number; height: number };
+type Typing = {
+  pageIndex: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  text: string;
+};
 
 function dataUrlFromCanvas(canvas: HTMLCanvasElement) {
   const blank = document.createElement("canvas");
@@ -36,9 +44,16 @@ function dataUrlFromCanvas(canvas: HTMLCanvasElement) {
   return canvas.toDataURL("image/png");
 }
 
+function isPdfFile(file: File) {
+  const type = file.type.toLowerCase();
+  const name = file.name.toLowerCase();
+  return type === "application/pdf" || name.endsWith(".pdf");
+}
+
 export function PdfSignTool() {
   const fileInput = useRef<HTMLInputElement>(null);
   const signCanvas = useRef<HTMLCanvasElement>(null);
+  const typingInput = useRef<HTMLInputElement>(null);
   const drawing = useRef(false);
   const pdfBytes = useRef<ArrayBuffer | null>(null);
 
@@ -48,13 +63,20 @@ export function PdfSignTool() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [fields, setFields] = useState<PdfFormField[]>([]);
   const [stamps, setStamps] = useState<PdfStamp[]>([]);
-  const [mode, setMode] = useState<Mode>("idle");
+  const [mode, setMode] = useState<Mode>("text");
   const [textValue, setTextValue] = useState("");
   const [signature, setSignature] = useState("");
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [dragging, setDragging] = useState(false);
+  const [typing, setTyping] = useState<Typing | null>(null);
+  const typingRef = useRef<Typing | null>(null);
+
+  useEffect(() => {
+    typingRef.current = typing;
+  }, [typing]);
 
   const resetPad = useCallback(() => {
     const canvas = signCanvas.current;
@@ -118,9 +140,14 @@ export function PdfSignTool() {
     }
 
     return attachPad(pad, ink);
-  }, []);
+  }, [loaded]);
 
-  async function renderPages(data: ArrayBuffer) {
+  useEffect(() => {
+    if (!typing) return;
+    typingInput.current?.focus();
+  }, [typing]);
+
+  const renderPages = useCallback(async (data: ArrayBuffer) => {
     const pdfjs = await import("pdfjs-dist");
     pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
     const task = pdfjs.getDocument({
@@ -149,12 +176,36 @@ export function PdfSignTool() {
     setSizes(nextSizes);
     setPreviews(nextPreviews);
     return count;
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!loaded || fields.length === 0) return;
+    const source = pdfBytes.current;
+    if (!source) return;
+    const handle = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const bytes = await exportSignedPdf({
+            data: source.slice(0),
+            fields,
+            stamps: [],
+          });
+          const copy = new ArrayBuffer(bytes.byteLength);
+          new Uint8Array(copy).set(bytes);
+          await renderPages(copy);
+        } catch {
+          // El preview original sigue valiendo.
+        }
+      })();
+    }, 400);
+    return () => window.clearTimeout(handle);
+  }, [fields, loaded, renderPages]);
 
   async function openBytes(data: ArrayBuffer, name: string) {
     setBusy(true);
     setError("");
     setNotice("");
+    setTyping(null);
     try {
       if (data.byteLength > MAX_PDF_BYTES) {
         throw new Error("El PDF pesa más de 20 MB. Usa uno más ligero.");
@@ -163,6 +214,7 @@ export function PdfSignTool() {
       setLoaded(true);
       setFileName(name);
       setStamps([]);
+      setMode("text");
       const found = await listPdfFields(data.slice(0));
       setFields(found);
       const pages = await renderPages(data.slice(0));
@@ -172,8 +224,8 @@ export function PdfSignTool() {
           : "";
       setNotice(
         (found.length
-          ? `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} para rellenar. También puedes escribir y firmar encima.`
-          : "Este PDF no trae campos. Pulsa en la hoja para escribir, poner la fecha o la firma.") +
+          ? `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} del formulario. Rellénalos a la izquierda, o pulsa en la hoja y escribe encima.`
+          : "Pulsa en el PDF y escribe donde haga falta. Dibuja la firma y pulsa donde va.") +
           extra,
       );
     } catch (caught) {
@@ -191,11 +243,9 @@ export function PdfSignTool() {
     }
   }
 
-  async function onFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
+  async function takeFile(file: File | undefined) {
     if (!file) return;
-    if (file.type && file.type !== "application/pdf") {
+    if (!isPdfFile(file)) {
       setError("Sube un archivo PDF.");
       return;
     }
@@ -203,9 +253,67 @@ export function PdfSignTool() {
     await openBytes(data, file.name);
   }
 
+  async function onFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    await takeFile(file);
+  }
+
   async function openBlank() {
     const data = await createBlankSheet();
     await openBytes(data, "documento-para-firmar.pdf");
+  }
+
+  function onDragOver(event: React.DragEvent) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    setDragging(true);
+  }
+
+  function onDragLeave(event: React.DragEvent) {
+    if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+    setDragging(false);
+  }
+
+  async function onDrop(event: React.DragEvent) {
+    event.preventDefault();
+    setDragging(false);
+    const file = [...event.dataTransfer.files].find(isPdfFile);
+    if (!file) {
+      setError("Suelta un archivo PDF.");
+      return;
+    }
+    await takeFile(file);
+  }
+
+  function stampFromTyping(current: Typing): PdfStamp {
+    const size = sizes[current.pageIndex];
+    const width = Math.min(
+      size ? size.width - 24 : current.width,
+      Math.max(72, current.text.trim().length * 6.2),
+    );
+    return {
+      id: newId(),
+      pageIndex: current.pageIndex,
+      kind: "text",
+      x: current.x,
+      y: current.y,
+      width,
+      height: current.height,
+      text: current.text.trim(),
+      imageDataUrl: "",
+    };
+  }
+
+  function flushTyping() {
+    const current = typingRef.current;
+    typingRef.current = null;
+    setTyping(null);
+    if (!current?.text.trim()) return stamps;
+    const extra = stampFromTyping(current);
+    const next = [...stamps, extra];
+    setStamps(next);
+    return next;
   }
 
   function placeStamp(
@@ -213,24 +321,21 @@ export function PdfSignTool() {
     point: { x: number; y: number },
     size: PageSize,
   ) {
-    if (mode === "idle") return;
-    if (mode === "sign" && !signature) {
-      setError("Dibuja la firma arriba y luego pulsa en el PDF.");
-      return;
+    if (typing) {
+      flushTyping();
     }
-    if (mode === "text" && !textValue.trim()) {
-      setError("Escribe el texto y luego pulsa donde debe ir.");
-      return;
-    }
-    setError("");
-    const id = newId();
     if (mode === "sign") {
+      if (!signature) {
+        setError("Dibuja la firma a la izquierda y luego pulsa en el PDF.");
+        return;
+      }
+      setError("");
       const width = 132;
       const height = 52;
       setStamps((current) => [
         ...current,
         {
-          id,
+          id: newId(),
           pageIndex,
           kind: "signature",
           x: Math.min(point.x, size.width - width),
@@ -243,36 +348,71 @@ export function PdfSignTool() {
       ]);
       return;
     }
-    const text = mode === "date" ? formatPdfDate() : textValue.trim();
-    const width = Math.min(size.width - 24, Math.max(72, text.length * 6.2));
-    setStamps((current) => [
-      ...current,
-      {
-        id,
-        pageIndex,
-        kind: mode,
-        x: Math.min(point.x, size.width - 12),
-        y: Math.min(point.y, size.height - 12),
-        width,
-        height: 14,
-        text,
-        imageDataUrl: "",
-      },
-    ]);
+    if (mode === "date") {
+      setError("");
+      const text = formatPdfDate();
+      const width = Math.min(size.width - 24, Math.max(72, text.length * 6.2));
+      setStamps((current) => [
+        ...current,
+        {
+          id: newId(),
+          pageIndex,
+          kind: "date",
+          x: Math.min(point.x, size.width - 12),
+          y: Math.min(point.y, size.height - 12),
+          width,
+          height: 14,
+          text,
+          imageDataUrl: "",
+        },
+      ]);
+      return;
+    }
+    setError("");
+    if (textValue.trim()) {
+      const text = textValue.trim();
+      const width = Math.min(size.width - 24, Math.max(72, text.length * 6.2));
+      setStamps((current) => [
+        ...current,
+        {
+          id: newId(),
+          pageIndex,
+          kind: "text",
+          x: Math.min(point.x, size.width - 12),
+          y: Math.min(point.y, size.height - 12),
+          width,
+          height: 14,
+          text,
+          imageDataUrl: "",
+        },
+      ]);
+      return;
+    }
+    const next = {
+      pageIndex,
+      x: Math.min(point.x, size.width - 80),
+      y: Math.min(point.y, size.height - 16),
+      width: Math.min(240, Math.max(120, size.width - point.x - 16)),
+      height: 16,
+      text: "",
+    };
+    typingRef.current = next;
+    setTyping(next);
   }
 
   async function download() {
     if (!pdfBytes.current) {
-      setError("Abre un PDF o crea una hoja en blanco.");
+      setError("Sube un PDF o crea una hoja en blanco.");
       return;
     }
+    const nextStamps = flushTyping();
     setBusy(true);
     setError("");
     try {
       const bytes = await exportSignedPdf({
         data: pdfBytes.current.slice(0),
         fields,
-        stamps,
+        stamps: nextStamps,
       });
       const copy = new Uint8Array(bytes);
       const blob = new Blob([copy], { type: "application/pdf" });
@@ -290,22 +430,88 @@ export function PdfSignTool() {
     }
   }
 
+  const filePicker = (
+    <input
+      ref={fileInput}
+      type="file"
+      accept="application/pdf,.pdf"
+      className="sr-only"
+      onChange={(event) => void onFile(event)}
+    />
+  );
+
+  if (!loaded) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        {filePicker}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => fileInput.current?.click()}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={(event) => void onDrop(event)}
+          className={`flex w-full flex-col items-center rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors sm:py-16 ${
+            dragging
+              ? "border-primary bg-primary/10"
+              : "border-foreground/20 bg-card hover:border-primary/50 hover:bg-muted/40"
+          }`}
+        >
+          <FileUp className="size-10 text-primary" />
+          <p className="mt-4 font-heading text-2xl sm:text-3xl">
+            {busy ? "Abriendo el PDF…" : "Sube tu PDF"}
+          </p>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            {busy
+              ? "Se abre en este ordenador. Un archivo grande tarda un momento."
+              : "Arrástralo aquí o elige el que te han mandado. Rellenas, firmas y te lo descargas. No se envía a ningún servidor."}
+          </p>
+          {!busy ? (
+            <span className="mt-6 inline-flex h-11 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground">
+              Elegir PDF del ordenador
+            </span>
+          ) : null}
+        </button>
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          ¿No tienes archivo?{" "}
+          <button
+            type="button"
+            className="text-primary underline-offset-4 hover:underline"
+            onClick={() => void openBlank()}
+            disabled={busy}
+          >
+            Empezar con una hoja en blanco
+          </button>
+        </p>
+        {error ? (
+          <p className="mt-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-8 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+      {filePicker}
       <div className="no-print flex flex-col gap-6">
-        <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">El archivo</h2>
+        <section
+          className={`rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6 ${
+            dragging ? "ring-2 ring-primary" : ""
+          }`}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={(event) => void onDrop(event)}
+        >
+          <h2 className="font-heading text-2xl">Tu PDF</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            No se sube a ningún servidor. Si el PDF ya trae cajas, las rellenas
-            aquí. Si no, escribes y firmas encima, como en papel.
+            {fileName}
+            {pageCount
+              ? ` · ${pageCount} página${pageCount === 1 ? "" : "s"}`
+              : ""}
+            . Sigue en este navegador.
           </p>
-          <input
-            ref={fileInput}
-            type="file"
-            accept="application/pdf,.pdf"
-            className="sr-only"
-            onChange={(event) => void onFile(event)}
-          />
           <div className="mt-4 flex flex-wrap gap-2">
             <Button
               type="button"
@@ -313,7 +519,7 @@ export function PdfSignTool() {
               disabled={busy}
             >
               <FileUp />
-              Abrir PDF
+              Cambiar de PDF
             </Button>
             <Button
               type="button"
@@ -324,67 +530,66 @@ export function PdfSignTool() {
               Hoja en blanco
             </Button>
           </div>
-          {fileName ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              {fileName}
-              {pageCount ? ` · ${pageCount} página${pageCount === 1 ? "" : "s"}` : ""}
-            </p>
-          ) : null}
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <h2 className="font-heading text-2xl">Escribir y firmar</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Elige qué colocar y pulsa en la hoja, donde iría en el papel.
+            Pulsa en el documento y escribe. O dibuja la firma y pulsa donde
+            debe ir.
           </p>
           <div className="mt-4 grid gap-3">
             <div className="grid gap-1.5">
-              <Label htmlFor="pdf-text">Texto</Label>
+              <Label htmlFor="pdf-text">
+                Texto para repetir (opcional)
+              </Label>
               <Input
                 id="pdf-text"
                 className="h-10"
                 value={textValue}
                 onChange={(event) => setTextValue(event.target.value)}
-                placeholder="Nombre, NIF, “conforme”…"
+                placeholder="Si lo rellenas, cada clic lo pega"
               />
             </div>
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
                 variant={mode === "text" ? "default" : "outline"}
-                onClick={() => setMode(mode === "text" ? "idle" : "text")}
+                onClick={() => setMode("text")}
               >
                 <Type />
-                Colocar texto
+                Escribir
               </Button>
               <Button
                 type="button"
                 variant={mode === "date" ? "default" : "outline"}
-                onClick={() => setMode(mode === "date" ? "idle" : "date")}
+                onClick={() => setMode("date")}
               >
-                Colocar fecha
+                Fecha
               </Button>
               <Button
                 type="button"
                 variant={mode === "sign" ? "default" : "outline"}
-                onClick={() => setMode(mode === "sign" ? "idle" : "sign")}
+                onClick={() => setMode("sign")}
               >
                 <PenLine />
-                Colocar firma
+                Firma
               </Button>
             </div>
-            {mode !== "idle" ? (
-              <p className="text-sm text-primary">
-                {mode === "sign"
-                  ? "Dibuja la firma y pulsa en el PDF."
-                  : mode === "date"
-                    ? "Pulsa en el PDF para poner la fecha de hoy."
-                    : "Pulsa en el PDF para pegar el texto."}
-              </p>
-            ) : null}
+            <p className="text-sm text-primary">
+              {mode === "sign"
+                ? "Dibuja la firma y pulsa en el PDF."
+                : mode === "date"
+                  ? "Pulsa en el PDF para poner la fecha de hoy."
+                  : textValue.trim()
+                    ? "Pulsa en el PDF para pegar ese texto."
+                    : "Pulsa en el PDF y escribe ahí mismo."}
+            </p>
           </div>
           <div className="mt-4">
-            <Label htmlFor="pdf-sign">Firma (dibuja con el dedo o el ratón)</Label>
+            <Label htmlFor="pdf-sign">
+              Firma (dibuja con el dedo o el ratón)
+            </Label>
             <canvas
               id="pdf-sign"
               ref={signCanvas}
@@ -409,8 +614,8 @@ export function PdfSignTool() {
           <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
             <h2 className="font-heading text-2xl">Campos del PDF</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Estos venían en el archivo (formularios de Hacienda, bancos,
-              colegios…).
+              Este archivo ya traía cajas (Hacienda, banco, colegio…).
+              Rellénalas aquí; salen en el PDF descargado.
             </p>
             <ul className="mt-4 flex flex-col gap-3">
               {fields.map((field, index) => (
@@ -495,16 +700,19 @@ export function PdfSignTool() {
             size="lg"
             className="h-11 px-5"
             onClick={() => void download()}
-            disabled={busy || !loaded}
+            disabled={busy}
           >
             {busy ? "Preparando…" : <Download />}
-            {busy ? "" : "Descargar PDF firmado"}
+            {busy ? "" : "Descargar PDF rellenado"}
           </Button>
           {stamps.length > 0 ? (
             <Button
               type="button"
               variant="ghost"
-              onClick={() => setStamps([])}
+              onClick={() => {
+                setTyping(null);
+                setStamps([]);
+              }}
             >
               <Trash2 />
               Quitar textos y firmas
@@ -517,18 +725,6 @@ export function PdfSignTool() {
         {busy && previews.length === 0 ? (
           <div className="rounded-2xl bg-card p-8 ring-1 ring-foreground/10">
             <p className="font-heading text-2xl">Abriendo el PDF…</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Se dibuja aquí, en este ordenador. Un archivo grande tarda un
-              momento.
-            </p>
-          </div>
-        ) : previews.length === 0 ? (
-          <div className="rounded-2xl bg-card p-8 ring-1 ring-foreground/10">
-            <p className="font-heading text-2xl">Aún no hay PDF</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Abre el que te han mandado, o crea una hoja en blanco si solo
-              necesitas una firma.
-            </p>
           </div>
         ) : (
           <ol className="flex flex-col gap-6">
@@ -538,37 +734,32 @@ export function PdfSignTool() {
               const pageStamps = stamps.filter(
                 (stamp) => stamp.pageIndex === pageIndex,
               );
+              const pageTyping =
+                typing && typing.pageIndex === pageIndex ? typing : null;
               return (
-                <li key={src.slice(-24) + pageIndex}>
+                <li key={pageIndex}>
                   <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
                     Página {pageIndex + 1}
                   </p>
-                  <div
-                    className={`relative overflow-hidden rounded-sm bg-white shadow-[0_24px_50px_-18px_rgba(40,24,10,0.45)] ring-1 ring-foreground/10 ${
-                      mode === "idle" ? "" : "cursor-crosshair"
-                    }`}
-                    onClick={(event) => {
-                      if (
-                        event.target !== event.currentTarget &&
-                        !(event.target instanceof HTMLImageElement)
-                      ) {
-                        return;
-                      }
-                      const image = event.currentTarget.querySelector("img");
-                      if (!(image instanceof HTMLImageElement)) return;
-                      placeStamp(
-                        pageIndex,
-                        clickToPdfPoint(event, image, size.width, size.height),
-                        size,
-                      );
-                    }}
-                  >
+                  <div className="relative overflow-hidden rounded-sm bg-white shadow-[0_24px_50px_-18px_rgba(40,24,10,0.45)] ring-1 ring-foreground/10">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={src}
                       alt={`Página ${pageIndex + 1} del PDF`}
-                      className="block w-full select-none"
+                      className="block w-full cursor-crosshair select-none"
                       draggable={false}
+                      onClick={(event) => {
+                        placeStamp(
+                          pageIndex,
+                          clickToPdfPoint(
+                            event,
+                            event.currentTarget,
+                            size.width,
+                            size.height,
+                          ),
+                          size,
+                        );
+                      }}
                     />
                     {pageStamps.map((stamp) => (
                       <button
@@ -603,6 +794,42 @@ export function PdfSignTool() {
                         )}
                       </button>
                     ))}
+                    {pageTyping ? (
+                      <input
+                        ref={typingInput}
+                        value={pageTyping.text}
+                        aria-label="Escribir en el PDF"
+                        className="absolute z-20 rounded-sm border border-primary bg-white px-1 text-[12px] leading-4 text-foreground shadow-sm outline-none"
+                        style={{
+                          left: `${(pageTyping.x / size.width) * 100}%`,
+                          top: `${((size.height - pageTyping.y - pageTyping.height) / size.height) * 100}%`,
+                          width: `${(pageTyping.width / size.width) * 100}%`,
+                          height: `${(pageTyping.height / size.height) * 100}%`,
+                          minHeight: "1.1rem",
+                        }}
+                        onClick={(event) => event.stopPropagation()}
+                        onChange={(event) => {
+                          const text = event.target.value;
+                          setTyping((current) => {
+                            if (!current) return current;
+                            const next = { ...current, text };
+                            typingRef.current = next;
+                            return next;
+                          });
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            flushTyping();
+                          }
+                          if (event.key === "Escape") {
+                            event.preventDefault();
+                            setTyping(null);
+                          }
+                        }}
+                        onBlur={() => flushTyping()}
+                      />
+                    ) : null}
                   </div>
                 </li>
               );
