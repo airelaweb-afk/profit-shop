@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s · Luna Oficio",
   },
   description:
-    "Presupuestos en lote y otras herramientas para autónomos y empresas pequeñas. Sin cuentas ni pipelines.",
+    "Presupuestos, cobros y partes de horas para autónomos y administración. Sin cuentas ni CRM.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,14 +1,15 @@
 # Luna Oficio
 
-Herramientas de administración para **autónomos y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (por ejemplo, generar muchos presupuestos de una vez) y se puede encontrar en Google.
+Herramientas de administración para **autónomos, secretaría y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (varios presupuestos, recordatorios de cobro, un parte de horas) y se puede encontrar en Google.
 
 Los datos se quedan en el navegador (`localStorage`). No hay cuentas, ni base de datos, ni servidor propio.
 
 ## Herramientas
 
 - **Versiones de un trabajo** (`/versiones`): un cliente, un encargo, varios presupuestos (básico / recomendado / completo, con o sin urgencia).
-- **Recordatorios de cobro** (`/cobros`): pegas quién te debe y copias una tanda de mensajes de WhatsApp o correo.
-- **Presupuestos en lote** (`/presupuestos`): varios presupuestos de una vez, listos para copiar.
+- **Recordatorios de cobro** (`/cobros`): pegas quién te debe y copias o abres WhatsApp / correo.
+- **Presupuestos en lote** (`/presupuestos`): varios presupuestos de una vez, listos para PDF y mensaje.
+- **Parte de horas** (`/horas`): pegas la semana y sacas un papel para el cliente o el jefe.
 
 La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el menú: el producto son las herramientas.
 

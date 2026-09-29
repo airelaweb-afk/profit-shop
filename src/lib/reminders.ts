@@ -8,21 +8,26 @@ export type Debtor = {
   amount: number;
   dateLabel: string;
   concept: string;
+  phone: string;
+  email: string;
 };
 
 export const sampleSender = "Clara López";
 
-export const sampleDebtText = `Taller Sur, 450, 01/08/2026, web de la tienda
-Academia Norte, 1200, 15/07/2026, pack mensual de redes
-Clínica Alma, 280, 20/08/2026, sesión de marca
+export const sampleDebtText = `Taller Sur, 450, 01/08/2026, web de la tienda, 600111222
+Academia Norte, 1.200, 15/07/2026, pack mensual de redes, marta@norte.com
+Clínica Alma, 280 €, 20/08/2026, sesión de marca, 611222333
 Café Lumen, 90, 05/09/2026, fotos de carta
-Hotel Bruma, 860, 12/06/2026, campaña de verano
+Hotel Bruma, 860, 12/06/2026, campaña de verano, 622333444
 Gimnasio Ronda, 150, 28/08/2026, diseño de stories
-Asesoría Vives, 320, 02/07/2026, landing de captación
+Asesoría Vives, 320, 02/07/2026, landing de captación, vives@asesoria.es
 Colegio Santa Isabel, 540, 10/08/2026, extraescolares web`;
 
-function parseAmount(raw: string): number | null {
-  const cleaned = raw.replace(/€|eur|euros/gi, "").trim();
+export function parseAmount(raw: string): number | null {
+  const cleaned = raw
+    .replace(/€|eur|euros/gi, "")
+    .replace(/\s/g, "")
+    .trim();
   if (!cleaned) return null;
   if (/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(cleaned)) {
     const [euros, cents = ""] = cleaned.split(",");
@@ -47,17 +52,49 @@ function looksLikeDate(raw: string) {
   );
 }
 
+function looksLikeEmail(raw: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw.trim());
+}
+
+export function parsePhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 9 && /^[6-9]/.test(digits)) return digits;
+  if (digits.length === 11 && digits.startsWith("34")) return digits.slice(2);
+  if (digits.length === 12 && digits.startsWith("0034")) return digits.slice(4);
+  return "";
+}
+
+export function waLink(phone: string, text: string) {
+  const digits = parsePhone(phone);
+  const path = digits ? `34${digits}` : "";
+  return `https://wa.me/${path}?text=${encodeURIComponent(text)}`;
+}
+
+export function mailLink(email: string, subject: string, body: string) {
+  const to = email.trim();
+  const params = new URLSearchParams();
+  if (subject) params.set("subject", subject);
+  if (body) params.set("body", body);
+  const query = params.toString().replace(/\+/g, "%20");
+  return `mailto:${to ? encodeURIComponent(to) : ""}?${query}`;
+}
+
 export function parseDebtors(raw: string): Debtor[] {
   return raw
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
-      const parts = line.split(/[,|;]/).map((part) => part.trim()).filter(Boolean);
+      const parts = line
+        .split(/[,|;]/)
+        .map((part) => part.trim())
+        .filter(Boolean);
       if (parts.length === 0) return null;
       const company = parts[0] ?? "";
       let amount: number | null = null;
       let dateLabel = "";
+      let phone = "";
+      let email = "";
       const conceptParts: string[] = [];
       for (const part of parts.slice(1)) {
         if (amount === null) {
@@ -71,6 +108,17 @@ export function parseDebtors(raw: string): Debtor[] {
           dateLabel = part;
           continue;
         }
+        if (!email && looksLikeEmail(part)) {
+          email = part;
+          continue;
+        }
+        if (!phone) {
+          const parsedPhone = parsePhone(part);
+          if (parsedPhone) {
+            phone = parsedPhone;
+            continue;
+          }
+        }
         conceptParts.push(part);
       }
       if (!company || amount === null || amount <= 0) return null;
@@ -79,16 +127,19 @@ export function parseDebtors(raw: string): Debtor[] {
         amount,
         dateLabel,
         concept: conceptParts.join(", "),
+        phone,
+        email,
       };
     })
     .filter((row): row is Debtor => Boolean(row))
-    .slice(0, 30);
+    .slice(0, 40);
 }
 
 export function reminderSubject(debtor: Debtor, round: ReminderRound) {
   const what = debtor.concept || "trabajo pendiente";
   if (round === "primera") return `Pendiente de cobro: ${what}`;
-  if (round === "segunda") return `Recordatorio: ${what} (${formatEuro(debtor.amount)})`;
+  if (round === "segunda")
+    return `Recordatorio: ${what} (${formatEuro(debtor.amount)})`;
   return `Cierre de pago: ${what}`;
 }
 

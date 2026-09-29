@@ -1,18 +1,20 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatEuro } from "@/lib/quotes";
 import {
+  mailLink,
   parseDebtors,
   reminderBody,
   reminderSubject,
   sampleDebtText,
   sampleSender,
+  waLink,
   type Debtor,
   type ReminderChannel,
   type ReminderRound,
@@ -29,7 +31,14 @@ type Stored = {
   list: string;
 };
 
-const defaults: Stored = {
+const emptyStored: Stored = {
+  sender: "",
+  round: "primera",
+  channel: "whatsapp",
+  list: "",
+};
+
+const sampleStored: Stored = {
   sender: sampleSender,
   round: "primera",
   channel: "whatsapp",
@@ -46,17 +55,17 @@ function subscribe(listener: () => void) {
 }
 
 function parseStored(json: string): Stored {
-  if (!json) return defaults;
+  if (!json) return structuredClone(emptyStored);
   try {
     const parsed = JSON.parse(json) as Partial<Stored>;
     return {
-      sender: parsed.sender ?? defaults.sender,
-      round: parsed.round ?? defaults.round,
-      channel: parsed.channel ?? defaults.channel,
-      list: parsed.list ?? defaults.list,
+      sender: parsed.sender ?? "",
+      round: parsed.round ?? "primera",
+      channel: parsed.channel ?? "whatsapp",
+      list: parsed.list ?? "",
     };
   } catch {
-    return defaults;
+    return structuredClone(emptyStored);
   }
 }
 
@@ -127,6 +136,8 @@ export function ReminderBatchTool() {
     await copyOne("all", blob);
   }
 
+  const totalCents = debtors.reduce((sum, row) => sum + row.amount, 0);
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       <form
@@ -137,11 +148,31 @@ export function ReminderBatchTool() {
         }}
       >
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Tu firma</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Sale al final de cada mensaje. Nada se envía solo: tú pegas en
-            WhatsApp o el correo.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-2xl">Tu firma</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Nada se envía solo. Copias, WhatsApp o correo: tú pegas el
+                mensaje.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => write(structuredClone(sampleStored))}
+              >
+                Cargar ejemplo
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => write(structuredClone(emptyStored))}
+              >
+                Empezar de cero
+              </Button>
+            </div>
+          </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5 sm:col-span-2">
               <Label htmlFor="sender">Nombre con el que firmas</Label>
@@ -150,6 +181,7 @@ export function ReminderBatchTool() {
                 className="h-10"
                 value={stored.sender}
                 onChange={(event) => patch({ sender: event.target.value })}
+                placeholder="Clara López"
               />
             </div>
             <div className="grid gap-1.5">
@@ -168,7 +200,7 @@ export function ReminderBatchTool() {
               </select>
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="channel">Canal</Label>
+              <Label htmlFor="channel">Tono de canal</Label>
               <select
                 id="channel"
                 className="h-10 rounded-lg border border-input bg-transparent px-2.5 text-sm"
@@ -187,22 +219,24 @@ export function ReminderBatchTool() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <h2 className="font-heading text-2xl">Quién te debe</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Una línea por persona. Formato:{" "}
+            Una línea por persona:{" "}
             <span className="text-foreground">
-              empresa, importe, fecha, concepto
+              empresa, importe, fecha, concepto, teléfono o correo
             </span>
-            . La fecha y el concepto son opcionales.
+            . Fecha, teléfono y correo son opcionales. Entiende 450, 1.200 y
+            280 €.
           </p>
           <Textarea
             className="mt-4 min-h-48 font-mono text-sm"
             value={stored.list}
             onChange={(event) => patch({ list: event.target.value })}
             aria-label="Lista de impagos"
+            placeholder={"Taller Sur, 450, 01/08/2026, web, 600111222"}
           />
           <p className="mt-2 text-sm text-muted-foreground">
             {debtors.length === 0
               ? "No hay líneas con nombre e importe."
-              : `${debtors.length} recordatorio${debtors.length === 1 ? "" : "s"} · máximo 30.`}
+              : `${debtors.length} recordatorio${debtors.length === 1 ? "" : "s"} · ${formatEuro(totalCents)} · máximo 40.`}
           </p>
         </section>
 
@@ -223,8 +257,8 @@ export function ReminderBatchTool() {
           <div className="rounded-2xl bg-card p-6 ring-1 ring-foreground/10">
             <p className="font-heading text-2xl">No hay mensajes todavía</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pega al menos una línea con un nombre y un número. Ejemplo:
-              Taller Sur, 450, 01/08/2026, web.
+              Pega una línea con nombre e importe, o pulsa “Cargar ejemplo”.
+              Ejemplo: Taller Sur, 450, 01/08/2026, web, 600111222.
             </p>
           </div>
         ) : (
@@ -267,6 +301,9 @@ function ReminderCard({
   copied: boolean;
   onCopy: () => void;
 }) {
+  const wa = waLink(debtor.phone, body);
+  const mail = mailLink(debtor.email, subject, body);
+
   return (
     <article className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -276,12 +313,36 @@ function ReminderCard({
             {formatEuro(debtor.amount)}
             {debtor.concept ? ` · ${debtor.concept}` : ""}
             {debtor.dateLabel ? ` · ${debtor.dateLabel}` : ""}
+            {debtor.phone ? ` · ${debtor.phone}` : ""}
+            {debtor.email ? ` · ${debtor.email}` : ""}
           </p>
         </div>
-        <Button type="button" variant="outline" onClick={onCopy}>
-          {copied ? <Check /> : <Copy />}
-          {copied ? "Copiado" : "Copiar"}
-        </Button>
+        <div className="flex flex-wrap gap-1">
+          <Button type="button" variant="outline" size="sm" onClick={onCopy}>
+            {copied ? <Check /> : <Copy />}
+            {copied ? "Copiado" : "Copiar"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<a href={wa} target="_blank" rel="noreferrer" />}
+          >
+            <MessageCircle />
+            WhatsApp
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<a href={mail} />}
+          >
+            <Mail />
+            Correo
+          </Button>
+        </div>
       </div>
       {channel === "email" ? (
         <p className="mt-3 text-sm">

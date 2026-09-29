@@ -17,6 +17,7 @@ const links = [
   { href: "/presupuestos", label: "Presupuestos" },
   { href: "/versiones", label: "Versiones" },
   { href: "/cobros", label: "Cobros" },
+  { href: "/horas", label: "Horas" },
   { href: "/como-funciona", label: "Cómo funciona" },
 ];
 
@@ -32,7 +33,7 @@ export function SiteHeader() {
           Luna Oficio
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm md:flex">
+        <nav className="hidden items-center gap-6 text-sm lg:flex">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -65,7 +66,7 @@ export function SiteHeader() {
             type="button"
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden"
             aria-label="Abrir menú"
             onClick={() => setOpen(true)}
           >

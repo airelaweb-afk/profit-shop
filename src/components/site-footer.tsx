@@ -30,6 +30,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/horas" className="hover:text-foreground">
+                Parte de horas
+              </Link>
+            </li>
+            <li>
               <Link href="/como-funciona" className="hover:text-foreground">
                 Cómo funciona
               </Link>
@@ -44,7 +49,7 @@ export function SiteFooter() {
                 Cómo funciona
               </Link>
             </li>
-            <li>Los datos de los presupuestos no salen de tu navegador.</li>
+            <li>Los datos no salen de tu navegador.</li>
           </ul>
         </div>
       </div>

@@ -17,9 +17,9 @@ export default function CobrosPage() {
         Quién te debe. Una tanda de recordatorios.
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        No es un programa de cobros ni un tono agresivo. Eliges si es el primer
-        aviso, el segundo o el último, pegas la lista y copias cada texto a
-        WhatsApp o al correo. Tú lo envías. La herramienta no persigue a nadie.
+        Eliges si es el primer aviso, el segundo o el último. Pegas quién te
+        debe (importe, fecha, teléfono o correo) y cada ficha tiene Copiar,
+        WhatsApp y Correo. Tú lo envías. La web no persigue a nadie.
       </p>
       <div className="mt-10">
         <ReminderBatchTool />
