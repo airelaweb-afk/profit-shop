@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Plus, Printer, Trash2 } from "lucide-react";
+import { QuoteDocument } from "@/components/quote-document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,10 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   blankIssuer,
   formatEuro,
-  lineTotal,
   newId,
-  quoteNumber,
-  validUntil,
   type Issuer,
   type ServiceLine,
 } from "@/lib/quotes";
@@ -38,22 +36,22 @@ function subscribe(listener: () => void) {
 }
 
 function parseStored(json: string): VersionJob {
-  if (!json) return emptyVersionJob;
+  if (!json) return structuredClone(emptyVersionJob);
   try {
     const parsed = JSON.parse(json) as Partial<VersionJob>;
     return {
-      title: parsed.title ?? sampleVersionJob.title,
-      client: { ...sampleVersionJob.client, ...parsed.client },
+      title: parsed.title ?? "",
+      client: { ...emptyVersionJob.client, ...parsed.client },
       issuer: { ...blankIssuer, ...parsed.issuer },
       packages:
         Array.isArray(parsed.packages) && parsed.packages.length > 0
           ? parsed.packages
-          : sampleVersionJob.packages,
+          : structuredClone(emptyVersionJob.packages),
       rush: parsed.rush ?? true,
       rushPercent: parsed.rushPercent ?? 30,
     };
   } catch {
-    return sampleVersionJob;
+    return structuredClone(emptyVersionJob);
   }
 }
 
@@ -75,6 +73,8 @@ export function VersionQuoteTool() {
   const job = useMemo(() => parseStored(json), [json]);
   const versions = useMemo(() => buildVersions(job), [job]);
   const [error, setError] = useState("");
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const preview = versions[Math.min(previewIndex, Math.max(versions.length - 1, 0))];
 
   function patch(partial: Partial<VersionJob>) {
     write({ ...job, ...partial });
@@ -422,100 +422,77 @@ export function VersionQuoteTool() {
 
         <Button type="submit" size="lg" className="h-11 px-5 self-start">
           <Printer />
-          Generar e imprimir {versions.length || ""} versiones
+          Guardar PDF
+          {versions.length
+            ? ` · ${versions.length} versión${versions.length === 1 ? "" : "es"}`
+            : ""}
         </Button>
       </form>
 
-      <aside className="no-print lg:sticky lg:top-24 lg:self-start">
-        <div className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10">
-          <p className="text-xs tracking-wide text-primary uppercase">
-            Resumen
+      <aside className="no-print min-w-0 lg:sticky lg:top-20 lg:self-start">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-muted-foreground">
+            Vista previa · una página por versión en el PDF
           </p>
-          <h2 className="mt-1 font-heading text-2xl">
-            {job.client.company || "Cliente"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">{job.title}</p>
-          {versions.length === 0 ? (
-            <p className="mt-4 text-sm text-muted-foreground">
-              Activa un paquete con precio para ver las versiones.
-            </p>
-          ) : (
-            <ul className="mt-4 space-y-2 text-sm">
-              {versions.map((version) => (
-                <li key={version.key} className="flex justify-between gap-3">
-                  <span>{version.label}</span>
-                  <span className="font-medium">{formatEuro(version.total)}</span>
-                </li>
+          {versions.length > 1 ? (
+            <select
+              className="h-8 rounded-md border border-border bg-background px-2 text-sm"
+              value={Math.min(previewIndex, versions.length - 1)}
+              onChange={(event) => setPreviewIndex(Number(event.target.value))}
+              aria-label="Versión a previsualizar"
+            >
+              {versions.map((version, index) => (
+                <option key={version.key} value={index}>
+                  {version.label}
+                </option>
               ))}
-            </ul>
-          )}
+            </select>
+          ) : null}
         </div>
+        <div className="quote-preview-desk">
+          <div className="quote-preview-screen">
+            <QuoteDocument
+              issuer={{
+                ...job.issuer,
+                intro: [preview?.includes, job.issuer.intro]
+                  .filter(Boolean)
+                  .join("\n\n"),
+              }}
+              client={job.client}
+              services={preview?.lines ?? []}
+              index={Math.min(previewIndex, Math.max(versions.length - 1, 0))}
+              optionLabel={preview?.label}
+            />
+          </div>
+        </div>
+        {versions.length > 0 ? (
+          <ul className="mt-4 grid gap-2 text-sm">
+            {versions.map((version) => (
+              <li key={version.key} className="flex justify-between gap-3">
+                <span>{version.label}</span>
+                <span className="font-medium">{formatEuro(version.total)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </aside>
 
       <div className="quote-print hidden">
         {versions.map((version, index) => (
-          <article key={version.key} className="quote-sheet">
-            <header className="flex items-start justify-between gap-6">
-              <div>
-                <p className="font-heading text-2xl">{job.issuer.name}</p>
-                <p className="mt-1 text-sm text-neutral-600">
-                  {[job.issuer.taxId, job.issuer.email, job.issuer.phone]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
-              </div>
-              <div className="text-right text-sm">
-                <p className="font-medium">{quoteNumber(index)}</p>
-                <p>Opción: {version.label}</p>
-                <p>Válido hasta {validUntil(job.issuer.validDays)}</p>
-              </div>
-            </header>
-            <h1 className="mt-8 font-heading text-3xl">Presupuesto</h1>
-            <p className="mt-2 text-sm">
-              <strong>{job.title}</strong>
-            </p>
-            <p className="mt-1 text-sm">
-              Para <strong>{job.client.company}</strong>
-              {job.client.contact ? ` · ${job.client.contact}` : ""}
-              {job.client.email ? ` · ${job.client.email}` : ""}
-            </p>
-            {version.includes ? (
-              <p className="mt-4 text-sm text-neutral-600">{version.includes}</p>
-            ) : null}
-            <table className="mt-6 w-full text-sm">
-              <thead>
-                <tr className="border-b text-left">
-                  <th className="py-2 font-medium">Concepto</th>
-                  <th className="py-2 font-medium">Cant.</th>
-                  <th className="py-2 text-right font-medium">Importe</th>
-                </tr>
-              </thead>
-              <tbody>
-                {version.lines.map((line) => (
-                  <tr key={line.id} className="border-b border-neutral-200">
-                    <td className="py-2">{line.name}</td>
-                    <td className="py-2">{line.quantity}</td>
-                    <td className="py-2 text-right">{formatEuro(lineTotal(line))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <dl className="mt-4 ml-auto w-56 text-sm">
-              <div className="flex justify-between">
-                <dt>Base</dt>
-                <dd>{formatEuro(version.subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>IVA {job.issuer.taxPercent}%</dt>
-                <dd>{formatEuro(version.tax)}</dd>
-              </div>
-              <div className="mt-1 flex justify-between border-t pt-1 font-medium">
-                <dt>Total</dt>
-                <dd>{formatEuro(version.total)}</dd>
-              </div>
-            </dl>
-            <p className="mt-8 text-sm text-neutral-600">{job.issuer.conditions}</p>
-          </article>
+          <div key={version.key} className="quote-sheet">
+            <QuoteDocument
+              issuer={{
+                ...job.issuer,
+                intro: [version.includes, job.issuer.intro]
+                  .filter(Boolean)
+                  .join("\n\n"),
+              }}
+              client={job.client}
+              services={version.lines}
+              index={index}
+              optionLabel={version.label}
+            />
+          </div>
         ))}
       </div>
     </div>

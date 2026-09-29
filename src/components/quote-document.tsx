@@ -25,11 +25,13 @@ export function QuoteDocument({
   client,
   services,
   index,
+  optionLabel,
 }: {
   issuer: Issuer;
   client: ClientRow;
   services: ServiceLine[];
   index: number;
+  optionLabel?: string;
 }) {
   const totals = quoteTotals(services, issuer.taxPercent);
   const number = quoteNumber(index, {
@@ -68,8 +70,13 @@ export function QuoteDocument({
           </div>
         </div>
         <div className="quote-doc-stamp">
-          <p>Presupuesto</p>
-          <strong>{number}</strong>
+          <p>{optionLabel ? "Opción" : "Presupuesto"}</p>
+          <strong>{optionLabel || number}</strong>
+          {optionLabel ? (
+            <p className="quote-doc-kicker" style={{ marginTop: 8 }}>
+              {number}
+            </p>
+          ) : null}
         </div>
       </header>
 

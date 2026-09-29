@@ -36,15 +36,21 @@ Hecho el primero: pegar la semana, ver el total, PDF. No es un fichaje.
 
 **Prueba:** `/horas` → 4 líneas reales de esta semana → ¿se lo enviarías al cliente o al jefe?
 
-### Paso 5 — Pulir y añadir la siguiente que duela
+### Paso 5 — Gastos para el gestor
 
-Lo que falle en PDF o en el móvil, se corrige. La siguiente herramienta será otro atasco concreto (gastos para el gestor, albarán, textos de aplazamiento), no un panel de “todo”.
+Hecho el primero: pegar tickets, separar base e IVA, PDF.
 
-### Paso 6 — Que Google las encuentre
+**Prueba:** `/gastos` → 5 tickets reales del mes → ¿se lo enviarías al gestor?
+
+### Paso 6 — Pulir y la siguiente que duela
+
+Lo que falle en PDF o en el móvil, se corrige. Siguiente atasco concreto (albarán, aplazamientos), no un panel de “todo”.
+
+### Paso 7 — Que Google las encuentre
 
 Una URL, un título, un problema. Textos para búsquedas reales.
 
-### Paso 7 — Ofrecer algo, más adelante
+### Paso 8 — Ofrecer algo, más adelante
 
 Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue existiendo. No hay demo calls. No recoger datos de la gente hasta que haya consentimiento claro.
 
@@ -60,4 +66,5 @@ Cuentas de usuario. Pasarela de pago. CRM. La tienda de plantillas. Campañas. R
 | Cobros | `/cobros` |
 | Presupuestos en lote | `/presupuestos` |
 | Parte de horas | `/horas` |
+| Gastos | `/gastos` |
 | Explicación | `/como-funciona` |

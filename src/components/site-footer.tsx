@@ -7,8 +7,8 @@ export function SiteFooter() {
         <div>
           <p className="font-heading text-xl">Luna Oficio</p>
           <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-            Herramientas admin para autónomos y empresas pequeñas. Un atasco
-            cada vez. Sin CRM.
+            Herramientas admin para autónomos y quien lleva la oficina. Un
+            atasco cada vez. Sin CRM.
           </p>
         </div>
         <div>
@@ -35,8 +35,8 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/como-funciona" className="hover:text-foreground">
-                Cómo funciona
+              <Link href="/gastos" className="hover:text-foreground">
+                Relación de gastos
               </Link>
             </li>
           </ul>
@@ -49,7 +49,7 @@ export function SiteFooter() {
                 Cómo funciona
               </Link>
             </li>
-            <li>Los datos no salen de tu navegador.</li>
+            <li>Nada se envía a un servidor. Todo queda en tu navegador.</li>
           </ul>
         </div>
       </div>

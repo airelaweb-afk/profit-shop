@@ -16,10 +16,9 @@ export default function ComoFuncionaPage() {
         Cosas que no existen como producto (aunque el problema sí)
       </h1>
       <p className="mt-4 text-lg text-muted-foreground">
-        Un CRM te pide agenda, clientes, facturas y hábitos nuevos. Un autónomo
-        lo que quiere el martes es: “tengo que mandar diez presupuestos” o
-        “tengo que recordar diez cobros”. Eso no es un CRM. Es una herramienta
-        de un solo propósito.
+        Un CRM te pide agenda, clientes, facturas y hábitos nuevos. Quien lleva
+        la administración quiere el martes: “diez presupuestos”, “estos cobros”
+        o “estos tickets para el gestor”. Eso no es un CRM. Es una página.
       </p>
 
       <div className="mt-10 space-y-8">
@@ -63,10 +62,10 @@ export default function ComoFuncionaPage() {
         <Button
           variant="outline"
           className="h-11 px-5"
-          render={<Link href="/horas" />}
+          render={<Link href="/gastos" />}
           nativeButton={false}
         >
-          Parte de horas
+          Relación de gastos
         </Button>
       </div>
     </div>

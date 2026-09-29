@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, ShoppingBag } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,21 +10,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useCart } from "@/lib/cart";
-import { CartDrawer } from "@/components/cart-drawer";
 
 const links = [
   { href: "/presupuestos", label: "Presupuestos" },
   { href: "/versiones", label: "Versiones" },
   { href: "/cobros", label: "Cobros" },
   { href: "/horas", label: "Horas" },
-  { href: "/como-funciona", label: "Cómo funciona" },
+  { href: "/gastos", label: "Gastos" },
 ];
 
 export function SiteHeader() {
-  const { count } = useCart();
   const [open, setOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <header className="no-print sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
@@ -33,7 +29,7 @@ export function SiteHeader() {
           Luna Oficio
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm lg:flex">
+        <nav className="hidden items-center gap-5 text-sm lg:flex">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -45,56 +41,44 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-1">
-          {count > 0 ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="relative"
-              aria-label="Abrir carrito"
-              onClick={() => setCartOpen(true)}
-            >
-              <ShoppingBag />
-              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                {count}
-              </span>
-            </Button>
-          ) : null}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          aria-label="Abrir menú"
+          onClick={() => setOpen(true)}
+        >
+          <Menu />
+        </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            aria-label="Abrir menú"
-            onClick={() => setOpen(true)}
-          >
-            <Menu />
-          </Button>
-
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent side="left" className="w-72">
-              <SheetHeader>
-                <SheetTitle className="font-heading text-xl">Menú</SheetTitle>
-              </SheetHeader>
-              <nav className="flex flex-col gap-1 px-4">
-                {links.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-2 py-2 text-base hover:bg-muted"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent side="left" className="w-72">
+            <SheetHeader>
+              <SheetTitle className="font-heading text-xl">Menú</SheetTitle>
+            </SheetHeader>
+            <nav className="flex flex-col gap-1 px-4">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-2 py-2 text-base hover:bg-muted"
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <Link
+                href="/como-funciona"
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-2 py-2 text-base hover:bg-muted"
+              >
+                Cómo funciona
+              </Link>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
-      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </header>
   );
 }
