@@ -86,16 +86,16 @@ export function parseExpenses(raw: string): ExpenseRow[] {
           continue;
         }
         if (total === null) {
-          const joined =
+          const next = parts[index + 1] ?? "";
+          const looksLikeCents =
             /^\d+$/.test(part) &&
-            parts[index + 1] &&
-            /^\d{1,2}$/.test(parts[index + 1] ?? "")
-              ? `${part},${parts[index + 1]}`
-              : part;
+            /^\d{1,2}$/.test(next) &&
+            !["0", "4", "10", "21"].includes(next);
+          const joined = looksLikeCents ? `${part},${next}` : part;
           const parsed = parseAmount(joined);
           if (parsed !== null && parsed > 0) {
             total = parsed;
-            if (joined.includes(",") && joined !== part) index += 1;
+            if (looksLikeCents) index += 1;
             continue;
           }
         }
