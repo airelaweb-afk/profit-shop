@@ -60,6 +60,15 @@ export default function ComoFuncionaPage() {
           </p>
         </section>
         <section>
+          <h2 className="font-heading text-2xl">Unir y comprimir PDF</h2>
+          <p className="mt-2 text-muted-foreground">
+            Lo que más se busca: juntar varios PDF, partir páginas, bajar el
+            peso, pasar fotos a PDF o al revés. Se hace en este navegador. No
+            convertimos a Word: sin servidor el resultado sería un documento
+            feo, y no vale la pena.
+          </p>
+        </section>
+        <section>
           <h2 className="font-heading text-2xl">Rellenar y firmar un PDF</h2>
           <p className="mt-2 text-muted-foreground">
             Adobe cobra. Los “firma gratis” de internet se quedan el archivo.
@@ -74,10 +83,10 @@ export default function ComoFuncionaPage() {
       <div className="mt-10 flex flex-wrap gap-3">
         <Button
           className="h-11 px-5"
-          render={<Link href="/pdf" />}
+          render={<Link href="/unir-pdf" />}
           nativeButton={false}
         >
-          Firmar un PDF
+          Unir PDF
         </Button>
         <Button
           variant="outline"

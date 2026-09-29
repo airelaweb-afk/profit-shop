@@ -19,7 +19,7 @@ const links = [
   { href: "/cobros", label: "Cobros" },
   { href: "/horas", label: "Horas" },
   { href: "/gastos", label: "Gastos" },
-  { href: "/pdf", label: "Firmar PDF" },
+  { href: "/herramientas-pdf", label: "PDF" },
 ];
 
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {

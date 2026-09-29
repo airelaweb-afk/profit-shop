@@ -48,15 +48,21 @@ Hecho: hay que entrar con cuenta. Subes el PDF, amplías, marcas casillas (✓/X
 
 **Prueba:** `/entrar` → cuenta → `/pdf` → un modelo 145 → casillas + descarga.
 
-### Paso 7 — Pulir y la siguiente que duela
+### Paso 7 — Unir, comprimir y foto ↔ PDF
+
+Hecho: `/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`, `/jpg-a-pdf`, `/pdf-a-jpg`. Sin PDF→Word (calidad mentira en el navegador).
+
+**Prueba:** cuenta → unir dos PDF → descargar.
+
+### Paso 8 — Pulir y la siguiente que duela
 
 Lo que falle en PDF o en el móvil, se corrige. Siguiente atasco concreto (albarán, aplazamientos), no un panel de “todo”.
 
-### Paso 8 — Que Google las encuentre
+### Paso 9 — Que Google las encuentre
 
 Una URL, un título, un problema. Textos para búsquedas reales.
 
-### Paso 9 — Ofrecer algo, más adelante
+### Paso 10 — Ofrecer algo, más adelante
 
 Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue existiendo. No hay demo calls. No recoger datos de la gente hasta que haya consentimiento claro.
 
@@ -74,5 +80,11 @@ Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. C
 | Parte de horas | `/horas` |
 | Gastos | `/gastos` |
 | Firmar PDF | `/pdf` |
+| Unir PDF | `/unir-pdf` |
+| Dividir PDF | `/dividir-pdf` |
+| Comprimir PDF | `/comprimir-pdf` |
+| JPG a PDF | `/jpg-a-pdf` |
+| PDF a JPG | `/pdf-a-jpg` |
+| Hub PDF | `/herramientas-pdf` |
 | Entrar | `/entrar` |
 | Explicación | `/como-funciona` |

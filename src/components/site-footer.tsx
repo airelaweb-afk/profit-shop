@@ -40,8 +40,8 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/pdf" className="hover:text-foreground">
-                Rellenar y firmar PDF
+              <Link href="/herramientas-pdf" className="hover:text-foreground">
+                Unir, comprimir y firmar PDF
               </Link>
             </li>
           </ul>
