@@ -50,12 +50,23 @@ export default function ComoFuncionaPage() {
           </p>
         </section>
         <section>
+          <h2 className="font-heading text-2xl">Hace falta una cuenta</h2>
+          <p className="mt-2 text-muted-foreground">
+            Las herramientas (presupuestos, cobros, horas, gastos y firmar PDF)
+            solo se usan si has iniciado sesión. La cuenta se crea en el sitio y
+            vive en este navegador: no hay Cl@ve, ni servidor de usuarios, ni
+            recuperación en otro ordenador. Si cambias de aparato, la creas otra
+            vez.
+          </p>
+        </section>
+        <section>
           <h2 className="font-heading text-2xl">Rellenar y firmar un PDF</h2>
           <p className="mt-2 text-muted-foreground">
             Adobe cobra. Los “firma gratis” de internet se quedan el archivo.
-            Aquí subes el PDF que te han mandado, rellenas las cajas o escribes
-            encima, dibujas la rúbrica y te lo llevas. No sale del navegador.
-            No sustituye a Cl@ve ni a un certificado digital.
+            Aquí, con la sesión iniciada, subes el PDF que te han mandado,
+            amplías la hoja, marcas casillas, escribes y firmas. Te lo llevas.
+            No sale del navegador. No sustituye a Cl@ve ni a un certificado
+            digital.
           </p>
         </section>
       </div>

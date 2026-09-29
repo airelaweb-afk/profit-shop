@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s · Luna Oficio",
   },
   description:
-    "Presupuestos, cobros, horas, gastos y firmar PDF para autónomos y administración. Sin cuentas ni CRM.",
+    "Presupuestos, cobros, horas, gastos y firmar PDF para autónomos y administración. Con cuenta en este navegador, sin CRM.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

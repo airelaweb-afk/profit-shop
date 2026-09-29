@@ -52,27 +52,28 @@ export default function HomePage() {
           El trabajo feo de la oficina, resuelto en una página.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-          No es un CRM. No pide cuenta. Pegas lo que tienes, sales con un PDF o
-          un WhatsApp. Los datos se quedan en tu navegador.
+          No es un CRM. Entras con una cuenta de este navegador y usas la
+          herramienta del atasco de hoy: presupuestos, cobros, gastos o firmar
+          un PDF. Los datos se quedan aquí, no en un servidor nuestro.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button
             size="lg"
             className="h-11 px-5"
-            render={<Link href="/presupuestos" />}
+            render={<Link href="/entrar/?tab=crear" />}
             nativeButton={false}
           >
-            Empezar por presupuestos
+            Crear cuenta y empezar
             <ArrowRight />
           </Button>
           <Button
             variant="outline"
             size="lg"
             className="h-11 px-5"
-            render={<Link href="/gastos" />}
+            render={<Link href="/entrar/" />}
             nativeButton={false}
           >
-            Relación de gastos
+            Ya tengo cuenta
           </Button>
           <Button
             variant="outline"
@@ -89,8 +90,8 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
         <h2 className="font-heading text-2xl sm:text-3xl">Las que hay ahora</h2>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Entras en la del atasco de hoy. Si no sirve, se corrige. Si sirve, se
-          queda gratis.
+          Entras con tu cuenta y abres la del atasco de hoy. Si no sirve, se
+          corrige. Si sirve, se queda.
         </p>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map((tool) => (

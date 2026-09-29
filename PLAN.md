@@ -10,7 +10,7 @@ La gente no busca “software de gestión”. Busca el atasco del martes: *hacer
 
 Una herramienta. Se publica. Se prueba en el móvil y en el ordenador. Si no sirve para una persona de administración de verdad, se corrige antes de inventar otra.
 
-Sin cuentas. Sin recoger datos en un servidor.
+Cuenta en el navegador (no hay servidor de usuarios). Sin recoger datos fuera de este aparato.
 
 ## Pasos
 
@@ -44,9 +44,9 @@ Hecho el primero: pegar tickets, separar base e IVA, PDF.
 
 ### Paso 6 — Rellenar y firmar PDF
 
-Hecho el primero: abrir un PDF o una hoja en blanco, rellenar campos si los hay, colocar texto/fecha/firma y descargar. Todo en el navegador.
+Hecho: hay que entrar con cuenta. Subes el PDF, amplías, marcas casillas (✓/X), escribes, firmas y descargas. Modelos planos tipo 145 van con marcas encima, no con campos AcroForm.
 
-**Prueba:** `/pdf` → hoja en blanco → texto + firma → ¿se lo enviarías?
+**Prueba:** `/entrar` → cuenta → `/pdf` → un modelo 145 → casillas + descarga.
 
 ### Paso 7 — Pulir y la siguiente que duela
 
@@ -62,7 +62,7 @@ Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue exi
 
 ## Qué no hacemos ahora
 
-Cuentas de usuario. Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor.
+Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor.
 
 ## Dónde está cada cosa
 
@@ -74,4 +74,5 @@ Cuentas de usuario. Pasarela de pago. CRM. La tienda de plantillas. Campañas. R
 | Parte de horas | `/horas` |
 | Gastos | `/gastos` |
 | Firmar PDF | `/pdf` |
+| Entrar | `/entrar` |
 | Explicación | `/como-funciona` |

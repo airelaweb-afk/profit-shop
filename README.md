@@ -2,7 +2,7 @@
 
 Herramientas de administración para **autónomos, secretaría y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (presupuestos, cobros, horas, gastos, firmar PDF) y se puede encontrar en Google.
 
-Los datos se quedan en el navegador (`localStorage`). No hay cuentas, ni base de datos, ni servidor propio.
+Las herramientas piden **iniciar sesión**. La cuenta se guarda en este navegador (`localStorage`, contraseña con PBKDF2). No hay base de datos ni servidor propio: si cambias de ordenador, hay que crear la cuenta otra vez. Los PDF no se suben a ningún sitio.
 
 ## Herramientas
 

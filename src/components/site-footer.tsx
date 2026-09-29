@@ -8,7 +8,7 @@ export function SiteFooter() {
           <p className="font-heading text-xl">Luna Oficio</p>
           <p className="mt-2 max-w-xs text-sm text-muted-foreground">
             Herramientas admin para autónomos y quien lleva la oficina. Un
-            atasco cada vez. Sin CRM.
+            atasco cada vez. Con cuenta, sin CRM.
           </p>
         </div>
         <div>
@@ -54,7 +54,15 @@ export function SiteFooter() {
                 Cómo funciona
               </Link>
             </li>
-            <li>Nada se envía a un servidor. Todo queda en tu navegador.</li>
+            <li>
+              <Link href="/entrar/" className="hover:text-foreground">
+                Entrar o crear cuenta
+              </Link>
+            </li>
+            <li>
+              La cuenta y los PDF se quedan en este navegador. Nada se envía a
+              un servidor nuestro.
+            </li>
           </ul>
         </div>
       </div>
