@@ -50,9 +50,13 @@ Hecho: hay que entrar con cuenta. Subes el PDF, amplías, marcas casillas (✓/X
 
 ### Paso 7 — Unir, comprimir y foto ↔ PDF
 
-Hecho: `/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`, `/jpg-a-pdf`, `/pdf-a-jpg`. Sin PDF→Word (calidad mentira en el navegador).
+Hecho: `/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`, `/jpg-a-pdf`, `/pdf-a-jpg`.
 
 **Prueba:** cuenta → unir dos PDF → descargar.
+
+### Pendiente — PDF a Word
+
+Aparcado a propósito. iLovePDF y Smallpdf sí lo hacen, pero **suben el archivo a un servidor** y corren un motor de maquetación (OCR, tablas, fuentes). En el navegador solo podríamos volcar texto a un .docx flojo. Cuando haya servidor o una API de pago (y se avise que el PDF viaja), se monta. No hay URL a medias.
 
 ### Paso 8 — Pulir y la siguiente que duela
 
@@ -68,7 +72,7 @@ Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue exi
 
 ## Qué no hacemos ahora
 
-Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor.
+Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor. PDF a Word (hasta tener motor decente). Conversiones de vídeo pesadas (ffmpeg.wasm) y quitar fondo / ampliar con IA.
 
 ## Dónde está cada cosa
 
