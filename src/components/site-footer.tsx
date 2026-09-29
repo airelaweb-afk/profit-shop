@@ -39,6 +39,11 @@ export function SiteFooter() {
                 Relación de gastos
               </Link>
             </li>
+            <li>
+              <Link href="/pdf" className="hover:text-foreground">
+                Rellenar y firmar PDF
+              </Link>
+            </li>
           </ul>
         </div>
         <div>

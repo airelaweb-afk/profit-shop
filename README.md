@@ -1,6 +1,6 @@
 # Luna Oficio
 
-Herramientas de administración para **autónomos, secretaría y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (presupuestos, cobros, horas, gastos) y se puede encontrar en Google.
+Herramientas de administración para **autónomos, secretaría y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (presupuestos, cobros, horas, gastos, firmar PDF) y se puede encontrar en Google.
 
 Los datos se quedan en el navegador (`localStorage`). No hay cuentas, ni base de datos, ni servidor propio.
 
@@ -11,6 +11,7 @@ Los datos se quedan en el navegador (`localStorage`). No hay cuentas, ni base de
 - **Presupuestos en lote** (`/presupuestos`): varios presupuestos de una vez, listos para PDF y mensaje.
 - **Parte de horas** (`/horas`): pegas la semana y sacas un papel para el cliente o el jefe.
 - **Relación de gastos** (`/gastos`): pegas los tickets y sale base + IVA para el gestor.
+- **Rellenar y firmar PDF** (`/pdf`): abres un PDF (o una hoja en blanco), rellenas, firmas y descargas. El archivo no se sube a ningún servidor.
 
 La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el menú: el producto son las herramientas.
 

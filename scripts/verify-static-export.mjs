@@ -2,13 +2,17 @@ import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const dir = "out";
-const index = join(dir, "index.html");
+const required = [
+  join(dir, "index.html"),
+  join(dir, "pdf", "index.html"),
+  join(dir, "pdf.worker.min.mjs"),
+];
 
-if (!existsSync(index)) {
-  console.error(
-    "Static export missing: expected out/index.html after next build.",
-  );
-  process.exit(1);
+for (const file of required) {
+  if (!existsSync(file)) {
+    console.error(`Static export missing: expected ${file} after next build.`);
+    process.exit(1);
+  }
 }
 
 const entries = readdirSync(dir);

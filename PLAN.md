@@ -42,15 +42,21 @@ Hecho el primero: pegar tickets, separar base e IVA, PDF.
 
 **Prueba:** `/gastos` → 5 tickets reales del mes → ¿se lo enviarías al gestor?
 
-### Paso 6 — Pulir y la siguiente que duela
+### Paso 6 — Rellenar y firmar PDF
+
+Hecho el primero: abrir un PDF o una hoja en blanco, rellenar campos si los hay, colocar texto/fecha/firma y descargar. Todo en el navegador.
+
+**Prueba:** `/pdf` → hoja en blanco → texto + firma → ¿se lo enviarías?
+
+### Paso 7 — Pulir y la siguiente que duela
 
 Lo que falle en PDF o en el móvil, se corrige. Siguiente atasco concreto (albarán, aplazamientos), no un panel de “todo”.
 
-### Paso 7 — Que Google las encuentre
+### Paso 8 — Que Google las encuentre
 
 Una URL, un título, un problema. Textos para búsquedas reales.
 
-### Paso 8 — Ofrecer algo, más adelante
+### Paso 9 — Ofrecer algo, más adelante
 
 Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue existiendo. No hay demo calls. No recoger datos de la gente hasta que haya consentimiento claro.
 
@@ -67,4 +73,5 @@ Cuentas de usuario. Pasarela de pago. CRM. La tienda de plantillas. Campañas. R
 | Presupuestos en lote | `/presupuestos` |
 | Parte de horas | `/horas` |
 | Gastos | `/gastos` |
+| Firmar PDF | `/pdf` |
 | Explicación | `/como-funciona` |

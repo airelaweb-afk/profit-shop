@@ -17,6 +17,7 @@ const links = [
   { href: "/cobros", label: "Cobros" },
   { href: "/horas", label: "Horas" },
   { href: "/gastos", label: "Gastos" },
+  { href: "/pdf", label: "Firmar PDF" },
 ];
 
 export function SiteHeader() {
@@ -29,7 +30,7 @@ export function SiteHeader() {
           Luna Oficio
         </Link>
 
-        <nav className="hidden items-center gap-5 text-sm lg:flex">
+        <nav className="hidden items-center gap-4 text-sm xl:flex">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -45,7 +46,7 @@ export function SiteHeader() {
           type="button"
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="xl:hidden"
           aria-label="Abrir menú"
           onClick={() => setOpen(true)}
         >

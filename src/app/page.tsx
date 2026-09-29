@@ -33,6 +33,12 @@ const tools = [
     problem: "El gestor me pide los tickets y los tengo en el cajón.",
     does: "Pegas fecha, tienda e importe. Sale base e IVA.",
   },
+  {
+    href: "/pdf",
+    name: "Firmar PDF",
+    problem: "Me mandan un PDF y no tengo Adobe para rellenarlo.",
+    does: "Lo abres aquí, escribes, firmas y te lo descargas. No se sube a ningún sitio.",
+  },
 ];
 
 export default function HomePage() {
@@ -68,11 +74,20 @@ export default function HomePage() {
           >
             Relación de gastos
           </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-11 px-5"
+            render={<Link href="/pdf" />}
+            nativeButton={false}
+          >
+            Firmar un PDF
+          </Button>
         </div>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
-        <h2 className="font-heading text-2xl sm:text-3xl">Las cinco</h2>
+        <h2 className="font-heading text-2xl sm:text-3xl">Las que hay ahora</h2>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
           Entras en la del atasco de hoy. Si no sirve, se corrige. Si sirve, se
           queda gratis.

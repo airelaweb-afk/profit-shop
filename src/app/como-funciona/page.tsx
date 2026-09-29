@@ -49,23 +49,32 @@ export default function ComoFuncionaPage() {
             en un chat.
           </p>
         </section>
+        <section>
+          <h2 className="font-heading text-2xl">Rellenar y firmar un PDF</h2>
+          <p className="mt-2 text-muted-foreground">
+            Adobe cobra. Los “firma gratis” de internet se quedan el archivo.
+            Aquí abres el PDF, rellenas si trae cajas, dibujas la rúbrica y te
+            lo llevas. No sale del navegador. No sustituye a Cl@ve ni a un
+            certificado digital.
+          </p>
+        </section>
       </div>
 
       <div className="mt-10 flex flex-wrap gap-3">
         <Button
           className="h-11 px-5"
-          render={<Link href="/presupuestos" />}
+          render={<Link href="/pdf" />}
           nativeButton={false}
         >
-          Tanda de presupuestos
+          Firmar un PDF
         </Button>
         <Button
           variant="outline"
           className="h-11 px-5"
-          render={<Link href="/gastos" />}
+          render={<Link href="/presupuestos" />}
           nativeButton={false}
         >
-          Relación de gastos
+          Tanda de presupuestos
         </Button>
       </div>
     </div>
