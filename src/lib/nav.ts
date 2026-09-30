@@ -22,6 +22,7 @@ const pdfPaths = new Set([
   "/pdf-a-jpg",
   "/pdf",
   "/rellenar-pdf",
+  "/editar-pdf",
   "/rotar-pdf",
   "/numerar-pdf",
   "/marca-de-agua-pdf",

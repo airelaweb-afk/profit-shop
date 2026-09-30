@@ -21,6 +21,7 @@ export const planRows = [
     pro: "Ilimitadas",
   },
   { label: "Rellenar campos originales del PDF", free: "Sí", pro: "Sí" },
+  { label: "Editar texto de la página (no escaneo)", free: "Sí", pro: "Sí" },
   { label: "Firmar y marcar encima", free: "Sí", pro: "Sí" },
   { label: "Marca de agua en PDF", free: "No", pro: "Sí" },
   { label: "WebP en lote (carpeta)", free: "No", pro: "Sí" },

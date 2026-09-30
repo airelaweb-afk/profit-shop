@@ -27,8 +27,8 @@ export function InkHero() {
           <span className="text-primary">En tu navegador.</span>
         </h1>
         <p className="mt-4 max-w-xl text-lg text-background/75">
-          Unir, comprimir, convertir, firmar, rellenar campos. El archivo no
-          se sube.
+          Unir, comprimir, convertir, firmar, rellenar, editar texto. El archivo
+          no se sube.
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
           <Button

@@ -42,6 +42,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/editar-pdf" className="hover:text-foreground">
+                Editar texto PDF
+              </Link>
+            </li>
+            <li>
               <Link href="/pdf" className="hover:text-foreground">
                 Firmar PDF
               </Link>

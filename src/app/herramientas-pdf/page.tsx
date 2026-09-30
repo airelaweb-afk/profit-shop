@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Herramientas PDF",
   description:
-    "Unir, dividir, comprimir, JPG a PDF, PDF a JPG, firmar, rotar, numerar y eliminar páginas. Marca de agua Pro. En el navegador, sin subir el archivo.",
+    "Unir, dividir, comprimir, JPG a PDF, PDF a JPG, rellenar, editar texto, firmar, rotar, numerar y eliminar páginas. Marca de agua Pro. En el navegador, sin subir el archivo.",
   path: "/herramientas-pdf",
   keywords: ["herramientas pdf", "unir pdf", "comprimir pdf", "firmar pdf"],
 });
@@ -22,7 +22,8 @@ export default function HerramientasPdfPage() {
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Las que más se buscan: unir, dividir, comprimir, JPG ↔ PDF. También
-        rellenar campos, firmar, rotar, numerar y eliminar páginas. La marca de
+        rellenar campos, editar el texto de la página, firmar, rotar, numerar y
+        eliminar páginas. La marca de
         agua es Pro. No convertimos a Word: en el navegador el resultado queda
         mal y no vamos a fingirlo. Los archivos no salen de aquí.
       </p>

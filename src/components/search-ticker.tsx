@@ -5,6 +5,7 @@ const ITEMS = [
   "heic a jpg",
   "firmar pdf",
   "rellenar pdf",
+  "editar pdf",
   "jpg a pdf",
   "sin subir el archivo",
   "en el navegador",

@@ -55,6 +55,14 @@ export const pdfKit = [
     does: "Rellenas los campos originales. Un escaneo no tiene campos.",
     search: "rellenar pdf",
   },
+  {
+    href: "/editar-pdf",
+    slug: "edit" as const,
+    name: "Editar texto PDF",
+    problem: "El cartel o el contrato no es un formulario y quiero cambiar una frase.",
+    does: "Pulsa el texto de la página, lo cambias y lo descargas. Un escaneo no tiene texto.",
+    search: "editar pdf",
+  },
 ] as const;
 
 export type PdfKitSlug = (typeof pdfKit)[number]["slug"];

@@ -31,6 +31,11 @@ export const siteFaqs: FaqItem[] = [
     href: "/rellenar-pdf",
   },
   {
+    q: "¿Puedo cambiar el texto de un PDF que no es formulario, como iLove?",
+    a: "Sí, en Editar texto PDF, si el archivo tiene letras seleccionables. Pulsas la frase, la cambias y al guardar se tapa la vieja y se escribe la nueva. Un escaneo no tiene texto: ahí usa Firmar PDF. No rehacemos el diseño como Word.",
+    href: "/editar-pdf",
+  },
+  {
     q: "¿Es una firma digital de la FNMT o Cl@ve?",
     a: "No. Es tu rúbrica dibujada, como en papel. Sirve para un parte o una autorización informal. No sustituye el certificado cualificado.",
     href: "/pdf",
@@ -98,7 +103,7 @@ export const toolFaqs: Record<string, FaqItem[]> = {
   "/rellenar-pdf": [
     {
       q: "¿Cualquier PDF se puede hacer editable?",
-      a: "No. Solo los que ya traen campos (AcroForm). Un escaneo, una foto o un PDF exportado como imagen no tiene cajas reales. No las inventamos pintando texto: eso sería mentir. Esos van a Firmar PDF.",
+      a: "No. Solo los que ya traen campos (AcroForm). Un escaneo, una foto o un PDF exportado como imagen no tiene cajas reales. No las inventamos pintando texto: eso sería mentir. Esos van a Firmar PDF. Si el PDF tiene texto seleccionable (un cartel, un contrato), usa Editar texto PDF.",
     },
     {
       q: "¿El PDF sigue siendo un formulario al descargarlo?",
@@ -107,6 +112,20 @@ export const toolFaqs: Record<string, FaqItem[]> = {
     {
       q: "¿Por qué salían todas las casillas con una X?",
       a: "Eso era un fallo del visor: pintaba el dibujo de «marcado» de cada casilla aunque el PDF original estuviera en blanco. Ahora solo se ve la X si tú la marcas, y al guardar no se escriben cruces que no hayas puesto.",
+    },
+  ],
+  "/editar-pdf": [
+    {
+      q: "¿Esto es lo mismo que Rellenar PDF?",
+      a: "No. Rellenar PDF escribe en casillas de formulario. Editar texto cambia frases que ya están dibujadas en la página, como el «Editar texto» de iLove. Hace falta que el PDF tenga texto seleccionable.",
+    },
+    {
+      q: "¿Queda la misma fuente y el mismo diseño?",
+      a: "No siempre. Tapamos la frase vieja con un recuadro blanco y escribimos encima con Helvetica. Si el original era una fuente rara o curva, se nota. Un escaneo no se edita: no hay letras, hay una foto.",
+    },
+    {
+      q: "¿El archivo se sube, como en iLove?",
+      a: "No. Se lee y se guarda en este navegador.",
     },
   ],
   "/marca-de-agua-pdf": [
