@@ -1,32 +1,24 @@
-import type { Metadata } from "next";
-import { AuthGate } from "@/components/auth-gate";
+import { OfficePageShell } from "@/components/office-page-shell";
 import { VersionQuoteTool } from "@/components/version-quote-tool";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMeta({
   title: "Versiones de un trabajo",
   description:
-    "Un cliente, un encargo, varios presupuestos: básico, recomendado, completo, con o sin urgencia.",
-};
+    "Un cliente, un encargo, varios presupuestos: básico, recomendado, completo, con o sin urgencia. En el navegador.",
+  path: "/versiones",
+  keywords: ["presupuesto basico y premium", "varias versiones presupuesto"],
+});
 
 export default function VersionesPage() {
   return (
-    <AuthGate>
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <p className="no-print text-sm tracking-wide text-primary uppercase">
-          Herramienta · con cuenta
-        </p>
-        <h1 className="no-print mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-          Un trabajo. Varias ofertas. El cliente elige.
-        </h1>
-        <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-          Distinto de la tanda: aquí hay un solo cliente y varias ofertas
-          (básico, recomendado, completo, con o sin urgencia). El de
-          “Presupuestos” es el mismo pack para mucha gente.
-        </p>
-        <div className="mt-10">
-          <VersionQuoteTool />
-        </div>
-      </div>
-    </AuthGate>
+    <OfficePageShell
+      kicker="Herramienta · con cuenta"
+      title="Un trabajo. Varias ofertas. El cliente elige."
+      lead="Distinto de la tanda: aquí hay un solo cliente y varias ofertas (básico, recomendado, completo, con o sin urgencia). El de “Presupuestos” es el mismo pack para mucha gente."
+      href="/versiones"
+    >
+      <VersionQuoteTool />
+    </OfficePageShell>
   );
 }

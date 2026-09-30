@@ -113,11 +113,39 @@ export function MobileDock() {
               </Link>
             ))}
             <Link
+              href="/blog"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+            >
+              Blog
+            </Link>
+            <Link
+              href="/precios"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+            >
+              Precios
+            </Link>
+            <Link
+              href="/faq"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+            >
+              Preguntas frecuentes
+            </Link>
+            <Link
               href="/como-funciona"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Cómo funciona
+            </Link>
+            <Link
+              href="/cookies"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+            >
+              Cookies y privacidad
             </Link>
             {session ? (
               <Button

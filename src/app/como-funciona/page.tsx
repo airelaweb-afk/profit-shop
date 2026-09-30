@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMeta({
   title: "Cómo funciona",
   description:
-    "Herramientas admin puntuales, sin CRM, pensadas para que la gente las encuentre sola en internet.",
-};
+    "Herramientas admin puntuales, sin CRM: unir PDF y presupuestos en el navegador. Los archivos no se suben. Se encuentran solas en Google.",
+  path: "/como-funciona",
+});
 
 export default function ComoFuncionaPage() {
   return (
@@ -99,10 +100,10 @@ export default function ComoFuncionaPage() {
         <Button
           variant="outline"
           className="h-11 px-5"
-          render={<Link href="/presupuestos" />}
+          render={<Link href="/blog" />}
           nativeButton={false}
         >
-          Tanda de presupuestos
+          Leer el blog
         </Button>
       </div>
     </div>

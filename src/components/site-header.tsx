@@ -49,6 +49,11 @@ function AccountActions() {
   );
 }
 
+const extraLinks = [
+  { href: "/blog", label: "Blog" },
+  { href: "/precios", label: "Precios" },
+] as const;
+
 export function SiteHeader() {
   return (
     <header className="no-print sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
@@ -57,7 +62,7 @@ export function SiteHeader() {
           Luna Oficio
         </Link>
 
-        <nav className="hidden items-center gap-4 text-sm xl:flex">
+        <nav className="hidden items-center gap-4 text-sm 2xl:flex">
           {allNavLinks.map((link) => (
             <Link
               key={link.href}
@@ -67,6 +72,33 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          {extraLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <nav className="hidden items-center gap-3 text-sm xl:flex 2xl:hidden">
+          <Link href="/herramientas-pdf" className="text-muted-foreground hover:text-foreground">
+            PDF
+          </Link>
+          <Link href="/herramientas-imagen" className="text-muted-foreground hover:text-foreground">
+            Imagen
+          </Link>
+          <Link href="/presupuestos" className="text-muted-foreground hover:text-foreground">
+            Oficio
+          </Link>
+          <Link href="/blog" className="text-muted-foreground hover:text-foreground">
+            Blog
+          </Link>
+          <Link href="/precios" className="text-muted-foreground hover:text-foreground">
+            Precios
+          </Link>
         </nav>
 
         <AccountActions />

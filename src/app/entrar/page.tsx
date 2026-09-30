@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import { LoginForm } from "@/components/login-form";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMeta({
   title: "Entrar",
   description:
-    "Inicia sesión o crea una cuenta en este navegador para usar las herramientas de Luna Oficio.",
-};
+    "Inicia sesión o crea una cuenta en este navegador para usar las herramientas de Luna Oficio. Los datos se quedan aquí.",
+  path: "/entrar",
+});
 
 export default function EntrarPage() {
   return (

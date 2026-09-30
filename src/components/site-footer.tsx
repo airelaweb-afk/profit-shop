@@ -3,77 +3,110 @@ import Link from "next/link";
 export function SiteFooter() {
   return (
     <footer className="no-print mt-auto border-t border-border/80 pb-dock">
-      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
+      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-heading text-xl">Luna Oficio</p>
           <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-            Herramientas admin para autónomos y quien lleva la oficina. Un
-            atasco cada vez. Con cuenta, sin CRM.
+            Unir PDF, comprimir imagen y el oficio del autónomo. En el
+            navegador. Los datos se quedan en tu aparato.
           </p>
         </div>
         <div>
-          <p className="text-sm font-medium">Usar</p>
+          <p className="text-sm font-medium">Herramientas</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
+              <Link href="/unir-pdf" className="hover:text-foreground">
+                Unir PDF
+              </Link>
+            </li>
+            <li>
+              <Link href="/comprimir-pdf" className="hover:text-foreground">
+                Comprimir PDF
+              </Link>
+            </li>
+            <li>
+              <Link href="/heic-a-jpg" className="hover:text-foreground">
+                HEIC a JPG
+              </Link>
+            </li>
+            <li>
+              <Link href="/pdf" className="hover:text-foreground">
+                Firmar PDF
+              </Link>
+            </li>
+            <li>
               <Link href="/presupuestos" className="hover:text-foreground">
-                Tanda de presupuestos
+                Presupuestos
               </Link>
             </li>
             <li>
-              <Link href="/versiones" className="hover:text-foreground">
-                Versiones de un trabajo
-              </Link>
-            </li>
-            <li>
-              <Link href="/cobros" className="hover:text-foreground">
-                Recordatorios de cobro
-              </Link>
-            </li>
-            <li>
-              <Link href="/horas" className="hover:text-foreground">
-                Parte de horas
-              </Link>
-            </li>
-            <li>
-              <Link href="/gastos" className="hover:text-foreground">
-                Relación de gastos
-              </Link>
-            </li>
-            <li>
-              <Link href="/herramientas-pdf" className="hover:text-foreground">
-                Unir, comprimir y firmar PDF
-              </Link>
-            </li>
-            <li>
-              <Link href="/herramientas-imagen" className="hover:text-foreground">
-                Comprimir imagen y HEIC a JPG
+              <Link href="/marca-de-agua-pdf" className="hover:text-foreground">
+                Marca de agua (Pro)
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <p className="text-sm font-medium">Enfoque</p>
+          <p className="text-sm font-medium">Aprender</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>
+              <Link href="/blog" className="hover:text-foreground">
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link href="/faq" className="hover:text-foreground">
+                Preguntas frecuentes
+              </Link>
+            </li>
             <li>
               <Link href="/como-funciona" className="hover:text-foreground">
                 Cómo funciona
               </Link>
             </li>
             <li>
-              <Link href="/entrar/" className="hover:text-foreground">
-                Entrar o crear cuenta
+              <Link href="/precios" className="hover:text-foreground">
+                Precios
               </Link>
             </li>
             <li>
-              La cuenta y los PDF se quedan en este navegador. Nada se envía a
-              un servidor nuestro.
+              <Link href="/contacto" className="hover:text-foreground">
+                Contacto
+              </Link>
             </li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Legal</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>
+              <Link href="/aviso-legal" className="hover:text-foreground">
+                Aviso legal
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacidad" className="hover:text-foreground">
+                Privacidad
+              </Link>
+            </li>
+            <li>
+              <Link href="/cookies" className="hover:text-foreground">
+                Cookies
+              </Link>
+            </li>
+            <li>
+              <Link href="/condiciones" className="hover:text-foreground">
+                Condiciones
+              </Link>
+            </li>
+            <li>La cuenta y los archivos se quedan en este navegador.</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/60">
         <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground sm:px-6">
-          Luna Oficio. Herramientas puntuales, no un sistema de gestión.
+          Luna Oficio. Herramientas puntuales, no un sistema de gestión. Airela
+          Web.
         </p>
       </div>
     </footer>

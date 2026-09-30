@@ -16,12 +16,23 @@ En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Oficio), botones grande
 - **Rellenar y firmar PDF** (`/pdf`): subes el PDF (modelo 145 u otro), marcas casillas, escribes, firmas y descargas. El archivo no se sube a ningún servidor.
 - **Unir / dividir / comprimir PDF** (`/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`): las búsquedas gordas. En el navegador.
 - **JPG a PDF** y **PDF a JPG** (`/jpg-a-pdf`, `/pdf-a-jpg`): fotos ↔ hojas.
+- **Rotar y numerar PDF** (`/rotar-pdf`, `/numerar-pdf`).
+- **Marca de agua PDF** (`/marca-de-agua-pdf`): Pro.
 - **Imagen** (`/herramientas-imagen`): comprimir, PNG/JPG/WebP, HEIC a JPG, recortar, girar, redimensionar.
 - **Audio a WAV** y **recortar audio** (`/audio-a-wav`, `/recortar-audio`). No hay MP3 de salida ni vídeo.
+
+Blog (`/blog`), FAQ (`/faq`), precios (`/precios`) y páginas legales (`/aviso-legal`, `/privacidad`, `/cookies`, `/condiciones`). Consentimiento de cookies en el pie; puedes cambiarlo en `/cookies`.
 
 Aparcado: PDF a Word, vídeo, quitar fondo, ampliar con IA.
 
 La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el menú: el producto son las herramientas.
+
+## Dinero (sin servidor)
+
+- **Gratis:** unir, comprimir, firmar, imagen, oficio. Anuncios de casa si aceptas publicidad (AdSense cuando haya ID de cliente).
+- **Pro (29 €/año):** sin anuncios en este navegador + marca de agua. Pagas por Bizum o transferencia a `airelaweb@gmail.com`; te enviamos la clave `LUNA-OFICIO-PRO`. Vive en `localStorage`.
+
+Los PDF y la cuenta **no salen** de este navegador.
 
 El orden de trabajo está en [`PLAN.md`](PLAN.md): un paso, se prueba en Hostinger, luego el siguiente.
 

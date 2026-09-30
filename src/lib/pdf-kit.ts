@@ -50,3 +50,37 @@ export const pdfKit = [
 ] as const;
 
 export type PdfKitSlug = (typeof pdfKit)[number]["slug"];
+
+export const pdfExtraKit = [
+  {
+    href: "/rotar-pdf",
+    slug: "rotate" as const,
+    name: "Rotar PDF",
+    problem: "El escaneo ha salido de lado y el cliente lo ve torcido.",
+    does: "Giras todas las páginas 90, 180 o 270 grados.",
+    search: "rotar pdf",
+    pro: false,
+  },
+  {
+    href: "/numerar-pdf",
+    slug: "numbers" as const,
+    name: "Numerar PDF",
+    problem: "El contrato no lleva número de página y el gestor se pierde.",
+    does: "Pone el número al pie, en este navegador.",
+    search: "numerar pdf",
+    pro: false,
+  },
+  {
+    href: "/marca-de-agua-pdf",
+    slug: "watermark" as const,
+    name: "Marca de agua PDF",
+    problem: "Quiero que ponga BORRADOR o CONFIDENCIAL encima.",
+    does: "Texto en diagonal en cada hoja. Herramienta Pro.",
+    search: "marca de agua pdf",
+    pro: true,
+  },
+] as const;
+
+export type PdfExtraSlug = (typeof pdfExtraKit)[number]["slug"];
+
+export const allPdfTools = [...pdfKit, ...pdfExtraKit];

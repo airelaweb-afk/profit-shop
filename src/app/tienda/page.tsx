@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Tienda",
   description:
     "Planners, kits de marca, facturas y packs para Instagram. Descarga inmediata.",
+  robots: { index: false, follow: false },
 };
 
 export default function TiendaPage() {

@@ -81,15 +81,19 @@ Hostinger (chat Tienda Luna Oficio): plan React, GitHub `main`, `out/`, `next bu
 
 ### Paso 10 — Que Google las encuentre
 
-Una URL, un título, un problema. Textos para búsquedas reales.
+Hecho: sitemap, robots, JSON-LD, landings públicas (el login solo tapa el procesado), blog long-tail, FAQ, páginas legales y cookies.
 
-### Paso 11 — Ofrecer algo, más adelante
+### Paso 11 — Ads y Pro
 
-Cuando 1–3 herramientas ya se usen: un extra opcional, o ads. Gratis sigue existiendo. No hay demo calls. No recoger datos de la gente hasta que haya consentimiento claro.
+Hecho en local: banner de consentimiento, huecos de anuncio de casa (AdSense cuando haya ID), Pro 29 €/año con clave en el navegador. Marca de agua PDF es Pro. Unir/comprimir/firmar siguen gratis.
+
+### Paso 12 — La siguiente que duela
+
+Albarán, aplazamientos. PDF a Word sigue aparcado.
 
 ## Qué no hacemos ahora
 
-Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. CRM. La tienda de plantillas. Campañas. Recoger listados de clientes en un servidor. PDF a Word. Vídeo y MP3 de salida. Quitar fondo / ampliar con IA.
+Cuentas en un servidor (las de ahora viven en el navegador). Pasarela Stripe (la clave Pro se activa a mano). CRM. Campañas. Recoger listados de clientes en un servidor. PDF a Word. Vídeo y MP3 de salida. Quitar fondo / ampliar con IA.
 
 ## Dónde está cada cosa
 
@@ -107,10 +111,17 @@ Cuentas en un servidor (las de ahora viven en el navegador). Pasarela de pago. C
 | JPG a PDF | `/jpg-a-pdf` |
 | PDF a JPG | `/pdf-a-jpg` |
 | Hub PDF | `/herramientas-pdf` |
+| Rotar PDF | `/rotar-pdf` |
+| Numerar PDF | `/numerar-pdf` |
+| Marca de agua (Pro) | `/marca-de-agua-pdf` |
 | Comprimir imagen | `/comprimir-imagen` |
 | PNG a JPG | `/png-a-jpg` |
 | HEIC a JPG | `/heic-a-jpg` |
 | Hub imagen | `/herramientas-imagen` |
 | Audio a WAV | `/audio-a-wav` |
+| Blog | `/blog` |
+| FAQ | `/faq` |
+| Precios | `/precios` |
+| Legal | `/aviso-legal`, `/privacidad`, `/cookies`, `/condiciones` |
 | Entrar | `/entrar` |
 | Explicación | `/como-funciona` |

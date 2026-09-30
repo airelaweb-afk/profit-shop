@@ -23,7 +23,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-16 text-sm text-muted-foreground">
+      <div className="rounded-2xl bg-card px-4 py-8 text-sm text-muted-foreground ring-1 ring-foreground/10">
         Comprobando la sesión…
       </div>
     );
@@ -31,14 +31,15 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!session) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-12 sm:px-6 sm:py-16">
+      <div className="rounded-2xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8">
         <p className="text-sm tracking-wide text-primary uppercase">Cuenta</p>
-        <h1 className="mt-2 font-heading text-4xl tracking-tight">
-          Entra para usar esta herramienta.
-        </h1>
+        <h2 className="mt-2 font-heading text-3xl tracking-tight">
+          Entra para procesar el archivo.
+        </h2>
         <p className="mt-3 text-muted-foreground">
           La creas aquí, en este teléfono o este ordenador. Los PDF y las fotos
-          no salen del navegador.
+          no salen del navegador. El título y las guías de esta página se pueden
+          leer sin cuenta.
         </p>
         <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
           <Button

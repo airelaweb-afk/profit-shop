@@ -7,16 +7,30 @@ export default function NotFound() {
       <p className="text-sm tracking-wide text-primary uppercase">404</p>
       <h1 className="mt-2 font-heading text-4xl">Esa página no existe</h1>
       <p className="mt-3 text-muted-foreground">
-        El enlace está roto o la herramienta se movió. Las de administración
-        siguen en la portada.
+        El enlace está roto o la herramienta se movió. Prueba unir PDF, el blog
+        o el inicio.
       </p>
-      <Button
-        className="mt-6 h-11 px-5"
-        render={<Link href="/" />}
-        nativeButton={false}
-      >
-        Ir al inicio
-      </Button>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Button className="h-11 px-5" render={<Link href="/" />} nativeButton={false}>
+          Inicio
+        </Button>
+        <Button
+          variant="outline"
+          className="h-11 px-5"
+          render={<Link href="/unir-pdf" />}
+          nativeButton={false}
+        >
+          Unir PDF
+        </Button>
+        <Button
+          variant="outline"
+          className="h-11 px-5"
+          render={<Link href="/blog" />}
+          nativeButton={false}
+        >
+          Blog
+        </Button>
+      </div>
     </div>
   );
 }

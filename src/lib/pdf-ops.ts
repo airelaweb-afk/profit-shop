@@ -1,4 +1,4 @@
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import { zipSync } from "fflate";
 import { MAX_PDF_BYTES } from "@/lib/pdf-fill";
 import { saveBytes } from "@/lib/save-file";
@@ -281,4 +281,57 @@ export async function compressPdf(
 export function suggestedOutName(original: string, suffix: string, ext: string) {
   const base = original.replace(/\.[^.]+$/, "") || "documento";
   return `${base}-${suffix}.${ext}`;
+}
+
+export async function rotatePdf(data: ArrayBuffer, angle: 90 | 180 | 270) {
+  const doc = await loadPdf(data);
+  for (const page of doc.getPages()) {
+    const current = page.getRotation().angle;
+    page.setRotation(degrees((((current + angle) % 360) + 360) % 360));
+  }
+  return doc.save({ useObjectStreams: true });
+}
+
+export async function watermarkPdf(data: ArrayBuffer, text: string) {
+  const trimmed = text.trim();
+  if (!trimmed) throw new Error("Escribe el texto de la marca de agua.");
+  if (trimmed.length > 72) throw new Error("Máximo 72 caracteres.");
+  const doc = await loadPdf(data);
+  const font = await doc.embedFont(StandardFonts.HelveticaBold);
+  for (const page of doc.getPages()) {
+    const { width, height } = page.getSize();
+    const size = Math.max(18, Math.min(width, height) / 9);
+    const tw = font.widthOfTextAtSize(trimmed, size);
+    page.drawText(trimmed, {
+      x: Math.max(24, (width - tw) / 2),
+      y: height / 2,
+      size,
+      font,
+      color: rgb(0.45, 0.45, 0.45),
+      opacity: 0.28,
+      rotate: degrees(28),
+    });
+  }
+  return doc.save({ useObjectStreams: true });
+}
+
+export async function numberPdfPages(data: ArrayBuffer, start = 1) {
+  const from = Number.isFinite(start) ? Math.max(1, Math.floor(start)) : 1;
+  const doc = await loadPdf(data);
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const pages = doc.getPages();
+  pages.forEach((page, index) => {
+    const { width } = page.getSize();
+    const label = String(from + index);
+    const size = 11;
+    const tw = font.widthOfTextAtSize(label, size);
+    page.drawText(label, {
+      x: (width - tw) / 2,
+      y: 16,
+      size,
+      font,
+      color: rgb(0.28, 0.28, 0.28),
+    });
+  });
+  return doc.save({ useObjectStreams: true });
 }

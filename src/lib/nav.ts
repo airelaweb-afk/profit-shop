@@ -21,6 +21,9 @@ const pdfPaths = new Set([
   "/jpg-a-pdf",
   "/pdf-a-jpg",
   "/pdf",
+  "/rotar-pdf",
+  "/numerar-pdf",
+  "/marca-de-agua-pdf",
 ]);
 
 const imagePaths = new Set([
