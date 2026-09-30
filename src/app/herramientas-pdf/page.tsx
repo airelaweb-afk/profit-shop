@@ -22,9 +22,9 @@ export default function HerramientasPdfPage() {
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Las que más se buscan: unir, dividir, comprimir, JPG ↔ PDF. También
-        firmar, rotar, numerar y eliminar páginas. La marca de agua es Pro. No
-        convertimos a Word: en el navegador el resultado queda mal y no vamos a
-        fingirlo. Los archivos no salen de aquí.
+        rellenar campos, firmar, rotar, numerar y eliminar páginas. La marca de
+        agua es Pro. No convertimos a Word: en el navegador el resultado queda
+        mal y no vamos a fingirlo. Los archivos no salen de aquí.
       </p>
       <AdSlot label="Unir y comprimir son gratis. Pro desbloquea la marca de agua." wrapClassName="mt-6" />
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

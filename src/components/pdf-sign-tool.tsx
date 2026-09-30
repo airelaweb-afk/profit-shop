@@ -326,8 +326,8 @@ export function PdfSignTool() {
           : "";
       setNotice(
         (found.length
-          ? `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} del formulario. Rellénalos a la izquierda, o pulsa en la hoja y escribe encima.`
-          : "Este PDF no trae casillas interactivas (pasa con Hacienda). Amplía, elige ✓ tamaño S y pulsa en cada recuadro. Arrastra o usa las flechas si no cae en el sitio.") +
+          ? `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} reales del formulario. Rellénalos a la izquierda (no es texto pintado encima). Si quieres solo eso, usa Rellenar PDF.`
+          : "Este PDF no trae campos. Un escaneo o un PDF ‘impreso’ no se puede convertir en formulario de verdad. Aquí marcas encima; para campos originales usa un PDF hecho con casillas (Word, Acrobat, Hacienda).") +
           extra,
       );
     } catch (caught) {
@@ -977,7 +977,7 @@ export function PdfSignTool() {
                         />
                         Marcado
                       </label>
-                    ) : field.kind === "choice" ? (
+                    ) : field.kind === "choice" || field.kind === "radio" ? (
                       <select
                         id={`field-${index}`}
                         className="h-10 rounded-lg border border-input bg-transparent px-2.5 text-sm"

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LogoMark } from "@/components/site-brand";
-import { PRO_MONTHLY, PRO_YEARLY } from "@/lib/payments";
 
 export function InkHero() {
   return (
@@ -28,8 +27,8 @@ export function InkHero() {
           <span className="text-primary">En tu navegador.</span>
         </h1>
         <p className="mt-4 max-w-xl text-lg text-background/75">
-          Unir, comprimir, convertir, firmar. El archivo no se sube. Gratis
-          con un tope; Pro ilimitado por {PRO_MONTHLY}/mes o {PRO_YEARLY}/año.
+          Unir, comprimir, convertir, firmar, rellenar campos. El archivo no
+          se sube.
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
           <Button
@@ -48,15 +47,6 @@ export function InkHero() {
             nativeButton={false}
           >
             Unir PDF
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-12 w-full border-background/40 bg-transparent px-6 text-background hover:border-accent hover:bg-transparent hover:text-accent sm:w-auto"
-            render={<Link href="/precios" />}
-            nativeButton={false}
-          >
-            Pro, sin límite
           </Button>
         </div>
       </div>

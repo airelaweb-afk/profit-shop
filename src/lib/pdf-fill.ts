@@ -1,8 +1,13 @@
 import {
   LineCapStyle,
+  PDFArray,
   PDFCheckBox,
   PDFDocument,
   PDFDropdown,
+  PDFName,
+  PDFOptionList,
+  PDFRadioGroup,
+  PDFRef,
   PDFTextField,
   StandardFonts,
   rgb,
@@ -12,13 +17,31 @@ import {
 
 export const MAX_PDF_BYTES = 80 * 1024 * 1024;
 
+export type PdfFieldWidget = {
+  pageIndex: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  option?: string;
+};
+
 export type PdfFormField = {
   name: string;
-  kind: "text" | "check" | "choice";
+  kind: "text" | "check" | "choice" | "radio";
   value: string;
   checked: boolean;
   options: string[];
+  multiline: boolean;
+  readOnly: boolean;
+  widgets: PdfFieldWidget[];
 };
+
+export function humanFieldName(name: string) {
+  const parts = name.split(/[.\]]/).map((part) => part.replace(/\[/g, "").trim());
+  const last = [...parts].reverse().find((part) => part && !/^\d+$/.test(part));
+  return last || name;
+}
 
 export type PdfStampKind =
   | "text"
@@ -163,50 +186,162 @@ export async function createBlankSheet(): Promise<ArrayBuffer> {
   return copy;
 }
 
-export async function listPdfFields(data: ArrayBuffer): Promise<PdfFormField[]> {
+function pageIndexForWidget(
+  doc: PDFDocument,
+  widget: { P: () => PDFRef | undefined; dict: unknown },
+) {
+  const pages = doc.getPages();
+  const pref = widget.P();
+  if (pref) {
+    const hit = pages.findIndex((page) => page.ref === pref);
+    if (hit >= 0) return hit;
+  }
+  for (let index = 0; index < pages.length; index += 1) {
+    const annots = pages[index].node.lookupMaybe(PDFName.of("Annots"), PDFArray);
+    if (!annots) continue;
+    for (let i = 0; i < annots.size(); i += 1) {
+      try {
+        if (annots.lookup(i) === widget.dict) return index;
+      } catch {
+        // Anotación rota.
+      }
+    }
+  }
+  return 0;
+}
+
+function widgetsOf(
+  doc: PDFDocument,
+  field: { acroField: { getWidgets: () => Array<{
+    getRectangle: () => { x: number; y: number; width: number; height: number };
+    P: () => PDFRef | undefined;
+    dict: unknown;
+    getOnValue?: () => { decodeText: () => string } | undefined;
+  }> } },
+  options: string[] = [],
+): PdfFieldWidget[] {
   try {
-    const doc = await PDFDocument.load(data, { ignoreEncryption: false });
-    const form = doc.getForm();
-    return form.getFields().map((field) => {
-      const name = field.getName();
-      if (field instanceof PDFTextField) {
-        return {
-          name,
-          kind: "text" as const,
-          value: field.getText() ?? "",
-          checked: false,
-          options: [],
-        };
-      }
-      if (field instanceof PDFCheckBox) {
-        return {
-          name,
-          kind: "check" as const,
-          value: "",
-          checked: field.isChecked(),
-          options: [],
-        };
-      }
-      if (field instanceof PDFDropdown) {
-        const selected = field.getSelected();
-        return {
-          name,
-          kind: "choice" as const,
-          value: selected[0] ?? "",
-          checked: false,
-          options: field.getOptions(),
-        };
-      }
+    return field.acroField.getWidgets().map((widget, index) => {
+      const rect = widget.getRectangle();
       return {
-        name,
-        kind: "text" as const,
-        value: "",
-        checked: false,
-        options: [],
+        pageIndex: pageIndexForWidget(doc, widget),
+        x: rect.x,
+        y: rect.y,
+        width: Math.max(8, rect.width),
+        height: Math.max(8, rect.height),
+        option: widget.getOnValue?.()?.decodeText() || options[index],
       };
     });
   } catch {
     return [];
+  }
+}
+
+const emptyField = {
+  checked: false,
+  options: [] as string[],
+  multiline: false,
+  readOnly: false,
+  widgets: [] as PdfFieldWidget[],
+};
+
+export async function listPdfFields(data: ArrayBuffer): Promise<PdfFormField[]> {
+  try {
+    const doc = await PDFDocument.load(data, { ignoreEncryption: true });
+    const form = doc.getForm();
+    const out: PdfFormField[] = [];
+    for (const field of form.getFields()) {
+      const name = field.getName();
+      if (!name) continue;
+      const readOnly = field.isReadOnly();
+      if (field instanceof PDFTextField) {
+        out.push({
+          ...emptyField,
+          name,
+          kind: "text",
+          value: field.getText() ?? "",
+          multiline: field.isMultiline(),
+          readOnly,
+          widgets: widgetsOf(doc, field),
+        });
+        continue;
+      }
+      if (field instanceof PDFCheckBox) {
+        out.push({
+          ...emptyField,
+          name,
+          kind: "check",
+          value: "",
+          checked: field.isChecked(),
+          readOnly,
+          widgets: widgetsOf(doc, field),
+        });
+        continue;
+      }
+      if (field instanceof PDFDropdown || field instanceof PDFOptionList) {
+        const selected = field.getSelected();
+        out.push({
+          ...emptyField,
+          name,
+          kind: "choice",
+          value: selected[0] ?? "",
+          options: field.getOptions(),
+          readOnly,
+          widgets: widgetsOf(doc, field),
+        });
+        continue;
+      }
+      if (field instanceof PDFRadioGroup) {
+        const options = field.getOptions();
+        out.push({
+          ...emptyField,
+          name,
+          kind: "radio",
+          value: field.getSelected() ?? "",
+          options,
+          readOnly,
+          widgets: widgetsOf(doc, field, options),
+        });
+      }
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+export async function applyFormValues(
+  doc: PDFDocument,
+  fields: PdfFormField[],
+) {
+  const form = doc.getForm();
+  for (const field of fields) {
+    if (field.readOnly) continue;
+    try {
+      if (field.kind === "text") {
+        form.getTextField(field.name).setText(field.value);
+      } else if (field.kind === "check") {
+        const box = form.getCheckBox(field.name);
+        if (field.checked) box.check();
+        else box.uncheck();
+      } else if (field.kind === "choice" && field.value) {
+        try {
+          form.getDropdown(field.name).select(field.value);
+        } catch {
+          form.getOptionList(field.name).select(field.value);
+        }
+      } else if (field.kind === "radio" && field.value) {
+        form.getRadioGroup(field.name).select(field.value);
+      }
+    } catch {
+      // Campo raro o de solo lectura: se ignora.
+    }
+  }
+  try {
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    form.updateFieldAppearances(font);
+  } catch {
+    // El visor mostrará el valor al abrir el PDF.
   }
 }
 
@@ -295,29 +430,9 @@ export async function exportSignedPdf(options: {
   fields: PdfFormField[];
   stamps: PdfStamp[];
 }): Promise<Uint8Array> {
-  const doc = await PDFDocument.load(options.data);
+  const doc = await PDFDocument.load(options.data, { ignoreEncryption: true });
   try {
-    const form = doc.getForm();
-    for (const field of options.fields) {
-      try {
-        if (field.kind === "text") {
-          form.getTextField(field.name).setText(field.value);
-        } else if (field.kind === "check") {
-          const box = form.getCheckBox(field.name);
-          if (field.checked) box.check();
-          else box.uncheck();
-        } else if (field.kind === "choice" && field.value) {
-          form.getDropdown(field.name).select(field.value);
-        }
-      } catch {
-        // Campo raro o de solo lectura: se ignora.
-      }
-    }
-    try {
-      form.flatten();
-    } catch {
-      // Algunos PDF no se pueden aplanar; el resto del documento sí se firma.
-    }
+    await applyFormValues(doc, options.fields);
   } catch {
     // PDF sin formulario.
   }
@@ -369,4 +484,9 @@ export function formatPdfDate(when = new Date()) {
 export function suggestedFileName(originalName: string) {
   const base = originalName.replace(/\.pdf$/i, "").trim() || "documento";
   return `${base}-firmado.pdf`;
+}
+
+export function suggestedFillFileName(originalName: string) {
+  const base = originalName.replace(/\.pdf$/i, "").trim() || "formulario";
+  return `${base}-relleno.pdf`;
 }

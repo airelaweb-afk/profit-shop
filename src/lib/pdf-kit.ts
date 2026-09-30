@@ -47,6 +47,14 @@ export const pdfKit = [
     does: "Marcas casillas, escribes, firmas y te lo llevas.",
     search: "firmar pdf",
   },
+  {
+    href: "/rellenar-pdf",
+    slug: "fill" as const,
+    name: "Rellenar PDF",
+    problem: "El PDF ya trae casillas y no quiero escribir encima.",
+    does: "Rellenas los campos originales. Un escaneo no tiene campos.",
+    search: "rellenar pdf",
+  },
 ] as const;
 
 export type PdfKitSlug = (typeof pdfKit)[number]["slug"];

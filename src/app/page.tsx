@@ -2,12 +2,12 @@ import Link from "next/link";
 import { FaqJsonLd, FaqList } from "@/components/faq-list";
 import { HomeToolGrid } from "@/components/home-tool-grid";
 import { InkHero } from "@/components/ink-hero";
+import { PlanCompareTable } from "@/components/plan-compare-table";
 import { ToolCard } from "@/components/tool-card";
 import { Button } from "@/components/ui/button";
 import { posts } from "@/lib/blog";
 import { competitors } from "@/lib/comparisons";
 import { siteFaqs } from "@/lib/faq";
-import { PRO_MONTHLY, PRO_YEARLY } from "@/lib/payments";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta({
@@ -36,31 +36,7 @@ export default function HomePage() {
       <FaqJsonLd items={siteFaqs} />
       <InkHero />
       <HomeToolGrid />
-
-      <section className="bg-foreground py-12 text-background">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div>
-            <p className="font-mono text-[0.7rem] tracking-[0.18em] text-accent uppercase">
-              Pro
-            </p>
-            <h2 className="mt-2 font-heading text-3xl sm:text-4xl">
-              Ilimitado. {PRO_MONTHLY}/mes o {PRO_YEARLY}/año.
-            </h2>
-            <p className="mt-2 max-w-xl text-sm text-background/70">
-              Más archivos, más peso, sin cupo diario. Marca de agua, WebP en
-              lote y el plugin de WordPress.
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="h-12 shrink-0 border-2 border-accent bg-accent px-6 text-accent-foreground hover:bg-accent/90"
-            render={<Link href="/precios" />}
-            nativeButton={false}
-          >
-            Ver planes
-          </Button>
-        </div>
-      </section>
+      <PlanCompareTable />
 
       <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
         <p className="font-mono text-[0.7rem] tracking-[0.18em] text-primary uppercase">

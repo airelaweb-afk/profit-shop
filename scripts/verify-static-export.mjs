@@ -4,7 +4,7 @@ import { join } from "node:path";
 const dir = "out";
 const required = [
   join(dir, "index.html"),
-  join(dir, "pdf", "index.html"),
+  join(dir, "rellenar-pdf", "index.html"),
   join(dir, "unir-pdf", "index.html"),
   join(dir, "rotar-pdf", "index.html"),
   join(dir, "marca-de-agua-pdf", "index.html"),

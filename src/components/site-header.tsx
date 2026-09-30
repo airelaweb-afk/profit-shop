@@ -7,6 +7,7 @@ import { SiteBrand } from "@/components/site-brand";
 import { logoutAccount } from "@/lib/auth";
 import { allNavLinks } from "@/lib/nav";
 import { useSession } from "@/lib/use-session";
+import { MoreMenu } from "@/components/more-menu";
 
 function AccountActions() {
   const session = useSession();
@@ -54,12 +55,6 @@ function AccountActions() {
   );
 }
 
-const extraLinks = [
-  { href: "/comparar", label: "Comparar" },
-  { href: "/blog", label: "Blog" },
-  { href: "/precios", label: "Precios" },
-] as const;
-
 export function SiteHeader() {
   return (
     <header className="no-print sticky top-0 z-40 bg-foreground text-background">
@@ -72,11 +67,7 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          {extraLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="ink-link">
-              {link.label}
-            </Link>
-          ))}
+          <MoreMenu />
         </nav>
 
         <nav className="hidden items-center gap-3 text-sm xl:flex 2xl:hidden">
@@ -89,15 +80,7 @@ export function SiteHeader() {
           <Link href="/presupuestos" className="ink-link">
             Documentos
           </Link>
-          <Link href="/comparar" className="ink-link">
-            Comparar
-          </Link>
-          <Link href="/blog" className="ink-link">
-            Blog
-          </Link>
-          <Link href="/precios" className="ink-link">
-            Precios
-          </Link>
+          <MoreMenu />
         </nav>
 
         <AccountActions />

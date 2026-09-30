@@ -26,6 +26,11 @@ export const siteFaqs: FaqItem[] = [
     href: "/blog/por-que-no-convertimos-pdf-a-word/",
   },
   {
+    q: "¿Puedo rellenar las casillas reales de un PDF?",
+    a: "Sí, si el archivo trae campos de formulario (AcroForm). Rellenar PDF escribe dentro de esas cajas y el PDF sigue siendo un formulario. Un escaneo o un PDF ‘impreso’ no tiene campos: no se pueden inventar. En ese caso usa Firmar PDF y marcas encima.",
+    href: "/rellenar-pdf",
+  },
+  {
     q: "¿Es una firma digital de la FNMT o Cl@ve?",
     a: "No. Es tu rúbrica dibujada, como en papel. Sirve para un parte o una autorización informal. No sustituye el certificado cualificado.",
     href: "/pdf",
@@ -87,7 +92,17 @@ export const toolFaqs: Record<string, FaqItem[]> = {
   "/pdf": [
     {
       q: "¿Vale para un modelo 145?",
-      a: "Sí, como marcas encima. Amplía con + y pon checks grandes en el teléfono.",
+      a: "Sí, como marcas encima. Amplía con + y pon checks grandes en el teléfono. Si el modelo trae campos de formulario, usa Rellenar PDF.",
+    },
+  ],
+  "/rellenar-pdf": [
+    {
+      q: "¿Cualquier PDF se puede hacer editable?",
+      a: "No. Solo los que ya traen campos (AcroForm). Un escaneo, una foto o un PDF exportado como imagen no tiene cajas reales. No las inventamos pintando texto: eso sería mentir. Esos van a Firmar PDF.",
+    },
+    {
+      q: "¿El PDF sigue siendo un formulario al descargarlo?",
+      a: "Sí. Escribimos en los campos originales y no aplanamos el formulario. Lo puedes seguir editando en Acrobat u otro visor.",
     },
   ],
   "/marca-de-agua-pdf": [

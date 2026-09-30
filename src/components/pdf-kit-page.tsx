@@ -9,7 +9,7 @@ import { allPdfTools, pdfKit, type PdfKitSlug } from "@/lib/pdf-kit";
 import { pageMeta } from "@/lib/seo";
 
 const copy: Record<
-  Exclude<PdfKitSlug, "sign">,
+  Exclude<PdfKitSlug, "sign" | "fill">,
   {
     title: string;
     kicker: string;
@@ -61,7 +61,7 @@ const copy: Record<
   },
 };
 
-export function pdfKitMetadata(kind: Exclude<PdfKitSlug, "sign">): Metadata {
+export function pdfKitMetadata(kind: Exclude<PdfKitSlug, "sign" | "fill">): Metadata {
   const item = copy[kind];
   const href = pdfKit.find((tool) => tool.slug === kind)?.href ?? "/";
   return pageMeta({
@@ -72,7 +72,7 @@ export function pdfKitMetadata(kind: Exclude<PdfKitSlug, "sign">): Metadata {
   });
 }
 
-export function PdfKitPage({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
+export function PdfKitPage({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"> }) {
   const item = copy[kind];
   const href = pdfKit.find((tool) => tool.slug === kind)?.href ?? "/";
   const others = allPdfTools.filter((tool) => tool.slug !== kind);

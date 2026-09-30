@@ -24,8 +24,9 @@ export default function PdfPage() {
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
         Elige el archivo que te han mandado. Amplía la hoja, marca casillas,
-        escribe y firma. Te lo descargas. El PDF no sale de este navegador. No
-        es Cl@ve ni un certificado digital: es tu rúbrica, como en papel.
+        escribe y firma. Si el PDF ya trae campos de formulario, mejor usa
+        Rellenar PDF: ahí se editan las cajas originales, no se pinta texto
+        encima. El archivo no sale de este navegador. No es Cl@ve.
       </p>
       <AdSlot label="Firmar en el navegador es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { PlanCompareTable } from "@/components/plan-compare-table";
 import { PricingBox } from "@/components/pricing-box";
 import { LEGAL } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
@@ -63,6 +64,7 @@ export default function PreciosPage() {
           </ul>
         </li>
       </ul>
+      <PlanCompareTable showCta={false} embedded />
       <div className="mt-8">
         <Suspense>
           <PricingBox />
