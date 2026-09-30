@@ -1,0 +1,45 @@
+# Configuración del proyecto Supabase de Luna Oficio.
+# Se usa con la CLI (`supabase link`, `supabase db push`, `supabase functions deploy`)
+# y con la integración de GitHub. La web estática en Hostinger solo necesita la URL
+# y la anon key en variables de entorno.
+
+project_id = "luna-oficio"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 200
+
+[db]
+port = 54322
+major_version = 17
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "https://lunaoficio.com"
+additional_redirect_urls = [
+  "https://lunaoficio.com/cuenta/",
+  "https://lunaoficio.com/entrar/",
+  "http://127.0.0.1:43147/cuenta/",
+  "http://127.0.0.1:43147/entrar/",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+enable_signup = true
+minimum_password_length = 8
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+secure_password_change = false
+
+# Webhook de Stripe: lo llama Stripe, no un usuario con sesión.
+[functions.stripe-webhook]
+verify_jwt = false
