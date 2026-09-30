@@ -27,6 +27,7 @@ const pdfPaths = new Set([
   "/juntar-pdf",
   "/combinar-pdf",
   "/aligerar-pdf",
+  "/eliminar-paginas-pdf",
 ]);
 
 const imagePaths = new Set([
@@ -39,6 +40,8 @@ const imagePaths = new Set([
   "/redimensionar-imagen",
   "/recortar-imagen",
   "/girar-imagen",
+  "/webp-en-lote",
+  "/plugin-wordpress-webp",
   "/audio-a-wav",
   "/recortar-audio",
 ]);

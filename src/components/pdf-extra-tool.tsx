@@ -16,6 +16,7 @@ import {
   formatBytes,
   isPdfFile,
   numberPdfPages,
+  removePdfPages,
   rotatePdf,
   suggestedOutName,
   watermarkPdf,
@@ -45,6 +46,12 @@ const copy: Record<
     cta: "Elegir PDF",
     action: "Poner marca y guardar",
   },
+  remove: {
+    drop: "Suelta el PDF del que quieres quitar páginas",
+    tap: "Elige el PDF del que quieres quitar páginas",
+    cta: "Elegir PDF",
+    action: "Quitar páginas y guardar",
+  },
 };
 
 export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
@@ -55,6 +62,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
   const [angle, setAngle] = useState<90 | 180 | 270>(90);
   const [start, setStart] = useState("1");
   const [mark, setMark] = useState("BORRADOR");
+  const [pages, setPages] = useState("");
   const labels = copy[kind];
 
   async function addFiles(list: File[]) {
@@ -86,7 +94,13 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
       const data = await item.file.arrayBuffer();
       let bytes: Uint8Array;
       let suffix = "editado";
-      if (kind === "rotate") {
+      let ready = "";
+      if (kind === "remove") {
+        const removed = await removePdfPages(data, pages);
+        bytes = removed.bytes;
+        suffix = "sin-paginas";
+        ready = `Listo: ${removed.removed} página${removed.removed === 1 ? "" : "s"} fuera, quedan ${removed.kept}. ${formatBytes(bytes.byteLength)}.`;
+      } else if (kind === "rotate") {
         bytes = await rotatePdf(data, angle);
         suffix = `rotado-${angle}`;
       } else if (kind === "numbers") {
@@ -105,7 +119,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         suggestedOutName(item.file.name, suffix, "pdf"),
         "application/pdf",
       );
-      setNotice(noticeForSave(result, `Listo: ${formatBytes(bytes.byteLength)}.`));
+      setNotice(noticeForSave(result, ready || `Listo: ${formatBytes(bytes.byteLength)}.`));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo terminar.");
     } finally {
@@ -180,6 +194,23 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         </div>
       ) : null}
 
+      {kind === "remove" ? (
+        <div className="mt-6 grid gap-1.5">
+          <Label htmlFor="pdf-remove">Páginas a quitar</Label>
+          <Input
+            id="pdf-remove"
+            className="h-12"
+            inputMode="numeric"
+            value={pages}
+            onChange={(event) => setPages(event.target.value)}
+            placeholder={item?.pages ? `Por ejemplo: 1, 4-6 (hay ${item.pages})` : "Por ejemplo: 1, 4-6"}
+          />
+          <p className="text-xs text-muted-foreground">
+            Números y rangos separados por comas. Las demás páginas se quedan en su orden.
+          </p>
+        </div>
+      ) : null}
+
       {kind === "watermark" ? (
         <div className="mt-6 grid gap-1.5">
           <Label htmlFor="pdf-mark">Texto de la marca</Label>
@@ -199,7 +230,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
           type="button"
           size="lg"
           className="h-12 w-full px-5 sm:w-auto"
-          disabled={busy || !item}
+          disabled={busy || !item || (kind === "remove" && !pages.trim())}
           onClick={() => void run()}
         >
           {busy ? "Preparando…" : <Download />}

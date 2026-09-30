@@ -37,6 +37,14 @@ const copy: Record<
     title: "Que cada hoja lleve su número.",
     lead: "Pone el dígito al pie, centrado. Puedes empezar en 1 o en otro número si es un anexo.",
   },
+  remove: {
+    metaTitle: "Eliminar páginas PDF",
+    meta: "Quita páginas de un PDF en el navegador: escribe 2, 5-7 y descarga el archivo limpio. Gratis y sin subir el PDF.",
+    keywords: ["eliminar paginas pdf", "quitar paginas pdf", "borrar paginas de un pdf"],
+    kicker: "Eliminar páginas PDF · con cuenta",
+    title: "Fuera las páginas que sobran.",
+    lead: "Escribes las páginas a quitar (1, 4-6) y el resto se conserva en su orden, con su texto y sus imágenes. El PDF no sale de este navegador.",
+  },
   watermark: {
     metaTitle: "Marca de agua PDF",
     meta: "Pon BORRADOR o CONFIDENCIAL en un PDF. Herramienta Pro. En el navegador, sin subir el archivo.",
@@ -81,9 +89,7 @@ export function PdfExtraPage({ kind }: { kind: PdfExtraSlug }) {
         {item.title}
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
-      <div className="mt-6">
-        <AdSlot label="Unir y comprimir PDF siguen gratis, con o sin Pro." />
-      </div>
+      <AdSlot label="Unir y comprimir PDF siguen gratis, con o sin Pro." wrapClassName="mt-6" />
       <div className="mt-10">{tool}</div>
       <FaqList items={faqsForPath(href)} />
       <RelatedGuides href={href} />

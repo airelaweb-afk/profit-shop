@@ -292,6 +292,25 @@ export async function rotatePdf(data: ArrayBuffer, angle: 90 | 180 | 270) {
   return doc.save({ useObjectStreams: true });
 }
 
+export async function removePdfPages(data: ArrayBuffer, pagesToRemove: string) {
+  const src = await loadPdf(data);
+  const count = src.getPageCount();
+  if (!pagesToRemove.trim()) {
+    throw new Error("Escribe las páginas que quieres quitar, por ejemplo 2, 5-7.");
+  }
+  const remove = new Set(parsePageRanges(pagesToRemove, count));
+  const keep = Array.from({ length: count }, (_, index) => index).filter(
+    (index) => !remove.has(index),
+  );
+  if (keep.length === 0) {
+    throw new Error("Quitarías todas las páginas. Deja al menos una.");
+  }
+  const out = await PDFDocument.create();
+  const copied = await out.copyPages(src, keep);
+  for (const page of copied) out.addPage(page);
+  return { bytes: await out.save({ useObjectStreams: true }), removed: remove.size, kept: keep.length };
+}
+
 export async function watermarkPdf(data: ArrayBuffer, text: string) {
   const trimmed = text.trim();
   if (!trimmed) throw new Error("Escribe el texto de la marca de agua.");

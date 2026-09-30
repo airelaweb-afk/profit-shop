@@ -71,6 +71,15 @@ export const pdfExtraKit = [
     pro: false,
   },
   {
+    href: "/eliminar-paginas-pdf",
+    slug: "remove" as const,
+    name: "Eliminar páginas PDF",
+    problem: "Sobran la portada en blanco y dos hojas del medio.",
+    does: "Escribes las páginas a quitar (2, 5-7) y descargas el PDF limpio.",
+    search: "eliminar paginas pdf",
+    pro: false,
+  },
+  {
     href: "/marca-de-agua-pdf",
     slug: "watermark" as const,
     name: "Marca de agua PDF",
