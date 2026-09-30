@@ -4,6 +4,8 @@ import { imageKit, audioKit } from "@/lib/image-kit";
 import { allPdfTools } from "@/lib/pdf-kit";
 import { SITE_URL } from "@/lib/site";
 
+export const dynamic = "force-static";
+
 const staticPaths = [
   "/",
   "/blog/",
