@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /** Pega aquí la URL del proyecto si prefieres no usar variables de entorno. */
-export const SUPABASE_URL_MANUAL = "";
+export const SUPABASE_URL_MANUAL = "https://dncgvzpxorrgybfkmnrh.supabase.co";
 /** Pega aquí la anon key (pública por diseño; las reglas RLS protegen los datos). */
 export const SUPABASE_ANON_KEY_MANUAL = "";
 
