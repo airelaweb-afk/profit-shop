@@ -67,7 +67,6 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          <MoreMenu />
         </nav>
 
         <nav className="hidden items-center gap-3 text-sm xl:flex 2xl:hidden">
@@ -80,10 +79,15 @@ export function SiteHeader() {
           <Link href="/presupuestos" className="ink-link">
             Documentos
           </Link>
-          <MoreMenu />
         </nav>
 
-        <AccountActions />
+        <div className="ml-auto hidden items-center gap-4 xl:flex">
+          <MoreMenu />
+          <AccountActions />
+        </div>
+        <div className="ml-auto xl:hidden">
+          <AccountActions />
+        </div>
       </div>
       <SearchTicker />
     </header>
