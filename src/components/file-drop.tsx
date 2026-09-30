@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, FileUp } from "lucide-react";
+import { Camera, FileUp, FolderOpen } from "lucide-react";
 import { useCoarsePointer } from "@/lib/use-coarse-pointer";
 
 type FileDropProps = {
@@ -14,6 +14,8 @@ type FileDropProps = {
   busyHint?: string;
   cta: string;
   cameraCta?: string;
+  /** Adds a second button that opens the folder picker (all files inside are passed to onFiles). */
+  folderCta?: string;
   onFiles: (files: File[]) => void;
 };
 
@@ -27,10 +29,12 @@ export function FileDrop({
   busyHint = "Un momento. Un archivo grande tarda.",
   cta,
   cameraCta,
+  folderCta,
   onFiles,
 }: FileDropProps) {
   const input = useRef<HTMLInputElement>(null);
   const camera = useRef<HTMLInputElement>(null);
+  const folder = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const coarse = useCoarsePointer();
 
@@ -59,6 +63,20 @@ export function FileDrop({
           accept="image/*"
           capture="environment"
           className="sr-only"
+          onChange={(event) => {
+            take([...(event.target.files ?? [])]);
+            event.target.value = "";
+          }}
+        />
+      ) : null}
+      {folderCta ? (
+        <input
+          ref={folder}
+          type="file"
+          multiple
+          className="sr-only"
+          // Non-standard but supported by every desktop browser; React types omit it.
+          {...{ webkitdirectory: "" }}
           onChange={(event) => {
             take([...(event.target.files ?? [])]);
             event.target.value = "";
@@ -102,6 +120,16 @@ export function FileDrop({
           </span>
         ) : null}
       </button>
+      {folderCta && !busy ? (
+        <button
+          type="button"
+          className="mt-3 hidden h-12 w-full items-center justify-center gap-2 rounded-lg border border-border bg-card text-sm font-medium sm:flex"
+          onClick={() => folder.current?.click()}
+        >
+          <FolderOpen className="size-4" />
+          {folderCta}
+        </button>
+      ) : null}
       {cameraCta && !busy ? (
         <button
           type="button"

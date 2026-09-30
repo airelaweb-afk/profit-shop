@@ -59,6 +59,25 @@ export const imageKit = [
 
 export type ImageKitSlug = (typeof imageKit)[number]["slug"];
 
+export const imageProKit = [
+  {
+    href: "/webp-en-lote",
+    slug: "webp-batch" as const,
+    name: "WebP en lote",
+    problem: "Hay que pasar toda la carpeta de imágenes de la web a WebP.",
+    does: "Cientos de JPG y PNG a WebP de una vez, con ancho máximo y zip. Pro.",
+    pro: true,
+  },
+  {
+    href: "/plugin-wordpress-webp",
+    slug: "wp-plugin" as const,
+    name: "Plugin WordPress WebP",
+    problem: "La biblioteca de medios de WordPress pesa y PageSpeed se queja.",
+    does: "Plugin que convierte a WebP lo que subes y toda la biblioteca. Pro.",
+    pro: true,
+  },
+] as const;
+
 export const audioKit = [
   {
     href: "/audio-a-wav",

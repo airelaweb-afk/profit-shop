@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { posts } from "@/lib/blog";
 import { competitors } from "@/lib/comparisons";
-import { imageKit, audioKit } from "@/lib/image-kit";
+import { imageKit, imageProKit, audioKit } from "@/lib/image-kit";
 import { allPdfTools } from "@/lib/pdf-kit";
 import { SITE_URL } from "@/lib/site";
 
@@ -52,6 +52,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.9,
+    })),
+    ...imageProKit.map((tool) => ({
+      url: `${SITE_URL}${tool.href}/`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
     })),
     ...imageKit.map((tool) => ({
       url: `${SITE_URL}${tool.href}/`,
