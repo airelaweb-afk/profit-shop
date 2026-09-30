@@ -3,16 +3,16 @@
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Download, Trash2 } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
+import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
+import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PdfKitSlug } from "@/lib/pdf-kit";
+import { bytesLabel } from "@/lib/limits";
 import { newId } from "@/lib/quotes";
 import { noticeForSave, type SaveResult } from "@/lib/save-file";
 import {
-  MAX_IMAGE_FILES,
-  MAX_PDF_BYTES,
-  MAX_PDF_FILES,
   compressPdf,
   countPdfPages,
   downloadBytes,
@@ -83,6 +83,7 @@ function copyFor(kind: Exclude<PdfKitSlug, "sign">) {
 }
 
 export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -105,10 +106,17 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
       setError(wantsPdf ? "Sube archivos PDF." : "Sube JPG o PNG.");
       return;
     }
+    const maxBytes = limit.pdfBytes;
     const next: Item[] = [];
     for (const file of picked) {
-      if (file.size > MAX_PDF_BYTES) {
-        setError(`${file.name} pesa más de 20 MB.`);
+      if (file.size > maxBytes) {
+        if (pro) {
+          setError(`${file.name} pesa más de ${bytesLabel(maxBytes)}.`);
+        } else {
+          setUpgrade(
+            `${file.name} pesa más de ${bytesLabel(maxBytes)}. En Pro caben archivos más grandes.`,
+          );
+        }
         return;
       }
       let pages: number | null = null;
@@ -126,10 +134,19 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
     }
     setItems((current) => {
       const merged = multiple ? [...current, ...next] : next.slice(0, 1);
-      const limit = kind === "images" ? MAX_IMAGE_FILES : MAX_PDF_FILES;
-      if (merged.length > limit) {
-        setError(`Como máximo ${limit} archivos.`);
-        return current;
+      const cap =
+        kind === "images"
+          ? limit.imagesToPdf
+          : kind === "merge"
+            ? limit.pdfFiles
+            : 1;
+      if (merged.length > cap) {
+        setUpgrade(
+          pro
+            ? `Como máximo ${cap} archivos.`
+            : `Gratis son ${cap} ${kind === "images" ? "imágenes" : "PDF"}. Pro es ilimitado.`,
+        );
+        return merged.slice(0, cap);
       }
       return merged;
     });
@@ -148,6 +165,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
   }
 
   async function run() {
+    if (!beforeRun()) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -169,6 +187,13 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         if (!file) throw new Error("Sube un PDF.");
         const data = await file.arrayBuffer();
         const pageCount = items[0].pages ?? (await countPdfPages(data));
+        if (pageCount > limit.pdfPages) {
+          throw new Error(
+            pro
+              ? `Este PDF tiene ${pageCount} páginas (máximo ${limit.pdfPages}).`
+              : `Gratis son ${limit.pdfPages} páginas. Este tiene ${pageCount}. Pro es ilimitado.`,
+          );
+        }
         if (perPage) {
           const files = await splitPdfPerPage(data);
           result = await downloadBytes(
@@ -237,6 +262,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         ready = "Listo: un JPG por página, en un zip.";
       }
       setNotice(noticeForSave(result, ready));
+      afterRun();
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "No se pudo terminar.",
@@ -269,10 +295,20 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         tapTitle={copy.tap}
         cta={copy.cta}
         cameraCta={"camera" in copy ? copy.camera : undefined}
-        hint="No se envía a ningún servidor. Con cuenta, en este navegador."
+        hint="No se envía a ningún servidor. Sin cuenta."
         busyHint="Un archivo grande tarda un momento."
         onFiles={(list) => void addFiles(list)}
       />
+      <FreeCapNote
+        text={
+          kind === "merge"
+            ? `Gratis: hasta ${limit.pdfFiles} PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+            : kind === "images"
+              ? `Gratis: hasta ${limit.imagesToPdf} fotos de ${bytesLabel(limit.pdfBytes)}`
+              : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+        }
+      />
+      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
 
       {items.length > 0 ? (
         <ul className="mt-6 grid gap-2">

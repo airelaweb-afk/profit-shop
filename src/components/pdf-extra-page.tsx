@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { AdSlot } from "@/components/ad-slot";
-import { AuthGate } from "@/components/auth-gate";
 import { FaqList } from "@/components/faq-list";
 import { PdfExtraTool } from "@/components/pdf-extra-tool";
 import { ProGate } from "@/components/pro-gate";
@@ -25,7 +25,7 @@ const copy: Record<
     metaTitle: "Rotar PDF",
     meta: "Gira un PDF 90, 180 o 270 grados en el navegador. Sin Adobe y sin subir el archivo.",
     keywords: ["rotar pdf", "girar pdf", "enderezar pdf"],
-    kicker: "Rotar PDF · con cuenta",
+    kicker: "Rotar PDF · gratis",
     title: "El escaneo de lado, derecho.",
     lead: "Giras todas las páginas a la vez. 90, 180 o 270. El archivo no sale de este navegador.",
   },
@@ -33,7 +33,7 @@ const copy: Record<
     metaTitle: "Numerar PDF",
     meta: "Añade el número de página al pie de un PDF en el navegador. Sin subir el archivo.",
     keywords: ["numerar pdf", "numero de pagina pdf"],
-    kicker: "Numerar PDF · con cuenta",
+    kicker: "Numerar PDF · gratis",
     title: "Que cada hoja lleve su número.",
     lead: "Pone el dígito al pie, centrado. Puedes empezar en 1 o en otro número si es un anexo.",
   },
@@ -41,7 +41,7 @@ const copy: Record<
     metaTitle: "Eliminar páginas PDF",
     meta: "Quita páginas de un PDF en el navegador: escribe 2, 5-7 y descarga el archivo limpio. Gratis y sin subir el PDF.",
     keywords: ["eliminar paginas pdf", "quitar paginas pdf", "borrar paginas de un pdf"],
-    kicker: "Eliminar páginas PDF · con cuenta",
+    kicker: "Eliminar páginas PDF · gratis",
     title: "Fuera las páginas que sobran.",
     lead: "Escribes las páginas a quitar (1, 4-6) y el resto se conserva en su orden, con su texto y sus imágenes. El PDF no sale de este navegador.",
   },
@@ -51,7 +51,7 @@ const copy: Record<
     keywords: ["marca de agua pdf", "pdf borrador", "watermark pdf"],
     kicker: "Marca de agua · Pro",
     title: "BORRADOR, en cada hoja.",
-    lead: "Texto en diagonal, el que tú escribas. Es Pro: 29 € al año en este navegador. Unir y comprimir siguen gratis.",
+    lead: "Texto en diagonal, el que tú escribas. Es Pro (7 €/mes o 40 €/año). Unir y comprimir siguen gratis.",
   },
 };
 
@@ -70,17 +70,14 @@ export function PdfExtraPage({ kind }: { kind: PdfExtraSlug }) {
   const item = copy[kind];
   const href = pdfExtraKit.find((tool) => tool.slug === kind)?.href ?? "/";
   const others = allPdfTools.filter((tool) => tool.slug !== kind);
-  const tool = (
-    <AuthGate>
-      {kind === "watermark" ? (
-        <ProGate pitch="La marca de agua es de pago. Activas Pro en este navegador y el PDF sigue sin salir de aquí. Unir, comprimir y firmar no se tocan.">
-          <PdfExtraTool kind={kind} />
-        </ProGate>
-      ) : (
+  const tool =
+    kind === "watermark" ? (
+      <ProGate pitch="La marca de agua es de pago. Activas Pro y el PDF sigue sin salir de aquí. Unir, comprimir y firmar no se tocan.">
         <PdfExtraTool kind={kind} />
-      )}
-    </AuthGate>
-  );
+      </ProGate>
+    ) : (
+      <PdfExtraTool kind={kind} />
+    );
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -90,7 +87,11 @@ export function PdfExtraPage({ kind }: { kind: PdfExtraSlug }) {
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
       <AdSlot label="Unir y comprimir PDF siguen gratis, con o sin Pro." wrapClassName="mt-6" />
-      <div className="mt-10">{tool}</div>
+      <div className="mt-10">
+        <Suspense>
+          {tool}
+        </Suspense>
+      </div>
       <FaqList items={faqsForPath(href)} />
       <RelatedGuides href={href} />
       <aside className="mt-14">

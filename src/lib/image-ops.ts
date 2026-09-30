@@ -3,8 +3,8 @@ import { formatBytes } from "@/lib/pdf-ops";
 
 export { formatBytes };
 
-export const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
-export const MAX_IMAGE_FILES = 20;
+export const MAX_IMAGE_BYTES = 40 * 1024 * 1024;
+export const MAX_IMAGE_FILES = 80;
 export const MAX_EDGE = 8000;
 
 export type OutFormat = "jpeg" | "png" | "webp";
@@ -55,7 +55,7 @@ export function suggestedOutName(original: string, suffix: string, ext: string) 
 
 export async function loadBitmap(file: File) {
   if (file.size > MAX_IMAGE_BYTES) {
-    throw new Error(`${file.name} pesa más de 25 MB.`);
+    throw new Error(`${file.name} pesa más de 40 MB.`);
   }
   if (isHeicFile(file)) {
     const { heicTo } = await import("heic-to/next");

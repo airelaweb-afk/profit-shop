@@ -1,5 +1,4 @@
 import { AdSlot } from "@/components/ad-slot";
-import { AuthGate } from "@/components/auth-gate";
 import { RelatedGuides } from "@/components/related-guides";
 
 export function OfficePageShell({
@@ -25,9 +24,7 @@ export function OfficePageShell({
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">{lead}</p>
       <AdSlot label="La herramienta es gratis." wrapClassName="no-print mt-6" />
-      <div className="mt-10">
-        <AuthGate>{children}</AuthGate>
-      </div>
+      <div className="mt-10">{children}</div>
       <div className="no-print">
         <RelatedGuides href={href} />
       </div>

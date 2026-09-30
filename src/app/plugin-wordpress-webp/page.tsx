@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { AdSlot } from "@/components/ad-slot";
 import { FaqList } from "@/components/faq-list";
 import { PluginDownload } from "@/components/plugin-download";
@@ -68,7 +69,9 @@ export default function PluginWordpressWebpPage() {
       <AdSlot label="El plugin de WordPress forma parte de Pro." wrapClassName="mt-6" />
 
       <div className="mt-10">
-        <PluginDownload />
+        <Suspense>
+          <PluginDownload />
+        </Suspense>
       </div>
 
       <section className="mt-14">

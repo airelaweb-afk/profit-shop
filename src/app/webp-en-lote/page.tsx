@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { AdSlot } from "@/components/ad-slot";
-import { AuthGate } from "@/components/auth-gate";
 import { FaqList } from "@/components/faq-list";
 import { ProGate } from "@/components/pro-gate";
 import { WebpBatchTool } from "@/components/webp-batch-tool";
@@ -60,11 +60,11 @@ export default function WebpBatchPage() {
       <AdSlot label="JPG a WebP de una en una es gratis. El lote es Pro." wrapClassName="mt-6" />
 
       <div className="mt-10">
-        <AuthGate>
-          <ProGate pitch="La conversión en lote es Pro (29 € al año). Incluye también el plugin de WordPress para pasar toda la biblioteca de medios a WebP, la marca de agua en PDF y cero anuncios. Las imágenes siguen sin salir de tu navegador.">
+        <Suspense>
+          <ProGate pitch="La conversión en lote es Pro: 7 €/mes o 40 €/año. Incluye el plugin de WordPress, la marca de agua en PDF y sin límites de archivos. Las imágenes no salen de tu navegador.">
             <WebpBatchTool />
           </ProGate>
-        </AuthGate>
+        </Suspense>
       </div>
 
       <section className="mt-14">

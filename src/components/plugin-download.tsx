@@ -1,7 +1,6 @@
 "use client";
 
 import { Download } from "lucide-react";
-import { AuthGate } from "@/components/auth-gate";
 import { ProGate } from "@/components/pro-gate";
 import { Button } from "@/components/ui/button";
 
@@ -10,8 +9,7 @@ export const PLUGIN_VERSION = "1.0.0";
 
 export function PluginDownload() {
   return (
-    <AuthGate>
-      <ProGate pitch="El plugin va incluido en Pro (29 € al año), junto con la conversión a WebP en lote, la marca de agua en PDF y cero anuncios. Lo instalas en todos los WordPress que quieras.">
+      <ProGate pitch="El plugin va incluido en Pro (7 €/mes o 40 €/año), junto con WebP en lote y la marca de agua. Lo instalas en los WordPress que administres.">
         <div className="rounded-2xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8">
           <p className="text-sm tracking-wide text-primary uppercase">Descarga · Pro</p>
           <h2 className="mt-2 font-heading text-3xl tracking-tight">
@@ -40,6 +38,5 @@ export function PluginDownload() {
           </ol>
         </div>
       </ProGate>
-    </AuthGate>
   );
 }

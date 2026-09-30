@@ -13,7 +13,7 @@ export const metadata = pageMeta({
 export default function VersionesPage() {
   return (
     <OfficePageShell
-      kicker="Herramienta · con cuenta"
+      kicker="Herramienta · gratis"
       title="Un trabajo. Varias ofertas. El cliente elige."
       lead="Distinto de la tanda: aquí hay un solo cliente y varias ofertas (básico, recomendado, completo, con o sin urgencia). El de “Presupuestos” es el mismo pack para mucha gente."
       href="/versiones"

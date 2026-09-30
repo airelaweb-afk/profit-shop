@@ -17,7 +17,7 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Puedo unir PDF gratis y sin subir el archivo?",
-    a: "Sí. En Unir PDF eliges los archivos, los ordenas y descargas uno solo. Hace falta una cuenta gratuita, no una suscripción. El PDF no viaja a un servidor nuestro.",
+    a: "Sí. En Unir PDF eliges los archivos, los ordenas y descargas uno solo. No hace falta cuenta. Gratis: 5 PDF de 20 MB. Pro quita el tope.",
     href: "/unir-pdf",
   },
   {
@@ -32,9 +32,7 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Qué es Pro?",
-    a: cloud
-      ? "29 € al año: sin anuncios, marca de agua en PDF, conversión de imágenes a WebP en lote y el plugin de WordPress para pasar toda la biblioteca de medios a WebP. Pagas con Stripe (tarjeta) o Revolut y se activa en tu cuenta."
-      : "29 € al año: sin anuncios, marca de agua en PDF, conversión de imágenes a WebP en lote y el plugin de WordPress para pasar toda la biblioteca de medios a WebP. Pagas con Stripe (tarjeta) o Revolut; la clave se guarda en este navegador.",
+    a: "Pro quita los límites (archivos, peso, cupo diario) y abre marca de agua, WebP en lote y el plugin de WordPress. 7 € al mes o 40 € al año. Pagas con Stripe o Revolut.",
     href: "/precios",
   },
   {
@@ -44,7 +42,7 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Usáis cookies de publicidad?",
-    a: "Solo si pulsas Aceptar publicidad. Hasta que haya AdSense el hueco es nuestro (casa). Las necesarias son la cuenta, el consentimiento y la clave Pro.",
+    a: "No. No hay anuncios. Solo cookies necesarias (sesión, consentimiento y, si activas Pro, la clave).",
     href: "/cookies",
   },
   {
@@ -63,7 +61,7 @@ export const toolFaqs: Record<string, FaqItem[]> = {
   "/unir-pdf": [
     {
       q: "¿Cuántos PDF puedo juntar?",
-      a: "Hasta 15 archivos y 20 MB cada uno. Si son más, une en tandas.",
+      a: "Gratis: 5 PDF de 20 MB. Pro, sin ese tope. Si son más, une en tandas o pasa a Pro.",
     },
     {
       q: "¿Se mantiene el orden?",
@@ -95,7 +93,7 @@ export const toolFaqs: Record<string, FaqItem[]> = {
   "/marca-de-agua-pdf": [
     {
       q: "¿La marca de agua es Pro?",
-      a: "Sí. El resto de unir, comprimir y firmar sigue gratis. Pro también quita anuncios y abre WebP en lote.",
+      a: "Sí. Unir, comprimir y firmar siguen gratis (con tope). Pro quita el tope y abre WebP en lote.",
     },
   ],
   "/eliminar-paginas-pdf": [

@@ -5,8 +5,8 @@ import { saveBytes } from "@/lib/save-file";
 
 export { MAX_PDF_BYTES };
 
-export const MAX_PDF_FILES = 15;
-export const MAX_IMAGE_FILES = 30;
+export const MAX_PDF_FILES = 80;
+export const MAX_IMAGE_FILES = 80;
 export const MAX_RENDER_PAGES = 60;
 
 export function copyBuffer(data: ArrayBuffer) {

@@ -20,6 +20,8 @@ import {
   ImagePlus,
 } from "lucide-react";
 import { QuoteDocument } from "@/components/quote-document";
+import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
+import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,6 +106,7 @@ function getServerSnapshot() {
 }
 
 export function QuoteBatchTool() {
+  const { limit } = useJobGuard();
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const stored = useMemo(() => parseStored(json), [json]);
   const logoInput = useRef<HTMLInputElement>(null);
@@ -113,10 +116,11 @@ export function QuoteBatchTool() {
   const [previewIndex, setPreviewIndex] = useState(0);
   const [printOnly, setPrintOnly] = useState<number | null>(null);
   const [copied, setCopied] = useState("");
-  const clients = useMemo(
-    () => parseClients(stored.clientsText).slice(0, 30),
+  const parsedClients = useMemo(
+    () => parseClients(stored.clientsText),
     [stored.clientsText],
   );
+  const clients = parsedClients.slice(0, limit.quotes);
   const activeServices = stored.services.filter(
     (line) => line.name.trim() && line.price > 0 && line.quantity > 0,
   );
@@ -559,8 +563,17 @@ export function QuoteBatchTool() {
           <p className="mt-2 text-sm text-muted-foreground">
             {clients.length === 0
               ? "No hay líneas válidas todavía."
-              : `Vas a generar ${clients.length} presupuesto${clients.length === 1 ? "" : "s"}. Máximo 30.`}
+              : `Vas a generar ${clients.length} presupuesto${clients.length === 1 ? "" : "s"}. Gratis: ${limit.quotes}.`}
           </p>
+          {parsedClients.length > limit.quotes ? (
+            <UpgradeNudge
+              compact
+              reason={`Gratis son ${limit.quotes} presupuestos por tanda. Has puesto ${parsedClients.length}.`}
+            />
+          ) : null}
+          <FreeCapNote
+            text={`Gratis: ${limit.quotes} presupuestos y ${limit.jobsPerDay} tareas al día`}
+          />
         </section>
 
         {error ? (

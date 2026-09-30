@@ -3,7 +3,7 @@ export const SITE_URL = "https://lunaoficio.com";
 export const SITE_NAME = "Luna Oficio";
 
 export const SITE_TAGLINE =
-  "Unir PDF, comprimir imagen, HEIC a JPG y documentos de trabajo en el navegador. Sin subir tus archivos.";
+  "Herramientas PDF e imagen en el navegador. Sin cuenta y sin subir tus archivos.";
 
 export const LEGAL = {
   holder: "Airela Web",

@@ -33,7 +33,7 @@ export const competitors: Competitor[] = [
       },
       {
         label: "Unir, comprimir, JPG ↔ PDF",
-        ours: "Sí, gratis con cuenta local.",
+        ours: "Sí, gratis y sin cuenta (con tope).",
         theirs: "Sí; el documento se sube.",
       },
       {
@@ -69,7 +69,7 @@ export const competitors: Competitor[] = [
       },
       {
         label: "Límites y pago",
-        ours: "Unir, comprimir y firmar gratis; Pro quita anuncios y añade marca de agua, WebP en lote y plugin de WordPress.",
+        ours: "Unir, comprimir y firmar gratis (con tope); Pro es ilimitado y añade marca de agua, WebP en lote y plugin de WordPress.",
         theirs: "Plan gratuito con límites; suscripción para el resto.",
       },
       {
@@ -163,7 +163,7 @@ export const competitors: Competitor[] = [
       },
       {
         label: "Precio del uso diario",
-        ours: "Unir y comprimir gratis. Pro 29 €/año (sin anuncios, marca de agua, WebP en lote, plugin WordPress).",
+        ours: "Unir y comprimir gratis (con tope). Pro 7 €/mes o 40 €/año (ilimitado, marca de agua, WebP en lote, plugin WordPress).",
         theirs: "Licencia o suscripción de Adobe.",
       },
       {

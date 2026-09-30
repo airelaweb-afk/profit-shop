@@ -13,7 +13,7 @@ export const metadata = pageMeta({
 export default function HorasPage() {
   return (
     <OfficePageShell
-      kicker="Herramienta · con cuenta"
+      kicker="Herramienta · gratis"
       title="Las horas de la semana, en un papel."
       lead="Quien lleva la administración no quiere un fichaje. Quiere pegar lo que hizo, ver el total y mandarlo. Guardas el PDF y lo adjuntas tú."
       href="/horas"

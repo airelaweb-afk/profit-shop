@@ -15,12 +15,14 @@ import {
   X,
 } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
+import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
+import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
+import { bytesLabel } from "@/lib/limits";
 import {
-  MAX_PDF_BYTES,
   TEXT_SIZE,
   clickToPdfPoint,
   createBlankSheet,
@@ -104,6 +106,7 @@ function CrossGlyph() {
 }
 
 export function PdfSignTool() {
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
   const fileInput = useRef<HTMLInputElement>(null);
   const signCanvas = useRef<HTMLCanvasElement>(null);
   const typingInput = useRef<HTMLInputElement>(null);
@@ -299,8 +302,12 @@ export function PdfSignTool() {
     setTyping(null);
     setSelectedId(null);
     try {
-      if (data.byteLength > MAX_PDF_BYTES) {
-        throw new Error("El PDF pesa más de 20 MB. Usa uno más ligero.");
+      if (data.byteLength > limit.pdfBytes) {
+        throw new Error(
+          pro
+            ? `El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`
+            : `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+        );
       }
       pdfBytes.current = data.slice(0);
       setLoaded(true);
@@ -659,6 +666,7 @@ export function PdfSignTool() {
       setError("Sube un PDF o crea una hoja en blanco.");
       return;
     }
+    if (!beforeRun()) return;
     const nextStamps = flushTyping();
     setBusy(true);
     setError("");
@@ -674,6 +682,7 @@ export function PdfSignTool() {
       setNotice(
         noticeForSave(result, "Listo. El PDF firmado está guardado."),
       );
+      afterRun();
     } catch {
       setError("No se pudo guardar. Prueba con otro PDF (sin contraseña).");
     } finally {
@@ -718,6 +727,10 @@ export function PdfSignTool() {
           busyHint="Abriendo el PDF. Un archivo grande tarda un momento."
           onFiles={(list) => void takeFile(list[0])}
         />
+        <FreeCapNote
+          text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
+        />
+        {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
         <p className="mt-4 text-center text-sm text-muted-foreground">
           ¿No tienes archivo?{" "}
           <button

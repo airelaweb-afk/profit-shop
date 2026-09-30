@@ -21,7 +21,7 @@ export default function JuntarPdfPage() {
         "Elige dos o más PDF y ordénalos con las flechas.",
         "El resultado se descarga aquí. En el teléfono: Guardar en Archivos.",
         "No convertimos a Word: el .docx de un conversor online remaqueta mal las tablas.",
-        "Hace falta una cuenta de este navegador, no una suscripción.",
+        "No hace falta cuenta. Gratis con un tope; Pro, sin límite.",
       ]}
     />
   );

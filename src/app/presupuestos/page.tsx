@@ -13,7 +13,7 @@ export const metadata = pageMeta({
 export default function PresupuestosPage() {
   return (
     <OfficePageShell
-      kicker="Herramienta · con cuenta"
+      kicker="Herramienta · gratis"
       title="Presupuestos que se pueden mandar."
       lead="La web no manda el presupuesto por ti: no tiene tu correo ni WhatsApp. Guardas el PDF, copias el mensaje y lo adjuntas tú, como harías con un Word. Abajo tienes los botones de cada cliente."
       href="/presupuestos"

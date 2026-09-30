@@ -13,7 +13,7 @@ export const metadata = pageMeta({
 export default function GastosPage() {
   return (
     <OfficePageShell
-      kicker="Herramienta · con cuenta"
+      kicker="Herramienta · gratis"
       title="Los tickets del mes, listos para el gestor."
       lead="Pegas fecha, tienda, lo que pagaste y el IVA. Sale la base, el IVA y el total. Guardas el PDF. No sustituye a la contabilidad: ordena el caos del cajón."
       href="/gastos"

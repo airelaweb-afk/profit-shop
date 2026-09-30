@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AdSlot } from "@/components/ad-slot";
-import { AuthGate } from "@/components/auth-gate";
 import { AudioKitTool } from "@/components/audio-kit-tool";
 import { RelatedGuides } from "@/components/related-guides";
 import { audioKit, imageKit } from "@/lib/image-kit";
@@ -18,7 +17,7 @@ export default function Page() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="text-sm tracking-wide text-primary uppercase">
-        Audio a WAV · con cuenta
+        Audio a WAV · gratis
       </p>
       <h1 className="mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
         MP3 o nota de voz, a WAV.
@@ -29,9 +28,7 @@ export default function Page() {
       </p>
       <AdSlot label="La conversión es gratis." wrapClassName="mt-6" />
       <div className="mt-10">
-        <AuthGate>
           <AudioKitTool kind="to-wav" />
-        </AuthGate>
       </div>
       <RelatedGuides href="/audio-a-wav" />
       <ul className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

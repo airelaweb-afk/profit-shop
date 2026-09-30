@@ -87,7 +87,7 @@ export function WebpBatchTool() {
     const tooBig = picked.filter((file) => file.size > MAX_IMAGE_BYTES);
     if (tooBig.length > 0) {
       setError(
-        `${tooBig.length} archivo${tooBig.length === 1 ? "" : "s"} pasan de 25 MB y se han dejado fuera (${tooBig
+        `${tooBig.length} archivo${tooBig.length === 1 ? "" : "s"} pasan de 40 MB y se han dejado fuera (${tooBig
           .slice(0, 3)
           .map((file) => file.name)
           .join(", ")}${tooBig.length > 3 ? "…" : ""}).`,

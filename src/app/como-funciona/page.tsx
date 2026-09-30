@@ -51,13 +51,11 @@ export default function ComoFuncionaPage() {
           </p>
         </section>
         <section>
-          <h2 className="font-heading text-2xl">Hace falta una cuenta</h2>
+          <h2 className="font-heading text-2xl">Sin cuenta para usarlas</h2>
           <p className="mt-2 text-muted-foreground">
-            Las herramientas (presupuestos, cobros, horas, gastos y firmar PDF)
-            solo se usan si has iniciado sesión. La cuenta se crea en el sitio y
-            vive en este navegador: no hay Cl@ve, ni servidor de usuarios, ni
-            recuperación en otro aparato. Si cambias de teléfono u ordenador, la creas otra
-            vez.
+            Unir, comprimir, firmar y el resto se usan al entrar, sin registro.
+            Gratis tiene un tope (archivos, peso, 10 tareas al día). La cuenta
+            solo hace falta si pagas Pro y quieres llevarlo a otro aparato.
           </p>
         </section>
         <section>

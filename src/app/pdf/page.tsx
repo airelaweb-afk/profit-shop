@@ -1,5 +1,4 @@
 import { AdSlot } from "@/components/ad-slot";
-import { AuthGate } from "@/components/auth-gate";
 import { FaqList } from "@/components/faq-list";
 import { PdfSignTool } from "@/components/pdf-sign-tool";
 import { RelatedGuides } from "@/components/related-guides";
@@ -18,7 +17,7 @@ export default function PdfPage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="no-print text-sm tracking-wide text-primary uppercase">
-        Firmar PDF · con cuenta
+        Firmar PDF · gratis
       </p>
       <h1 className="no-print mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
         Sube tu PDF. Rellénalo. Fírmalo.
@@ -30,9 +29,7 @@ export default function PdfPage() {
       </p>
       <AdSlot label="Firmar en el navegador es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">
-        <AuthGate>
           <PdfSignTool />
-        </AuthGate>
       </div>
       <div className="no-print">
         <FaqList items={faqsForPath("/pdf")} />

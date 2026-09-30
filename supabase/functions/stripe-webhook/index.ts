@@ -52,6 +52,15 @@ function addMonths(from: Date, months: number) {
   return d;
 }
 
+function monthsFromSession(session: Stripe.Checkout.Session, fallback: number) {
+  const meta = Number(session.metadata?.months);
+  if (meta === 1 || meta === 12) return meta;
+  const cents = session.amount_total ?? 0;
+  if (cents > 0 && cents <= 1500) return 1;
+  if (cents >= 3500) return 12;
+  return fallback;
+}
+
 function isUuid(value: string | null | undefined): value is string {
   return !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
@@ -63,7 +72,7 @@ async function handleCheckout(session: Stripe.Checkout.Session) {
   const email = (session.customer_details?.email ?? session.customer_email ?? "").trim().toLowerCase();
   if (!email) return { skipped: "no-email" };
 
-  const months = Number(session.metadata?.months ?? proMonths) || proMonths;
+  const months = monthsFromSession(session, proMonths);
   const paidAt = new Date((session.created ?? Math.floor(Date.now() / 1000)) * 1000);
 
   // Si el comprador ya tiene cuenta y Pro vigente, el nuevo periodo empieza al caducar el actual.

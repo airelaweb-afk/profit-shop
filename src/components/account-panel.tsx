@@ -216,7 +216,7 @@ function CloudAccount() {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            Pro quita los anuncios y abre las herramientas de oficio por 29 € al año. Se activa
+            Pro quita los límites y abre marca de agua, WebP en lote y el plugin por 7 €/mes o 40 €/año. Se activa
             solo al pagar con tu correo: <Link href="/precios/" className="ink-link">ver Pro</Link>.
           </p>
         )}
@@ -292,7 +292,7 @@ function LocalAccount() {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            <Link href="/precios/" className="ink-link">Ver Pro</Link> · 29 € al año, sin anuncios.
+            <Link href="/precios/" className="ink-link">Ver Pro</Link> · 7 €/mes o 40 €/año.
           </p>
         )}
         {pro ? (

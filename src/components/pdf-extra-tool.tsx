@@ -3,14 +3,16 @@
 import { useState } from "react";
 import { Download, Trash2 } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
+import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
+import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PdfExtraSlug } from "@/lib/pdf-kit";
+import { bytesLabel } from "@/lib/limits";
 import { newId } from "@/lib/quotes";
 import { noticeForSave, type SaveResult } from "@/lib/save-file";
 import {
-  MAX_PDF_BYTES,
   countPdfPages,
   downloadBytes,
   formatBytes,
@@ -55,6 +57,7 @@ const copy: Record<
 };
 
 export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
   const [item, setItem] = useState<Item | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -73,8 +76,12 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
       setError("Sube un archivo PDF.");
       return;
     }
-    if (file.size > MAX_PDF_BYTES) {
-      setError(`${file.name} pesa más de 20 MB.`);
+    if (file.size > limit.pdfBytes) {
+      setUpgrade(
+        pro
+          ? `${file.name} pesa más de ${bytesLabel(limit.pdfBytes)}.`
+          : `${file.name} pesa más de ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+      );
       return;
     }
     try {
@@ -87,6 +94,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
 
   async function run() {
     if (!item) return;
+    if (!beforeRun()) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -120,6 +128,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         "application/pdf",
       );
       setNotice(noticeForSave(result, ready || `Listo: ${formatBytes(bytes.byteLength)}.`));
+      afterRun();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo terminar.");
     } finally {
@@ -136,10 +145,14 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         dropTitle={labels.drop}
         tapTitle={labels.tap}
         cta={labels.cta}
-        hint="No se envía a ningún servidor. Con cuenta, en este navegador."
+        hint="No se envía a ningún servidor."
         busyHint="Un archivo grande tarda un momento."
         onFiles={(list) => void addFiles(list)}
       />
+      <FreeCapNote
+        text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
+      />
+      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
 
       {item ? (
         <div className="mt-6 flex items-center gap-2 rounded-xl bg-card px-3 py-2 ring-1 ring-foreground/10">

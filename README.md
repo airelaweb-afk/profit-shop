@@ -2,7 +2,7 @@
 
 Herramientas para trabajar con archivos **sin subirlos a ningún servidor**: unir y comprimir PDF, comprimir imagen, HEIC a JPG, JPG a WebP, firmar PDF y documentos de trabajo en PDF (presupuestos, avisos de cobro, partes de horas, gastos). Cada página resuelve una búsqueda concreta y está pensada para encontrarse en Google. Pro añade WebP en lote, un plugin de WordPress y la marca de agua.
 
-Las herramientas piden **iniciar sesión**. Hay dos modos, y la web elige solo según haya o no variables de Supabase:
+Las herramientas se usan **sin cuenta**. Hay dos modos de Pro, y la web elige según haya o no variables de Supabase:
 
 - **Modo nube (recomendado):** con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`, las cuentas viven en Supabase (Postgres en la UE). Valen en cualquier aparato, hay «recuperar contraseña», Stripe activa Pro solo y el panel `/admin` ve todos los registros. Ver [Supabase](#supabase-cuentas-pro-y-panel-con-base-de-datos).
 - **Modo local (sin variables):** la cuenta se guarda en este navegador (`localStorage`, PBKDF2). No hay base de datos: si cambias de teléfono, hay que crearla otra vez.
@@ -40,13 +40,14 @@ La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el 
 
 ## Dinero (sin servidor)
 
-- **Gratis:** unir, comprimir, firmar, imagen, oficio. Anuncios de casa si aceptas publicidad (AdSense cuando haya ID de cliente).
-- **Pro (29 €/año):** sin anuncios, marca de agua en PDF, WebP en lote y plugin de WordPress. Pago con **Stripe** (Payment Link) o **Revolut**. Pega los enlaces en `src/lib/payments.ts` o en Hostinger:
+- **Gratis:** sin cuenta. Unir hasta 5 PDF de 20 MB, 5 imágenes por tanda, 10 tareas al día. Sin anuncios.
+- **Pro (7 €/mes o 40 €/año):** ilimitado, marca de agua, WebP en lote y plugin de WordPress. Pago con **Stripe** (Payment Link anual y mensual) o **Revolut**. Pega los enlaces en `src/lib/payments.ts` o en Hostinger:
 
-  `NEXT_PUBLIC_STRIPE_PAYMENT_LINK`  
+  `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` (anual, metadata `months=12`)  
+  `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY` (mensual, metadata `months=1`)  
   `NEXT_PUBLIC_REVOLUT_PAYMENT_LINK`
 
-  En Stripe, pon la URL de éxito a `/precios/?pago=ok`. Tras pagar, el usuario activa la clave en este navegador.
+  En Stripe, URL de éxito `/precios/?pago=ok`. En modo nube Pro se activa solo; en modo local, clave en el navegador.
 
 Los PDF y la cuenta **no salen** de este navegador.
 

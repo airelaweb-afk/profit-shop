@@ -26,11 +26,10 @@ export default function CondicionesPage() {
       </p>
       <h2>Gratis y Pro</h2>
       <p>
-        Las herramientas de búsqueda (unir PDF, comprimir, HEIC a JPG, etc.)
-        son gratis, con anuncios si aceptas cookies de publicidad. Pro (29 €
-        al año) quita los anuncios y desbloquea la marca de agua en PDF, la
-        conversión de imágenes a WebP en lote y el plugin de WordPress para
-        WebP. El plugin se licencia bajo GPL v2 o posterior; puedes instalarlo
+        Las herramientas (unir PDF, comprimir, HEIC a JPG, etc.) se usan
+        sin cuenta, con un tope de archivos y de tareas al día. Pro (7 € al
+        mes o 40 € al año) quita esos límites y desbloquea la marca de agua,
+        WebP en lote y el plugin de WordPress. El plugin se licencia bajo GPL v2 o posterior; puedes instalarlo
         en los WordPress que administres. El cobro es con Stripe (tarjeta) o
         Revolut.{" "}
         {cloud

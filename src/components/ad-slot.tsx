@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { useConsent, usePro } from "@/lib/use-consent";
 
+/** Anuncios desactivados a propósito: el modelo es límites + Pro, como iLovePDF. */
+const ADS_ENABLED = false;
+
 export function AdSlot({
   label,
   wrapClassName,
 }: {
   label: string;
-  /** Wrapper rendered only when the ad itself renders, so no empty band is left behind. */
   wrapClassName?: string;
 }) {
   const consent = useConsent();
   const pro = usePro();
+  if (!ADS_ENABLED) return null;
   if (pro) return null;
   if (!consent.ads) return null;
 

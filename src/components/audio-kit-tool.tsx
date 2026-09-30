@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
+import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { AudioKitSlug } from "@/lib/image-kit";
@@ -11,6 +12,7 @@ import { suggestedOutName } from "@/lib/image-ops";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
 export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
+  const { beforeRun, afterRun } = useJobGuard();
   const [file, setFile] = useState<File | null>(null);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [start, setStart] = useState(0);
@@ -48,6 +50,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
       setError("Elige un audio.");
       return;
     }
+    if (!beforeRun()) return;
     setBusy(true);
     setError("");
     try {
@@ -64,6 +67,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
           ? `Listo: de ${start.toFixed(1)} s a ${end.toFixed(1)} s, en WAV.`
           : "Listo: WAV. Codificar a MP3 queda aparcado.";
       setNotice(noticeForSave(result, ready));
+      afterRun();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo guardar.");
     } finally {

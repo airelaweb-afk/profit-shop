@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Download, Trash2 } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
+import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
+import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ImageKitSlug } from "@/lib/image-kit";
+import { bytesLabel } from "@/lib/limits";
 import {
-  MAX_IMAGE_FILES,
   downloadBlob,
   exportImage,
   extFor,
@@ -118,6 +120,7 @@ function titles(kind: ImageKitSlug) {
 }
 
 export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
   const stage = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
@@ -166,6 +169,14 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
     }
     const next: Item[] = [];
     for (const file of picked) {
+      if (file.size > limit.imageBytes) {
+        setUpgrade(
+          pro
+            ? `${file.name} pesa más de ${bytesLabel(limit.imageBytes)}.`
+            : `${file.name} pesa más de ${bytesLabel(limit.imageBytes)}. Pro admite archivos más grandes.`,
+        );
+        return;
+      }
       try {
         const bitmap = await loadBitmap(file);
         let preview = URL.createObjectURL(file);
@@ -200,8 +211,12 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         old.bitmap.close();
       }
       const merged = [...next];
-      if (merged.length > MAX_IMAGE_FILES) {
-        setError(`Como máximo ${MAX_IMAGE_FILES} imágenes.`);
+      if (merged.length > limit.imageFiles) {
+        setUpgrade(
+          pro
+            ? `Como máximo ${limit.imageFiles} imágenes.`
+            : `Gratis son ${limit.imageFiles} imágenes por tanda. Pro es ilimitado.`,
+        );
         return current;
       }
       const first = merged[0];
@@ -303,6 +318,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
       setError("Elige al menos una imagen.");
       return;
     }
+    if (!beforeRun()) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -358,6 +374,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
             : `Se ha reescrito (${formatBytes(totalOut)}). Si no baja, es un PNG: pásalo a JPG.`
           : `Listo: ${outputs.length} archivo${outputs.length === 1 ? "" : "s"}.`;
       setNotice(noticeForSave(result, ready));
+      afterRun();
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "No se pudo terminar.",
@@ -394,6 +411,10 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         hint="No se envía a ningún servidor. Quitar fondo, ampliar con IA y PDF a Word siguen aparcados."
         onFiles={(list) => void addFiles(list)}
       />
+      <FreeCapNote
+        text={`Gratis: ${limit.imageFiles} imágenes de ${bytesLabel(limit.imageBytes)} y ${limit.jobsPerDay} tareas al día`}
+      />
+      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
 
       {kind === "compress" ? (
         <div className="mt-6 grid gap-2">

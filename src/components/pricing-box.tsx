@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label";
 import { profileIsPro, refreshProfile } from "@/lib/cloud";
 import {
   hasRevolutPay,
+  hasStripeMonthlyPay,
   hasStripePay,
-  PRO_PERIOD,
-  PRO_PRICE,
+  PRO_MONTHLY,
+  PRO_YEARLY,
   REVOLUT_PAYMENT_LINK,
   stripeCheckoutUrl,
 } from "@/lib/payments";
@@ -40,7 +41,7 @@ export function PricingBox() {
   const waitingForWebhook = cloud && paidReturn && Boolean(session) && !cloudPro;
   const checking = waitingForWebhook && tries < MAX_TRIES;
 
-  // Al volver de Stripe con cuenta, el webhook ya habrá marcado el Pro: refrescamos unas veces.
+  // Al volver de Stripe gratis, el webhook ya habrá marcado el Pro: refrescamos unas veces.
   useEffect(() => {
     if (!waitingForWebhook) return;
     const timer = window.setInterval(() => {
@@ -59,7 +60,7 @@ export function PricingBox() {
     setNotice("");
     try {
       await activatePro(code);
-      setNotice("Pro activo en este navegador. Sin anuncios aquí.");
+      setNotice("Pro activo en este navegador. Sin límites.");
       setCode("");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo activar.");
@@ -100,9 +101,10 @@ export function PricingBox() {
     );
   }
 
-  const stripeHref = stripeCheckoutUrl(
-    cloud && session ? { id: session.accountId, email: session.email } : null,
-  );
+  const account = cloud && session ? { id: session.accountId, email: session.email } : null;
+  const stripeYear = stripeCheckoutUrl(account, "year");
+  const stripeMonth = stripeCheckoutUrl(account, "month");
+  const monthly = hasStripeMonthlyPay();
 
   return (
     <div className="grid gap-4">
@@ -117,10 +119,10 @@ export function PricingBox() {
       ) : null}
 
       <div className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15">
-        <p className="font-heading text-2xl">Pagar Pro · {PRO_PRICE} / {PRO_PERIOD}</p>
+        <p className="font-heading text-2xl">Pagar Pro</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Elige tarjeta (Stripe) o Revolut. El archivo sigue en tu navegador:
-          el pago es en su web, no aquí.
+          Tarjeta (Stripe) o Revolut. El archivo sigue en tu navegador: el pago
+          es en su web, no aquí.
           {cloud
             ? session
               ? ` Pagas con ${session.email} y Pro se activa solo en tu cuenta.`
@@ -151,10 +153,20 @@ export function PricingBox() {
           {stripe ? (
             <Button
               className="h-12"
-              render={<a href={stripeHref} target="_blank" rel="noreferrer" />}
+              render={<a href={stripeYear} target="_blank" rel="noreferrer" />}
               nativeButton={false}
             >
-              Pagar con tarjeta (Stripe)
+              Anual · {PRO_YEARLY}
+            </Button>
+          ) : null}
+          {monthly ? (
+            <Button
+              variant="outline"
+              className="h-12"
+              render={<a href={stripeMonth} target="_blank" rel="noreferrer" />}
+              nativeButton={false}
+            >
+              Mensual · {PRO_MONTHLY}
             </Button>
           ) : null}
           {revolut ? (
@@ -178,7 +190,7 @@ export function PricingBox() {
               className="h-12"
               render={
                 <a
-                  href={`mailto:${LEGAL.email}?subject=${encodeURIComponent("Luna Oficio Pro 29 €")}&body=${encodeURIComponent("Quiero Pro. Pago por Stripe o Revolut. Enviadme la clave para este navegador.")}`}
+                  href={`mailto:${LEGAL.email}?subject=${encodeURIComponent("Luna Oficio Pro")}&body=${encodeURIComponent("Quiero Pro (7 €/mes o 40 €/año). Pago por Stripe o Revolut.")}`}
                 />
               }
               nativeButton={false}
@@ -189,10 +201,12 @@ export function PricingBox() {
         </div>
         {!stripe || !revolut ? (
           <p className="mt-3 text-xs text-muted-foreground">
-            Para los botones directos, pega tu Payment Link de Stripe y tu
-            revolut.me en <code>src/lib/payments.ts</code> o en las variables{" "}
-            <code>NEXT_PUBLIC_STRIPE_PAYMENT_LINK</code> y{" "}
-            <code>NEXT_PUBLIC_REVOLUT_PAYMENT_LINK</code>.
+            Para los botones, pega los Payment Link (anual y mensual) y tu
+            revolut.me en <code>src/lib/payments.ts</code> o en Hostinger:{" "}
+            <code>NEXT_PUBLIC_STRIPE_PAYMENT_LINK</code>,{" "}
+            <code>NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY</code>,{" "}
+            <code>NEXT_PUBLIC_REVOLUT_PAYMENT_LINK</code>. En Stripe, metadata{" "}
+            <code>months=12</code> (anual) y <code>months=1</code> (mensual).
           </p>
         ) : null}
         {cloud && revolut ? (

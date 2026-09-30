@@ -10,7 +10,7 @@ import {
   type PDFPage,
 } from "pdf-lib";
 
-export const MAX_PDF_BYTES = 20 * 1024 * 1024;
+export const MAX_PDF_BYTES = 80 * 1024 * 1024;
 
 export type PdfFormField = {
   name: string;

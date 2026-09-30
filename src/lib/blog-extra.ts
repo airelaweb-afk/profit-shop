@@ -141,7 +141,7 @@ export const extraPosts: BlogPost[] = [
       },
       {
         type: "p",
-        text: "Es una herramienta Pro: 29 € al año en este navegador, sin anuncios. Unir, comprimir y firmar siguen gratis. El texto se pinta en tu aparato; el archivo no sale.",
+        text: "Es una herramienta Pro: 7 €/mes o 40 €/año. Unir, comprimir y firmar siguen gratis. El texto se pinta en tu aparato; el archivo no sale.",
       },
       {
         type: "cta",

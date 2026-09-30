@@ -17,26 +17,16 @@ export function CookieBanner() {
       <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
         <p className="text-xs text-background/75 sm:text-sm">
           {cloud
-            ? "Tus archivos se procesan en este navegador y no se suben. Usamos almacenamiento local para la sesión y el consentimiento; la cuenta se guarda en nuestra base de datos. Si aceptas publicidad, más adelante podrán cargarse anuncios de terceros."
-            : "Usamos almacenamiento local para tu cuenta y tus archivos (no se van a ningún servidor nuestro). Si aceptas publicidad, más adelante podrán cargarse anuncios de terceros."}{" "}
+            ? "Los archivos se procesan en este navegador y no se suben. Guardamos la sesión en tu aparato; la cuenta (si la creas) va a nuestra base de datos."
+            : "Usamos almacenamiento local para la sesión, el consentimiento y, si activas Pro, la clave."}{" "}
           <Link href="/cookies/" className="text-accent underline-offset-4 hover:underline">
             Política de cookies
           </Link>
           .
         </p>
-        <div className="flex shrink-0 flex-row gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 flex-1 border-background/40 bg-transparent text-background hover:border-accent hover:bg-transparent hover:text-accent sm:h-11 sm:flex-none"
-            onClick={() => saveConsent(false)}
-          >
-            Solo necesarias
-          </Button>
-          <Button type="button" className="h-10 flex-1 sm:h-11 sm:flex-none" onClick={() => saveConsent(true)}>
-            Aceptar publicidad
-          </Button>
-        </div>
+        <Button type="button" className="h-10 w-full shrink-0 sm:h-11 sm:w-auto" onClick={() => saveConsent(false)}>
+          Entendido
+        </Button>
       </div>
     </div>
   );
