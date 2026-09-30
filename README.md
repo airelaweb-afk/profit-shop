@@ -43,6 +43,20 @@ La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el 
 
 Los PDF y la cuenta **no salen** de este navegador.
 
+## Panel de administración (`/admin`)
+
+Sin servidor, el panel vive en **tu** navegador (contraseña propia, PBKDF2). Desde ahí:
+
+- **Socios Pro:** apuntas cada pago (Stripe, Revolut, Bizum…), se firma una clave única `LUNA-SERIAL-YYYYMMDD-firma` con ECDSA P-256 y la mandas por correo. Renovar, revocar, reembolso, notas, buscar, CSV.
+- **Cuentas:** las cuentas gratuitas creadas en ese aparato (borrar, nueva contraseña). Las de otros teléfonos no existen en ningún servidor: no se pueden listar.
+- **Claves:** crear la clave de firma privada (copia descargable), ver la pública, comprobar una clave que te manda un socio, lista de revocados.
+- **Ajustes:** copia de seguridad JSON (con o sin clave privada), restaurar, estado de Stripe/Revolut/AdSense, Pro y cookies de ese navegador, zona roja.
+- **Resumen:** socios al día, caducan en 30 días, cobrado, checklist del negocio, pendientes.
+
+Para que la web acepte tus claves firmadas: `/admin` → Claves → copiar clave pública → Hostinger, variable `NEXT_PUBLIC_PRO_PUBLIC_KEY` → Redistribuir. Hasta entonces la web solo acepta la clave maestra de pruebas `LUNA-OFICIO-PRO`. Revocaciones: `NEXT_PUBLIC_PRO_REVOKED=SERIAL1,SERIAL2`.
+
+Descarga la copia del panel cada vez que des un alta: si borras datos del navegador, se pierde el libro.
+
 El orden de trabajo está en [`PLAN.md`](PLAN.md): un paso, se prueba en Hostinger, luego el siguiente.
 
 ## Cómo correrla en local

@@ -19,9 +19,16 @@ export type Session = {
 };
 
 const listeners = new Set<() => void>();
+let authVersion = 0;
 
 function emit() {
+  authVersion += 1;
   for (const listener of listeners) listener();
+}
+
+export function getAuthVersion() {
+  if (typeof window === "undefined") return -1;
+  return authVersion;
 }
 
 export function subscribeAuth(listener: () => void) {
@@ -44,13 +51,13 @@ function b64ToBytes(value: string) {
   return bytes;
 }
 
-function randomSalt() {
+export function randomSalt() {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
   return bytesToB64(bytes);
 }
 
-async function deriveHash(password: string, salt: string) {
+export async function deriveHash(password: string, salt: string) {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(password),
@@ -165,4 +172,35 @@ export async function loginAccount(input: { email: string; password: string }) {
 
 export function logoutAccount() {
   writeSession(null);
+}
+
+export type AccountSummary = Pick<AccountRecord, "id" | "name" | "email" | "createdAt">;
+
+export function listAccounts(): AccountSummary[] {
+  return readAccounts()
+    .map(({ id, name, email, createdAt }) => ({ id, name, email, createdAt }))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function deleteAccount(id: string) {
+  const accounts = readAccounts();
+  writeAccounts(accounts.filter((item) => item.id !== id));
+  const session = parseSession(getSessionSnapshot());
+  if (session?.accountId === id) writeSession(null);
+  else emit();
+}
+
+export async function resetAccountPassword(id: string, password: string) {
+  if (password.length < 8) {
+    throw new Error("La contraseña tiene que tener al menos 8 caracteres.");
+  }
+  const accounts = readAccounts();
+  const account = accounts.find((item) => item.id === id);
+  if (!account) throw new Error("Esa cuenta ya no está en este navegador.");
+  const salt = randomSalt();
+  const hash = await deriveHash(password, salt);
+  writeAccounts(
+    accounts.map((item) => (item.id === id ? { ...item, salt, hash } : item)),
+  );
+  emit();
 }

@@ -28,12 +28,12 @@ export function PricingBox() {
   const stripe = hasStripePay();
   const revolut = hasRevolutPay();
 
-  function onSubmit(event: React.FormEvent) {
+  async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
     setNotice("");
     try {
-      activatePro(code);
+      await activatePro(code);
       setNotice("Pro activo en este navegador. Sin anuncios aquí.");
       setCode("");
     } catch (caught) {

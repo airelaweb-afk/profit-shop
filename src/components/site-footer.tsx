@@ -116,7 +116,10 @@ export function SiteFooter() {
           <Link href="/aviso-legal" className="text-accent underline-offset-2 hover:underline">
             aviso legal
           </Link>
-          .
+          .{" "}
+          <Link href="/admin" className="text-background/50 underline-offset-2 hover:text-accent hover:underline">
+            Panel
+          </Link>
         </p>
       </div>
     </footer>

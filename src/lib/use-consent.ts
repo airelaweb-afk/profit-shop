@@ -6,7 +6,12 @@ import {
   parseConsent,
   subscribeConsent,
 } from "@/lib/consent";
-import { getProSnapshot, isProFromSnapshot, subscribePro } from "@/lib/pro";
+import {
+  getProSnapshot,
+  isProFromSnapshot,
+  parsePro,
+  subscribePro,
+} from "@/lib/pro";
 
 export function useConsent() {
   const json = useSyncExternalStore(
@@ -20,4 +25,9 @@ export function useConsent() {
 export function usePro() {
   const json = useSyncExternalStore(subscribePro, getProSnapshot, () => "");
   return isProFromSnapshot(json);
+}
+
+export function useProState() {
+  const json = useSyncExternalStore(subscribePro, getProSnapshot, () => "");
+  return parsePro(json);
 }
