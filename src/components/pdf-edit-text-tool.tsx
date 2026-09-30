@@ -44,7 +44,7 @@ import {
   type PdfTextLine,
 } from "@/lib/pdf-edit-text";
 import { ocrPdfPage } from "@/lib/pdf-ocr";
-import { loadPdfjs, renderPdfPage } from "@/lib/pdfjs-worker";
+import { loadPdfjs } from "@/lib/pdfjs-worker";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
 const PRESET_COLORS = [
@@ -55,17 +55,6 @@ const PRESET_COLORS = [
   "#a16207",
   "#ffffff",
 ];
-
-function describeError(caught: unknown, fallback: string) {
-  const message = caught instanceof Error ? caught.message : "";
-  if (
-    /is not a function/i.test(message) ||
-    (/undefined/i.test(message) && /function/i.test(message))
-  ) {
-    return "Este teléfono no pudo abrir el PDF. Actualiza Chrome o Safari, o ábrelo en el ordenador.";
-  }
-  return message || fallback;
-}
 
 function isPdfFile(file: File) {
   const type = file.type.toLowerCase();
@@ -166,7 +155,9 @@ export function PdfEditTextTool() {
     } catch (caught) {
       setSource(null);
       setLines([]);
-      setError(describeError(caught, "No se pudo abrir el PDF."));
+      setError(
+        caught instanceof Error ? caught.message : "No se pudo abrir el PDF.",
+      );
     } finally {
       setBusy(false);
     }
@@ -181,7 +172,9 @@ export function PdfEditTextTool() {
     } catch (caught) {
       setSource(null);
       setLines([]);
-      setError(describeError(caught, "No se pudo crear el ejemplo."));
+      setError(
+        caught instanceof Error ? caught.message : "No se pudo crear el ejemplo.",
+      );
     } finally {
       setBusy(false);
     }
@@ -196,7 +189,9 @@ export function PdfEditTextTool() {
     } catch (caught) {
       setSource(null);
       setLines([]);
-      setError(describeError(caught, "No se pudo crear el escaneo."));
+      setError(
+        caught instanceof Error ? caught.message : "No se pudo crear el escaneo.",
+      );
     } finally {
       setBusy(false);
     }
@@ -274,12 +269,11 @@ export function PdfEditTextTool() {
         const canvas = document.createElement("canvas");
         canvas.width = Math.floor(viewport.width);
         canvas.height = Math.floor(viewport.height);
-        await renderPdfPage(
-          page,
+        await page.render({
           canvas,
           viewport,
-          pdfjs.AnnotationMode.DISABLE,
-        );
+          annotationMode: pdfjs.AnnotationMode.DISABLE,
+        }).promise;
         next.push(canvas.toDataURL("image/jpeg", 0.7));
       }
       await task.destroy();
@@ -318,16 +312,17 @@ export function PdfEditTextTool() {
       canvas.height = Math.floor(viewport.height);
       canvas.style.width = `${css.width}px`;
       canvas.style.height = `${css.height}px`;
-      await renderPdfPage(
-        page,
+      await page.render({
         canvas,
         viewport,
-        pdfjs.AnnotationMode.DISABLE,
-      );
+        annotationMode: pdfjs.AnnotationMode.DISABLE,
+      }).promise;
       await task.destroy();
     })().catch((caught) => {
       if (!gone) {
-        setError(describeError(caught, "No se pudo pintar la página."));
+        setError(
+          caught instanceof Error ? caught.message : "No se pudo pintar la página.",
+        );
       }
     });
     return () => {
