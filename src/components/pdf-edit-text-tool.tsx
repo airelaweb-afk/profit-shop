@@ -124,7 +124,7 @@ export function PdfEditTextTool() {
     setLines(found.lines);
     setPageCount(found.pageCount);
     setSource(data.slice(0));
-    setActive(found.lines.find((line) => line.pageIndex === 0)?.id ?? null);
+    setActive(null);
     setFontNames(found.fontNames);
     if (found.lines.length === 0) {
       setNotice(
@@ -577,7 +577,7 @@ export function PdfEditTextTool() {
               ref={wrapRef}
               className="luna-pdf-page relative bg-white shadow-[0_24px_60px_-20px_rgba(40,24,10,0.5)]"
             >
-              <div className="pointer-events-none absolute inset-[4%] z-20 border border-dashed border-sky-500/70" />
+              <div className="pointer-events-none absolute inset-[4%] z-10 border border-dashed border-sky-500/70" />
               <canvas ref={canvasRef} className="block" />
               {pageLines.map((line) => {
                 const on = active === line.id;
@@ -588,9 +588,9 @@ export function PdfEditTextTool() {
                     key={line.id}
                     className={`absolute cursor-text overflow-hidden ${
                       on
-                        ? "z-30 ring-2 ring-sky-500"
+                        ? "z-30 bg-white ring-2 ring-sky-500"
                         : changed
-                          ? "z-20 ring-1 ring-sky-400/70"
+                          ? "z-20 bg-white ring-1 ring-sky-400/70"
                           : "z-20 bg-[rgba(37,99,235,0.16)] hover:bg-[rgba(37,99,235,0.28)]"
                     }`}
                     style={{
@@ -611,9 +611,12 @@ export function PdfEditTextTool() {
                       value={line.text}
                       rows={1}
                       spellCheck={false}
-                      className={`h-full w-full resize-none border-0 bg-transparent p-0 leading-none outline-none ${
-                        covering ? "" : "caret-transparent"
+                      className={`h-full w-full resize-none border-0 p-0 leading-none outline-none ${
+                        covering
+                          ? "bg-white"
+                          : "bg-transparent text-transparent caret-transparent"
                       }`}
+                      style={covering ? { color: line.color } : undefined}
                       onFocus={() => setActive(line.id)}
                       onChange={(event) => {
                         const value = event.target.value;
