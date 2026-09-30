@@ -209,6 +209,72 @@ export async function createBlankSheet(): Promise<ArrayBuffer> {
   return copy;
 }
 
+export async function createSampleForm(): Promise<ArrayBuffer> {
+  const doc = await PDFDocument.create();
+  const page = doc.addPage([595.28, 841.89]);
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const ink = rgb(0.12, 0.1, 0.08);
+  const muted = rgb(0.45, 0.4, 0.35);
+  page.drawText("Hoja de prueba", {
+    x: 56,
+    y: 780,
+    size: 20,
+    font: bold,
+    color: ink,
+  });
+  page.drawText(
+    "Casillas reales de formulario. Pulsa cada caja azulada y escribe.",
+    { x: 56, y: 758, size: 10, font, color: muted },
+  );
+
+  const labels = [
+    { text: "Nombre y apellidos", y: 700 },
+    { text: "NIF / DNI", y: 632 },
+    { text: "Correo", y: 564 },
+    { text: "Notas", y: 496 },
+  ];
+  for (const label of labels) {
+    page.drawText(label.text, {
+      x: 56,
+      y: label.y,
+      size: 11,
+      font,
+      color: ink,
+    });
+  }
+  page.drawText("Provincia", { x: 56, y: 300, size: 11, font, color: ink });
+  page.drawText("He leido los datos y son correctos", {
+    x: 80,
+    y: 236,
+    size: 11,
+    font,
+    color: ink,
+  });
+
+  const form = doc.getForm();
+  const name = form.createTextField("Nombre");
+  name.addToPage(page, { x: 56, y: 668, width: 483, height: 24 });
+  const nif = form.createTextField("NIF");
+  nif.addToPage(page, { x: 56, y: 600, width: 220, height: 24 });
+  const mail = form.createTextField("Correo");
+  mail.addToPage(page, { x: 56, y: 532, width: 483, height: 24 });
+  const notes = form.createTextField("Notas");
+  notes.enableMultiline();
+  notes.addToPage(page, { x: 56, y: 328, width: 483, height: 156 });
+  const place = form.createDropdown("Provincia");
+  place.addOptions(["", "Madrid", "Barcelona", "Valencia", "Sevilla"]);
+  place.addToPage(page, { x: 56, y: 268, width: 220, height: 24 });
+  const ok = form.createCheckBox("Correcto");
+  ok.addToPage(page, { x: 56, y: 228, width: 16, height: 16 });
+  form.updateFieldAppearances(font);
+
+  const bytes = await doc.save();
+  const copy = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(copy).set(bytes);
+  return copy;
+}
+
 function pageIndexForWidget(
   doc: PDFDocument,
   widget: { P: () => PDFRef | undefined; dict: unknown },

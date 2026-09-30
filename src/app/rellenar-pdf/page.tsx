@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AdSlot } from "@/components/ad-slot";
 import { FaqList } from "@/components/faq-list";
 import { PdfFillTool } from "@/components/pdf-fill-tool";
@@ -34,7 +35,9 @@ export default function RellenarPdfPage() {
       </p>
       <AdSlot label="Rellenar campos es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">
-        <PdfFillTool />
+        <Suspense fallback={<p className="text-sm text-muted-foreground">Cargando…</p>}>
+          <PdfFillTool />
+        </Suspense>
       </div>
       <div className="no-print">
         <FaqList items={faqsForPath("/rellenar-pdf")} />

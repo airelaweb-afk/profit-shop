@@ -142,7 +142,7 @@ export function PdfFormViewer({
       wrap.style.setProperty("--scale-round-x", "1px");
       wrap.style.setProperty("--scale-round-y", "1px");
 
-      const ratio = Math.min(2, window.devicePixelRatio || 1);
+      const ratio = 1;
       canvas.width = Math.floor(viewport.width * ratio);
       canvas.height = Math.floor(viewport.height * ratio);
       canvas.style.width = `${viewport.width}px`;
@@ -216,6 +216,9 @@ export function PdfFormViewer({
         <p className="mb-3 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </p>
+      ) : null}
+      {!ready && !error ? (
+        <p className="mb-3 text-sm text-muted-foreground">Abriendo las casillas del PDF…</p>
       ) : null}
       <div
         ref={wrapRef}

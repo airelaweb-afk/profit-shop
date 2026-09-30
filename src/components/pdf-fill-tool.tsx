@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Download, FileUp, Minus, Plus } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
 import { PdfFormViewer, type PdfFormHandle } from "@/components/pdf-form-viewer";
@@ -9,7 +10,11 @@ import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
 import { useJobGuard } from "@/components/use-job-guard";
 import { Button } from "@/components/ui/button";
 import { bytesLabel } from "@/lib/limits";
-import { listPdfFields, suggestedFillFileName } from "@/lib/pdf-fill";
+import {
+  createSampleForm,
+  listPdfFields,
+  suggestedFillFileName,
+} from "@/lib/pdf-fill";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
 function isPdfFile(file: File) {
@@ -34,7 +39,32 @@ export function PdfFillTool() {
   const [pageCount, setPageCount] = useState(1);
   const [fieldCount, setFieldCount] = useState(0);
   const [xfa, setXfa] = useState(false);
-  const [scale, setScale] = useState(1.15);
+  const [scale, setScale] = useState(1);
+  const search = useSearchParams();
+  const demo = search.get("demo") === "1";
+
+  async function openBytes(data: ArrayBuffer, name: string) {
+    if (data.byteLength > limit.pdfBytes) {
+      throw new Error(
+        pro
+          ? `El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`
+          : `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+      );
+    }
+    const found = await listPdfFields(data.slice(0));
+    setFileName(name);
+    setPageIndex(0);
+    setSource(data.slice(0));
+    if (found.length === 0) {
+      setNotice(
+        "Si ves casillas azules, son las del PDF: pulsa y escribe ahí. Si no hay ninguna, este archivo no trae campos (escaneo o PDF ‘impreso’). Eso no se inventa; usa Firmar PDF.",
+      );
+    } else {
+      setNotice(
+        `${found.length} campo${found.length === 1 ? "" : "s"} del propio PDF. Pulsa la casilla y escribe; no es texto pintado encima.`,
+      );
+    }
+  }
 
   async function takeFile(file: File | undefined) {
     if (!file) return;
@@ -47,27 +77,7 @@ export function PdfFillTool() {
     setNotice("");
     handle.current = null;
     try {
-      const data = await file.arrayBuffer();
-      if (data.byteLength > limit.pdfBytes) {
-        throw new Error(
-          pro
-            ? `El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`
-            : `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
-        );
-      }
-      const found = await listPdfFields(data.slice(0));
-      setFileName(file.name);
-      setPageIndex(0);
-      setSource(data.slice(0));
-      if (found.length === 0) {
-        setNotice(
-          "Si ves casillas azules, son las del PDF: pulsa y escribe ahí. Si no hay ninguna, este archivo no trae campos (escaneo o PDF ‘impreso’). Eso no se inventa; usa Firmar PDF.",
-        );
-      } else {
-        setNotice(
-          `${found.length} campo${found.length === 1 ? "" : "s"} del propio PDF. Pulsa la casilla y escribe; no es texto pintado encima.`,
-        );
-      }
+      await openBytes(await file.arrayBuffer(), file.name);
     } catch (caught) {
       setSource(null);
       setError(
@@ -79,6 +89,29 @@ export function PdfFillTool() {
       setBusy(false);
     }
   }
+
+  async function openSample() {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    handle.current = null;
+    try {
+      await openBytes(await createSampleForm(), "ejemplo-campos.pdf");
+    } catch (caught) {
+      setSource(null);
+      setError(
+        caught instanceof Error ? caught.message : "No se pudo crear el ejemplo.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!demo || source) return;
+    void openSample();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demo]);
 
   async function download() {
     if (!handle.current) {
@@ -119,6 +152,19 @@ export function PdfFillTool() {
           busyHint="Abriendo el formulario del PDF."
           onFiles={(list) => void takeFile(list[0])}
         />
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          ¿La máquina va justa o no tienes un PDF a mano?
+        </p>
+        <div className="mt-2 flex justify-center">
+          <Button
+            type="button"
+            className="h-12"
+            onClick={() => void openSample()}
+            disabled={busy}
+          >
+            Probar ahora con un ejemplo
+          </Button>
+        </div>
         <FreeCapNote
           text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
         />
