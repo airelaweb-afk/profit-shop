@@ -164,7 +164,7 @@ function groupLines(items: RawItem[]): PdfTextLine[] {
   );
   const buckets: RawItem[][] = [];
   for (const item of sorted) {
-    const current = buckets.at(-1);
+    const current = buckets[buckets.length - 1];
     const seed = current?.[0];
     const slop = Math.max(2.2, item.fontSize * 0.32);
     if (
@@ -278,8 +278,11 @@ export async function extractPdfText(data: ArrayBuffer): Promise<PdfTextExtract>
       const family = content.styles?.[fontName]?.fontFamily ?? "";
       let fontHint = fontName;
       try {
-        const face = page.commonObjs.get(fontName) as { name?: string } | undefined;
-        if (face?.name) fontHint = face.name;
+        const objs = page.commonObjs as { get?: (name: string) => { name?: string } };
+        if (typeof objs?.get === "function") {
+          const face = objs.get(fontName);
+          if (face?.name) fontHint = face.name;
+        }
       } catch {
         fontHint = fontName || family;
       }

@@ -1,4 +1,4 @@
-import { loadPdfjs } from "@/lib/pdfjs-worker";
+import { loadPdfjs, renderPdfPage } from "@/lib/pdfjs-worker";
 import {
   DEFAULT_TEXT_COLOR,
   type PdfTextLine,
@@ -42,11 +42,12 @@ export async function ocrPdfPage(
   const canvas = document.createElement("canvas");
   canvas.width = Math.floor(viewport.width);
   canvas.height = Math.floor(viewport.height);
-  await page.render({
+  await renderPdfPage(
+    page,
     canvas,
     viewport,
-    annotationMode: pdfjs.AnnotationMode.DISABLE,
-  }).promise;
+    pdfjs.AnnotationMode.DISABLE,
+  );
   await task.destroy();
 
   const tesseract = await import("tesseract.js");

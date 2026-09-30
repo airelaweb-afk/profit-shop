@@ -574,7 +574,7 @@ export function PdfSignTool() {
     const next = current.slice(0, -1);
     stampsRef.current = next;
     setStamps(next);
-    setSelectedId(next.at(-1)?.id ?? null);
+    setSelectedId(next[next.length - 1]?.id ?? null);
   }
 
   function nudgeSelected(dx: number, dy: number) {
@@ -621,13 +621,13 @@ export function PdfSignTool() {
           stampsRef.current = next;
           setTyping(null);
           setStamps(next);
-          setSelectedId(next.at(-1)?.id ?? null);
+          setSelectedId(next[next.length - 1]?.id ?? null);
           return;
         }
         const next = stampsRef.current.filter((item) => item.id !== id);
         stampsRef.current = next;
         setStamps(next);
-        setSelectedId(next.at(-1)?.id ?? null);
+        setSelectedId(next[next.length - 1]?.id ?? null);
         return;
       }
       const step = event.shiftKey ? 5 : 1;
