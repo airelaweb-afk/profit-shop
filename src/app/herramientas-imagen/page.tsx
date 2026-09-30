@@ -25,7 +25,7 @@ export default function HerramientasImagenPage() {
         PDF a Word y vídeo quedan aparcados.
       </p>
       <div className="mt-6">
-        <AdSlot label="Comprimir y HEIC a JPG son gratis. Pro quita los anuncios." />
+        <AdSlot label="Comprimir y HEIC a JPG son gratis." />
       </div>
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[...imageKit, ...audioKit].map((tool) => (

@@ -27,7 +27,7 @@ export default function Page() {
         Marcas inicio y fin. Sale un WAV. Extraer el audio de un MP4 no está.
       </p>
       <div className="mt-6">
-        <AdSlot label="Recortar es gratis. Pro quita los anuncios." />
+        <AdSlot label="Recortar es gratis." />
       </div>
       <div className="mt-10">
         <AuthGate>

@@ -109,7 +109,7 @@ export function ImageKitPage({ kind }: { kind: ImageKitSlug }) {
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
       <div className="mt-6">
-        <AdSlot label="Comprimir y convertir fotos es gratis. Pro quita los anuncios aquí." />
+        <AdSlot label="Comprimir y convertir fotos es gratis." />
       </div>
       <div className="mt-10">
         <AuthGate>

@@ -28,7 +28,7 @@ export default function Page() {
         o sacar el audio de un vídeo queda aparcado: pide un motor gordo.
       </p>
       <div className="mt-6">
-        <AdSlot label="La conversión es gratis. Pro quita los anuncios en este navegador." />
+        <AdSlot label="La conversión es gratis." />
       </div>
       <div className="mt-10">
         <AuthGate>

@@ -29,7 +29,7 @@ export default function PdfPage() {
         es Cl@ve ni un certificado digital: es tu rúbrica, como en papel.
       </p>
       <div className="no-print mt-6">
-        <AdSlot label="Firmar en el navegador es gratis. Pro quita los anuncios." />
+        <AdSlot label="Firmar en el navegador es gratis." />
       </div>
       <div className="mt-10">
         <AuthGate>

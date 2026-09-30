@@ -27,7 +27,7 @@ export default function HerramientasPdfPage() {
         no salen de aquí.
       </p>
       <div className="mt-6">
-        <AdSlot label="Unir y comprimir son gratis. Pro quita anuncios y desbloquea la marca de agua." />
+        <AdSlot label="Unir y comprimir son gratis. Pro desbloquea la marca de agua." />
       </div>
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {allPdfTools.map((tool) => (

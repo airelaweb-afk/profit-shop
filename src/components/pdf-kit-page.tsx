@@ -85,7 +85,7 @@ export function PdfKitPage({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
       <div className="mt-6">
-        <AdSlot label="Esta herramienta es gratis. Pro quita los anuncios en este navegador." />
+        <AdSlot label="Esta herramienta es gratis." />
       </div>
       <div className="mt-10">
         <AuthGate>

@@ -15,9 +15,9 @@ export function AdSlot({ label }: { label: string }) {
       <p className="mt-1">
         {label}{" "}
         <Link href="/precios/" className="text-primary underline-offset-4 hover:underline">
-          Pro quita los anuncios
+          Sin anuncios con Pro
         </Link>
-        , en este navegador.
+        .
       </p>
     </aside>
   );
