@@ -16,6 +16,8 @@ const required = [
   join(dir, "alternativa-a-ilovepdf", "index.html"),
   join(dir, "alternativa-a-iloveimg", "index.html"),
   join(dir, "juntar-pdf", "index.html"),
+  join(dir, "admin", "index.html"),
+  join(dir, "cuenta", "index.html"),
   join(dir, "aviso-legal", "index.html"),
   join(dir, "privacidad", "index.html"),
   join(dir, "cookies", "index.html"),

@@ -34,7 +34,7 @@ export function AdminKeys() {
   const matches = samePublic(priv ? publicFromPrivate(priv) : null, sitePublic);
   const [importText, setImportText] = useState("");
   const [check, setCheck] = useState("");
-  const [result, setResult] = useState<ProKeyInfo | null | "idle">("idle");
+  const [result, setResult] = useState<(ProKeyInfo & { expired: boolean }) | null | "idle">("idle");
   const [msg, setMsg] = useState("");
   const revoked = listMembers().filter((m) => m.status === "revocado").map((m) => m.serial);
 
@@ -44,7 +44,8 @@ export function AdminKeys() {
       setMsg("No hay clave con la que verificar.");
       return;
     }
-    setResult(await verifyWithJwk(check, jwk));
+    const info = await verifyWithJwk(check, jwk);
+    setResult(info ? { ...info, expired: info.expiresAt.getTime() < Date.now() } : null);
   }
 
   return (
@@ -220,7 +221,7 @@ export function AdminKeys() {
             <p className="mt-3 rounded-[2px] bg-foreground p-3 text-sm text-background">
               Firma válida · serial <span className="font-mono">{result.serial}</span> · caduca{" "}
               {formatDateEs(result.expires)}
-              {result.expiresAt.getTime() < Date.now() ? " · CADUCADA" : ""}
+              {result.expired ? " · CADUCADA" : ""}
               {result.revoked ? " · REVOCADA en la web" : ""}
               {(() => {
                 const owner = listMembers().find((m) => m.serial === result.serial);

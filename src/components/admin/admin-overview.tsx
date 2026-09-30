@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Kpi } from "@/components/admin/admin-bits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,46 +19,6 @@ import { hasRevolutPay, hasStripePay } from "@/lib/payments";
 import { hasPublicKey } from "@/lib/pro-keys";
 import { ADSENSE_CLIENT } from "@/lib/site";
 import { formatDateEs, formatEur } from "@/lib/use-admin";
-
-function Kpi({
-  label,
-  value,
-  tone = "bone",
-}: {
-  label: string;
-  value: string | number;
-  tone?: "bone" | "ink" | "signal" | "yellow";
-}) {
-  const classes = {
-    bone: "bg-card text-foreground ring-1 ring-foreground/15",
-    ink: "bg-foreground text-background",
-    signal: "bg-primary text-primary-foreground",
-    yellow: "bg-accent text-accent-foreground",
-  }[tone];
-  return (
-    <div className={`rounded-[2px] p-4 ${classes}`}>
-      <p className="font-mono text-[0.65rem] tracking-[0.18em] uppercase opacity-75">
-        {label}
-      </p>
-      <p className="mt-2 font-heading text-3xl tracking-tight">{value}</p>
-    </div>
-  );
-}
-
-function Check({ ok, label, hint }: { ok: boolean; label: string; hint: string }) {
-  return (
-    <li className="flex items-start gap-3 border-b border-foreground/10 py-3 last:border-0">
-      <span
-        className={`mt-0.5 inline-block size-3 shrink-0 rounded-full ${ok ? "bg-primary" : "bg-foreground/25"}`}
-        aria-hidden="true"
-      />
-      <div>
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      </div>
-    </li>
-  );
-}
 
 export function AdminOverview() {
   const members = listMembers();
