@@ -1,10 +1,14 @@
 import { LoginForm } from "@/components/login-form";
 import { pageMeta } from "@/lib/seo";
+import { hasCloud } from "@/lib/supabase";
+
+const cloud = hasCloud();
 
 export const metadata = pageMeta({
   title: "Entrar",
-  description:
-    "Inicia sesión o crea una cuenta en este navegador para usar las herramientas de Luna Oficio. Los datos se quedan aquí.",
+  description: cloud
+    ? "Inicia sesión o crea tu cuenta de Luna Oficio. Vale en cualquier aparato; los archivos siguen sin salir de tu navegador."
+    : "Inicia sesión o crea una cuenta en este navegador para usar las herramientas de Luna Oficio. Los datos se quedan aquí.",
   path: "/entrar",
 });
 
@@ -16,8 +20,10 @@ export default function EntrarPage() {
         Entra para usar Luna Oficio.
       </h1>
       <p className="mt-3 text-muted-foreground">
-        Las herramientas (presupuestos, cobros, firmar PDF…) piden cuenta. Sin
-        CRM: es solo para saber que eres tú, en este aparato.
+        Las herramientas (presupuestos, cobros, firmar PDF…) piden cuenta.
+        {cloud
+          ? " Una sola, para todos tus aparatos. Sin CRM: solo tu nombre, tu correo y si tienes Pro."
+          : " Sin CRM: es solo para saber que eres tú, en este aparato."}
       </p>
       <div className="mt-8 rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
         <LoginForm />

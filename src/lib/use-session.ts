@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   getSessionServerSnapshot,
   getSessionSnapshot,
@@ -14,5 +14,5 @@ export function useSession() {
     getSessionSnapshot,
     getSessionServerSnapshot,
   );
-  return parseSession(json);
+  return useMemo(() => parseSession(json), [json]);
 }

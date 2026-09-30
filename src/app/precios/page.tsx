@@ -2,6 +2,9 @@ import { Suspense } from "react";
 import { PricingBox } from "@/components/pricing-box";
 import { LEGAL } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
+import { hasCloud } from "@/lib/supabase";
+
+const cloud = hasCloud();
 
 export const metadata = pageMeta({
   title: "Precios",
@@ -38,10 +41,10 @@ export default function PreciosPage() {
           <p className="text-sm tracking-wide uppercase">Pro</p>
           <p className="mt-2 font-heading text-3xl">29 € / año</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li>Sin anuncios en este navegador</li>
+            <li>{cloud ? "Sin anuncios en todos tus aparatos" : "Sin anuncios en este navegador"}</li>
             <li>Marca de agua en PDF (BORRADOR, CONFIDENCIAL…)</li>
             <li>Pago con Stripe o Revolut</li>
-            <li>Clave local · {LEGAL.email}</li>
+            <li>{cloud ? `Se activa solo al pagar · ${LEGAL.email}` : `Clave local · ${LEGAL.email}`}</li>
           </ul>
         </li>
       </ul>

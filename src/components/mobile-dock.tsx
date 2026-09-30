@@ -155,17 +155,26 @@ export function MobileDock() {
               Cookies y privacidad
             </Link>
             {session ? (
-              <Button
-                type="button"
-                variant="ghost"
-                className="mt-3 h-12 justify-start"
-                onClick={() => {
-                  logoutAccount();
-                  setOpen(false);
-                }}
-              >
-                Salir
-              </Button>
+              <div className="mt-3 grid gap-1">
+                <Link
+                  href="/cuenta/"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+                >
+                  Mi cuenta · {session.name || session.email}
+                </Link>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-12 justify-start"
+                  onClick={() => {
+                    logoutAccount();
+                    setOpen(false);
+                  }}
+                >
+                  Salir
+                </Button>
+              </div>
             ) : (
               <div className="mt-3 grid gap-2">
                 <Button

@@ -1,4 +1,6 @@
+import { clearProfile, refreshProfile, setRecoveryMode } from "@/lib/cloud";
 import { newId } from "@/lib/quotes";
+import { authErrorMessage, hasCloud, supabase } from "@/lib/supabase";
 
 const ACCOUNTS_KEY = "luna-oficio-accounts";
 const SESSION_KEY = "luna-oficio-session";
@@ -16,7 +18,11 @@ export type Session = {
   accountId: string;
   name: string;
   email: string;
+  /** true cuando la sesión viene de Supabase (vale en cualquier aparato). */
+  cloud?: boolean;
 };
+
+export type RegisterResult = { needsConfirmation: boolean };
 
 const listeners = new Set<() => void>();
 let authVersion = 0;
@@ -124,11 +130,58 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+// ---------------------------------------------------------------------------
+// Modo nube (Supabase): la sesión real la lleva supabase-js; aquí se guarda una
+// copia mínima para que el header y las puertas pinten sin esperar a la red.
+// ---------------------------------------------------------------------------
+
+let cloudInitialised = false;
+
+type CloudUser = {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+};
+
+function cacheCloudSession(user: CloudUser) {
+  const cached = parseSession(getSessionSnapshot());
+  const metaName = user.user_metadata?.name;
+  const next: Session = {
+    accountId: user.id,
+    name:
+      (typeof metaName === "string" && metaName) ||
+      cached?.name ||
+      user.email?.split("@")[0] ||
+      "",
+    email: user.email ?? cached?.email ?? "",
+    cloud: true,
+  };
+  if (JSON.stringify(next) !== getSessionSnapshot()) writeSession(next);
+}
+
+export function initCloudAuth() {
+  if (cloudInitialised || typeof window === "undefined" || !hasCloud()) return;
+  cloudInitialised = true;
+  supabase().auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") setRecoveryMode(true);
+    if (session?.user) {
+      cacheCloudSession(session.user);
+      if (event !== "TOKEN_REFRESHED") {
+        // Fuera del callback: supabase-js recomienda no esperar peticiones aquí.
+        setTimeout(() => void refreshProfile(), 0);
+      }
+    } else if (event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
+      if (getSessionSnapshot()) writeSession(null);
+      clearProfile();
+    }
+  });
+}
+
 export async function registerAccount(input: {
   name: string;
   email: string;
   password: string;
-}) {
+}): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
   const password = input.password;
@@ -136,6 +189,21 @@ export async function registerAccount(input: {
   if (!email.includes("@")) throw new Error("El correo no parece válido.");
   if (password.length < 8) {
     throw new Error("La contraseña tiene que tener al menos 8 caracteres.");
+  }
+  if (hasCloud()) {
+    const { data, error } = await supabase().auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: `${window.location.origin}/entrar/?confirmado=1`,
+      },
+    });
+    if (error) throw new Error(authErrorMessage(error.message));
+    // Con "confirmar correo" activado, Supabase devuelve usuario sin sesión.
+    if (!data.session) return { needsConfirmation: true };
+    if (data.user) cacheCloudSession(data.user);
+    return { needsConfirmation: false };
   }
   const accounts = readAccounts();
   if (accounts.some((item) => item.email === email)) {
@@ -153,10 +221,20 @@ export async function registerAccount(input: {
   };
   writeAccounts([...accounts, account]);
   writeSession({ accountId: account.id, name: account.name, email: account.email });
+  return { needsConfirmation: false };
 }
 
 export async function loginAccount(input: { email: string; password: string }) {
   const email = normalizeEmail(input.email);
+  if (hasCloud()) {
+    const { data, error } = await supabase().auth.signInWithPassword({
+      email,
+      password: input.password,
+    });
+    if (error) throw new Error(authErrorMessage(error.message));
+    if (data.user) cacheCloudSession(data.user);
+    return;
+  }
   const account = readAccounts().find((item) => item.email === email);
   if (!account) {
     throw new Error("No hay ninguna cuenta con ese correo en este navegador.");
@@ -172,6 +250,10 @@ export async function loginAccount(input: { email: string; password: string }) {
 
 export function logoutAccount() {
   writeSession(null);
+  if (hasCloud()) {
+    clearProfile();
+    void supabase().auth.signOut();
+  }
 }
 
 export type AccountSummary = Pick<AccountRecord, "id" | "name" | "email" | "createdAt">;

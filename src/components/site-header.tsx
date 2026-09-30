@@ -35,9 +35,12 @@ function AccountActions() {
   }
   return (
     <div className="flex items-center gap-2">
-      <span className="hidden max-w-[10rem] truncate text-sm text-background/70 sm:inline">
-        {session.name}
-      </span>
+      <Link
+        href="/cuenta/"
+        className="hidden max-w-[10rem] truncate text-sm text-background/70 hover:text-accent sm:inline"
+      >
+        {session.name || "Mi cuenta"}
+      </Link>
       <Button
         type="button"
         size="sm"

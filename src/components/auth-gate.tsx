@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { safeNextPath } from "@/lib/safe-next";
+import { hasCloud } from "@/lib/supabase";
 import { useSession } from "@/lib/use-session";
 
 function useHydrated() {
@@ -37,9 +38,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           Entra para procesar el archivo.
         </h2>
         <p className="mt-3 text-muted-foreground">
-          La creas aquí, en este teléfono o este ordenador. Los PDF y las fotos
-          no salen del navegador. El título y las guías de esta página se pueden
-          leer sin cuenta.
+          {hasCloud()
+            ? "Gratis y vale en todos tus aparatos. Los PDF y las fotos no salen del navegador. El título y las guías de esta página se pueden leer sin cuenta."
+            : "La creas aquí, en este teléfono o este ordenador. Los PDF y las fotos no salen del navegador. El título y las guías de esta página se pueden leer sin cuenta."}
         </p>
         <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
           <Button
