@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { posts } from "@/lib/blog";
+import { competitors } from "@/lib/comparisons";
 import { imageKit, audioKit } from "@/lib/image-kit";
 import { allPdfTools } from "@/lib/pdf-kit";
 import { SITE_URL } from "@/lib/site";
@@ -18,6 +19,10 @@ const staticPaths = [
   "/cookies/",
   "/condiciones/",
   "/contacto/",
+  "/comparar/",
+  "/juntar-pdf/",
+  "/combinar-pdf/",
+  "/aligerar-pdf/",
   "/herramientas-pdf/",
   "/herramientas-imagen/",
   "/presupuestos/",
@@ -35,6 +40,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: path === "/" ? 1 : path === "/blog/" || path === "/faq/" ? 0.8 : 0.7,
+    })),
+    ...competitors.map((item) => ({
+      url: `${SITE_URL}${item.href}/`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
     })),
     ...allPdfTools.map((tool) => ({
       url: `${SITE_URL}${tool.href}/`,

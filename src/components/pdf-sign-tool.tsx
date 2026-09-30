@@ -749,7 +749,7 @@ export function PdfSignTool() {
   return (
     <div className="grid gap-4 pb-24 xl:pb-0">
       {filePicker}
-      <div className="no-print sticky top-14 z-30 rounded-2xl bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 backdrop-blur-md sm:top-16 sm:p-3">
+      <div className="no-print sticky top-[5.5rem] z-30 rounded-[2px] bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 backdrop-blur-md sm:top-[6.25rem] sm:p-3">
         <div className="grid grid-cols-5 gap-1 sm:flex sm:flex-wrap sm:items-center sm:gap-1.5">
           {modeButtons.map((item) => (
             <Button

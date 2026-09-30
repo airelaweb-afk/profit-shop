@@ -53,7 +53,6 @@
   --bone: #f4f0e6;
   --signal: #ff4b1a;
   --signal-soft: #ffb199;
-  --cobalt: #2430c9;
   --yellow: #ffe14a;
   --background: #f4f0e6;
   --foreground: #12110f;
@@ -63,8 +62,8 @@
   --popover-foreground: #12110f;
   --primary: #ff4b1a;
   --primary-foreground: #fffdf8;
-  --secondary: #2430c9;
-  --secondary-foreground: #fffdf8;
+  --secondary: #12110f;
+  --secondary-foreground: #f4f0e6;
   --muted: #e7e1d3;
   --muted-foreground: #5a554c;
   --accent: #ffe14a;
@@ -74,10 +73,10 @@
   --input: #d4cdbd;
   --ring: #ff4b1a;
   --chart-1: #ff4b1a;
-  --chart-2: #2430c9;
+  --chart-2: #12110f;
   --chart-3: #ffe14a;
   --chart-4: #ffb199;
-  --chart-5: #12110f;
+  --chart-5: #ff4b1a;
   --radius: 0.15rem;
   --sidebar: #f4f0e6;
   --sidebar-foreground: #12110f;
@@ -158,7 +157,7 @@
   bottom: 0;
   left: 0;
   width: 10px;
-  background: linear-gradient(180deg, #ff4b1a 0%, #2430c9 100%);
+  background: linear-gradient(180deg, #ff4b1a 0%, #ffe14a 100%);
 }
 
 .quote-doc-top {
@@ -334,7 +333,7 @@
 }
 
 .quote-doc-table tbody tr:nth-child(even) td {
-  background: rgba(36, 48, 201, 0.05);
+  background: rgba(255, 75, 26, 0.06);
 }
 
 .quote-doc-num {
@@ -570,5 +569,198 @@ input[type="range"] {
 
   body {
     background: white !important;
+  }
+}
+
+@keyframes marquee-track {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes logo-moon {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes logo-spark {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 0.82;
+  }
+}
+
+@keyframes hero-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-drift {
+  from {
+    transform: translate3d(-6%, 0, 0) rotate(-8deg);
+  }
+  to {
+    transform: translate3d(8%, 0, 0) rotate(-8deg);
+  }
+}
+
+@keyframes stamp-slam {
+  0% {
+    transform: scale(1.55) rotate(-18deg);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(0.94) rotate(-5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(-6deg);
+    opacity: 1;
+  }
+}
+
+@keyframes spark-float {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(12px, -18px);
+  }
+}
+
+@keyframes signal-pulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.08);
+  }
+}
+
+.marquee-track {
+  animation: marquee-track 26s linear infinite;
+}
+
+.marquee-track.reverse {
+  animation-duration: 38s;
+  animation-direction: reverse;
+}
+
+.logo-moon {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-moon 4.8s ease-in-out infinite;
+}
+
+.logo-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-spark 1.7s ease-in-out infinite;
+}
+
+.hero-orbit {
+  animation: hero-orbit 42s linear infinite;
+}
+
+.hero-stripe {
+  background-image: repeating-linear-gradient(
+    -18deg,
+    #ff4b1a 0 28px,
+    #12110f 28px 56px,
+    #ffe14a 56px 70px
+  );
+  background-size: 240px 240px;
+  animation: hero-drift 18s linear infinite alternate;
+}
+
+.stamp-mark {
+  animation: stamp-slam 0.7s cubic-bezier(0.2, 1.4, 0.3, 1) both;
+}
+
+.spark-float {
+  animation: spark-float 3.4s ease-in-out infinite;
+}
+
+.signal-bar {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+}
+
+.signal-bar > span:nth-child(1) {
+  flex: 3;
+  background: #ff4b1a;
+}
+
+.signal-bar > span:nth-child(2) {
+  flex: 3;
+  background: #12110f;
+}
+
+.signal-bar > span:nth-child(3) {
+  flex: 1.1;
+  background: #ffe14a;
+  transform-origin: left center;
+  animation: signal-pulse 2.2s ease-in-out infinite;
+}
+
+.punch-card {
+  border-radius: 2px;
+  background: var(--card);
+  box-shadow: 0 0 0 1px rgba(18, 17, 15, 0.14);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+a.punch-card:hover,
+button.punch-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 6px 6px 0 0 #ff4b1a;
+}
+
+.ink-link {
+  color: rgba(244, 240, 230, 0.72);
+  transition: color 0.15s ease;
+}
+
+.ink-link:hover {
+  color: #ffe14a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .logo-moon,
+  .logo-spark,
+  .hero-orbit,
+  .hero-stripe,
+  .stamp-mark,
+  .spark-float,
+  .signal-bar > span:nth-child(3) {
+    animation: none !important;
+  }
+
+  a.punch-card:hover,
+  button.punch-card:hover {
+    transform: none;
   }
 }

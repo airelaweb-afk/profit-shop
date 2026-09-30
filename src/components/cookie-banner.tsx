@@ -10,13 +10,13 @@ export function CookieBanner() {
   if (consent.decidedAt) return null;
 
   return (
-    <div className="no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t-2 border-foreground bg-background p-4 xl:bottom-0">
+    <div className="no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t-2 border-primary bg-foreground p-4 text-background xl:bottom-0">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-background/75">
           Usamos almacenamiento local para tu cuenta y tus archivos (no se van a
           ningún servidor nuestro). Si aceptas publicidad, más adelante podrán
           cargarse anuncios de terceros.{" "}
-          <Link href="/cookies/" className="text-primary underline-offset-4 hover:underline">
+          <Link href="/cookies/" className="text-accent underline-offset-4 hover:underline">
             Política de cookies
           </Link>
           .
@@ -25,7 +25,7 @@ export function CookieBanner() {
           <Button
             type="button"
             variant="outline"
-            className="h-11"
+            className="h-11 border-background/40 bg-transparent text-background hover:border-accent hover:bg-transparent hover:text-accent"
             onClick={() => saveConsent(false)}
           >
             Solo necesarias

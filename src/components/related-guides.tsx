@@ -12,7 +12,7 @@ export function RelatedGuides({ href }: { href: string }) {
           <li key={post.slug}>
             <Link
               href={`/blog/${post.slug}/`}
-              className="block rounded-xl bg-card p-4 ring-1 ring-foreground/10 hover:bg-muted/40"
+              className="punch-card block p-4"
             >
               <p className="font-heading text-lg">{post.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{post.meta}</p>

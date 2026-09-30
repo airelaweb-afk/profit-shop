@@ -94,7 +94,7 @@ export function PdfExtraPage({ kind }: { kind: PdfExtraSlug }) {
             <li key={entry.href}>
               <Link
                 href={entry.href}
-                className="block rounded-2xl bg-card p-4 ring-1 ring-foreground/10 hover:bg-muted/40"
+                className="block punch-card p-4"
               >
                 <p className="font-heading text-lg">{entry.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{entry.does}</p>

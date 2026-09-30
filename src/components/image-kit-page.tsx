@@ -125,7 +125,7 @@ export function ImageKitPage({ kind }: { kind: ImageKitSlug }) {
             <li key={tool.href}>
               <Link
                 href={tool.href}
-                className="block rounded-2xl bg-card p-4 ring-1 ring-foreground/10 hover:bg-muted/40"
+                className="block punch-card p-4"
               >
                 <p className="font-heading text-lg">{tool.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{tool.does}</p>

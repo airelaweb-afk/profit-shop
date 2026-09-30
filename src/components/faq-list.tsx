@@ -16,7 +16,7 @@ export function FaqList({
         {items.map((item) => (
           <div
             key={item.q}
-            className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10"
+            className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15"
           >
             <dt className="font-heading text-lg text-foreground">{item.q}</dt>
             <dd className="mt-2 text-sm text-muted-foreground">{item.a}</dd>

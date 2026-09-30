@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { SearchTicker } from "@/components/search-ticker";
 import { SiteBrand } from "@/components/site-brand";
+import { competitors } from "@/lib/comparisons";
 
 export function SiteFooter() {
   return (
-    <footer className="no-print mt-auto border-t-2 border-foreground/90 pb-dock">
+    <footer className="no-print mt-auto border-t-2 border-foreground pb-dock">
+      <SearchTicker reverse tone="orange" />
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <SiteBrand />
@@ -56,23 +59,25 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/comparar" className="hover:text-foreground">
+                Comparativas
+              </Link>
+            </li>
+            {competitors.slice(0, 3).map((item) => (
+              <li key={item.slug}>
+                <Link href={item.href} className="hover:text-foreground">
+                  Frente a {item.name}
+                </Link>
+              </li>
+            ))}
+            <li>
               <Link href="/faq" className="hover:text-foreground">
                 Preguntas frecuentes
               </Link>
             </li>
             <li>
-              <Link href="/como-funciona" className="hover:text-foreground">
-                Cómo funciona
-              </Link>
-            </li>
-            <li>
               <Link href="/precios" className="hover:text-foreground">
                 Precios
-              </Link>
-            </li>
-            <li>
-              <Link href="/contacto" className="hover:text-foreground">
-                Contacto
               </Link>
             </li>
           </ul>
@@ -104,10 +109,14 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-border/60">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground sm:px-6">
+      <div className="bg-foreground text-background">
+        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-background/70 sm:px-6">
           Luna Oficio. Herramientas puntuales, no un sistema de gestión. Airela
-          Web.
+          Web. Marcas ajenas identificadas en{" "}
+          <Link href="/aviso-legal" className="text-accent underline-offset-2 hover:underline">
+            aviso legal
+          </Link>
+          .
         </p>
       </div>
     </footer>

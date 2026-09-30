@@ -60,7 +60,7 @@ export function MobileDock() {
   return (
     <div className="no-print xl:hidden">
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-background/95 backdrop-blur-md"
+        className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-primary bg-foreground text-background"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         aria-label="Accesos del teléfono"
       >
@@ -73,7 +73,7 @@ export function MobileDock() {
                 <Link
                   href={item.href}
                   className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] ${
-                    active ? "text-primary" : "text-muted-foreground"
+                    active ? "text-accent" : "text-background/60"
                   }`}
                 >
                   <Icon className="size-5" />
@@ -85,7 +85,7 @@ export function MobileDock() {
           <li>
             <button
               type="button"
-              className="flex h-full w-full flex-col items-center justify-center gap-0.5 text-[11px] text-muted-foreground"
+              className="flex h-full w-full flex-col items-center justify-center gap-0.5 text-[11px] text-background/60"
               aria-label="Más herramientas"
               onClick={() => setOpen(true)}
             >
@@ -112,6 +112,13 @@ export function MobileDock() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/comparar"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+            >
+              Comparar
+            </Link>
             <Link
               href="/blog"
               onClick={() => setOpen(false)}

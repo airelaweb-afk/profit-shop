@@ -99,10 +99,7 @@ export function PdfKitPage({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {others.map((tool) => (
             <li key={tool.href}>
-              <Link
-                href={tool.href}
-                className="block rounded-2xl bg-card p-4 ring-1 ring-foreground/10 hover:bg-muted/40"
-              >
+              <Link href={tool.href} className="punch-card block p-4">
                 <p className="font-heading text-lg">{tool.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{tool.does}</p>
               </Link>

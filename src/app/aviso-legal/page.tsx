@@ -30,6 +30,25 @@ export default function AvisoLegalPage() {
         herramientas para tu trabajo. No puedes copiar el sitio entero y
         venderlo como propio.
       </p>
+      <h2>Marcas de terceros y publicidad comparativa</h2>
+      <p>
+        El nombre de este sitio es {SITE_NAME}. No es el de otro conversor. En
+        las páginas de comparativa citamos marcas ajenas (iLovePDF, Smallpdf,
+        PDF24, iLoveIMG, Adobe Acrobat, Sejda, PDF Candy, entre otras) solo para
+        identificar al competidor: no usamos su logotipo, no sugerimos
+        afiliación y no presentamos nuestro servicio como imitación ni como
+        producto llamado «Alternativa» más su marca.
+      </p>
+      <p>
+        En España esa comparación es lícita si es objetiva, versa sobre
+        características esenciales, pertinentes y verificables, no engaña, no
+        denigra y no explota la reputación ajena: artículo 10 de la Ley 3/1991
+        de Competencia Desleal (redacción de la Ley 29/2009), Directiva
+        2006/114/CE, Ley 17/2001 de Marcas y, para el uso de marcas como
+        palabra clave con justa causa al ofrecer una alternativa real, STS
+        105/2016. El hecho que contrastamos es dónde se procesa el archivo
+        (este navegador frente a un servidor ajeno).
+      </p>
       <h2>Responsabilidad</h2>
       <p>
         Las herramientas se ofrecen “tal cual”. Un PDF protegido, un HEIC raro

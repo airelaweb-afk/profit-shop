@@ -10,7 +10,7 @@ export function AdSlot({ label }: { label: string }) {
   if (!consent.ads) return null;
 
   return (
-    <aside className="no-print rounded-2xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground ring-1 ring-foreground/10">
+    <aside className="no-print rounded-[2px] border-2 border-foreground bg-accent px-4 py-3 text-sm text-foreground">
       <p className="text-xs tracking-wide uppercase">Publicidad</p>
       <p className="mt-1">
         {label}{" "}

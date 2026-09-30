@@ -24,6 +24,9 @@ const pdfPaths = new Set([
   "/rotar-pdf",
   "/numerar-pdf",
   "/marca-de-agua-pdf",
+  "/juntar-pdf",
+  "/combinar-pdf",
+  "/aligerar-pdf",
 ]);
 
 const imagePaths = new Set([

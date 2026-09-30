@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 80" role="img" aria-label="Luna Oficio">
-  <rect width="80" height="80" fill="#2430c9"/>
-  <path fill="#ff4b1a" fill-rule="evenodd" d="M30 16a26 26 0 1 0 0 52 26 26 0 0 0 0-52Zm16 8a20 20 0 1 0 0 36 20 20 0 0 0 0-36Z"/>
-  <circle cx="80" cy="8" r="8" fill="#ffe14a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Luna Oficio">
+  <rect width="80" height="80" fill="#12110f"/>
+  <path fill="#ff4b1a" fill-rule="evenodd" d="M28 12a28 28 0 1 0 0 56 28 28 0 0 0 0-56Zm18 10a22 22 0 1 0 0 36 22 22 0 0 0 0-36Z"/>
+  <circle cx="54" cy="26" r="10" fill="#ffe14a"/>
 </svg>

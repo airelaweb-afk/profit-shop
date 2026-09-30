@@ -318,7 +318,7 @@ const corePosts: BlogPost[] = [
     blocks: [
       {
         type: "p",
-        text: "iLovePDF y Smallpdf sí pasan a Word. Suben el archivo a un servidor con un motor de maquetación. En el navegador, sin eso, sale un .docx con el texto desordenado. No vamos a cobrarte un Word feo.",
+        text: "Algunos conversores online sí pasan a Word: suben el archivo a un servidor con un motor de maquetación. En el navegador, sin eso, sale un .docx con el texto desordenado. No vamos a cobrarte un Word feo.",
       },
       {
         type: "p",

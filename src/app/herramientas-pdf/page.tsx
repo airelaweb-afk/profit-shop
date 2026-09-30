@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
+import { ToolCard } from "@/components/tool-card";
 import { RelatedGuides } from "@/components/related-guides";
 import { allPdfTools } from "@/lib/pdf-kit";
 import { pageMeta } from "@/lib/seo";
@@ -32,25 +32,13 @@ export default function HerramientasPdfPage() {
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {allPdfTools.map((tool) => (
           <li key={tool.href}>
-            <Link
+            <ToolCard
               href={tool.href}
-              className="flex h-full flex-col rounded-2xl bg-card p-5 ring-1 ring-foreground/10 transition-colors hover:bg-muted/40"
-            >
-              <p className="font-heading text-xl">
-                {tool.name}
-                {"pro" in tool && tool.pro ? (
-                  <span className="ml-2 text-sm font-sans tracking-wide text-primary uppercase">
-                    Pro
-                  </span>
-                ) : null}
-              </p>
-              <p className="mt-3 text-sm text-muted-foreground">{tool.problem}</p>
-              <p className="mt-2 text-sm">{tool.does}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm text-primary">
-                Abrir
-                <ArrowRight className="size-3.5" />
-              </span>
-            </Link>
+              name={tool.name}
+              problem={tool.problem}
+              does={tool.does}
+              pro={"pro" in tool && tool.pro}
+            />
           </li>
         ))}
       </ul>

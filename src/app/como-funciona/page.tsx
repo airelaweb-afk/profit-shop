@@ -87,6 +87,17 @@ export default function ComoFuncionaPage() {
             digital.
           </p>
         </section>
+        <section>
+          <h2 className="font-heading text-2xl">Si buscan el nombre de otro</h2>
+          <p className="mt-2 text-muted-foreground">
+            Quien escribe el nombre de un conversor famoso suele querer unir o
+            comprimir un PDF. En España se puede aterrizar esa búsqueda con
+            publicidad comparativa objetiva (Ley 3/1991 art. 10, Ley 17/2001):
+            el producto se llama Luna Oficio, no usamos su logo y contrastamos
+            un hecho (el archivo se queda en el navegador). Las fichas están en
+            Comparar.
+          </p>
+        </section>
       </div>
 
       <div className="mt-10 flex flex-wrap gap-3">

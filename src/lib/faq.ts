@@ -10,8 +10,8 @@ export const siteFaqs: FaqItem[] = [
     a: "No. Unir, comprimir, convertir y firmar se hace en este navegador. La cuenta también vive aquí (localStorage). Si cambias de teléfono, hay que crear la cuenta otra vez.",
   },
   {
-    q: "¿Puedo unir PDF gratis y sin iLovePDF?",
-    a: "Sí. En Unir PDF eliges los archivos, los ordenas y descargas uno solo. Hace falta una cuenta de este navegador, no una suscripción.",
+    q: "¿Puedo unir PDF gratis y sin subir el archivo?",
+    a: "Sí. En Unir PDF eliges los archivos, los ordenas y descargas uno solo. Hace falta una cuenta de este navegador, no una suscripción. El PDF no viaja a un servidor nuestro.",
     href: "/unir-pdf",
   },
   {
@@ -26,8 +26,13 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Qué es Pro?",
-    a: "29 € al año: sin anuncios en este navegador y la marca de agua en PDF. Pagas por Bizum o transferencia; te enviamos una clave que se guarda aquí, no en un servidor nuestro.",
+    a: "29 € al año: sin anuncios en este navegador y la marca de agua en PDF. Pagas con Stripe (tarjeta) o Revolut; si aún no hay enlace, escríbenos. La clave se guarda aquí, no en un servidor nuestro.",
     href: "/precios",
+  },
+  {
+    q: "¿Por qué aparecen nombres de otros conversores?",
+    a: "Porque mucha gente busca unir o comprimir PDF escribiendo el nombre de un producto conocido. En España se puede comparar de forma objetiva (Ley 3/1991 art. 10, Ley 17/2001, STS 105/2016) si no nos hacemos pasar por ellos, no usamos su logo y no llamamos a nuestro producto «Alternativa + su marca». El nuestro se llama Luna Oficio. Las fichas están en Comparar.",
+    href: "/comparar",
   },
   {
     q: "¿Usáis cookies de publicidad?",

@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { AdSlot } from "@/components/ad-slot";
+import { ToolCard } from "@/components/tool-card";
 import { posts } from "@/lib/blog";
 import { pageMeta } from "@/lib/seo";
 
@@ -28,16 +28,12 @@ export default function BlogIndexPage() {
       <ul className="mt-10 grid gap-4 sm:grid-cols-2">
         {posts.map((post) => (
           <li key={post.slug}>
-            <Link
+            <ToolCard
               href={`/blog/${post.slug}/`}
-              className="flex h-full flex-col rounded-2xl bg-card p-5 ring-1 ring-foreground/10 hover:bg-muted/40"
-            >
-              <p className="text-sm tracking-wide text-primary uppercase">
-                {post.kicker}
-              </p>
-              <p className="mt-2 font-heading text-2xl">{post.title}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{post.meta}</p>
-            </Link>
+              name={post.title}
+              does={post.meta}
+              kicker={post.kicker}
+            />
           </li>
         ))}
       </ul>

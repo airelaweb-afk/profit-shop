@@ -21,7 +21,11 @@ En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Oficio), botones grande
 - **Imagen** (`/herramientas-imagen`): comprimir, PNG/JPG/WebP, HEIC a JPG, recortar, girar, redimensionar.
 - **Audio a WAV** y **recortar audio** (`/audio-a-wav`, `/recortar-audio`). No hay MP3 de salida ni vídeo.
 
-Blog (`/blog`), FAQ (`/faq`), precios (`/precios`) y páginas legales (`/aviso-legal`, `/privacidad`, `/cookies`, `/condiciones`). Consentimiento de cookies en el pie; puedes cambiarlo en `/cookies`.
+Blog (`/blog`), FAQ (`/faq`), precios (`/precios`), comparativas objetivas (`/comparar`, `alternativa-a-…`) y páginas legales (`/aviso-legal`, `/privacidad`, `/cookies`, `/condiciones`). Consentimiento de cookies en el pie; puedes cambiarlo en `/cookies`.
+
+Paleta: negro `#12110f`, naranja `#ff4b1a`, amarillo `#ffe14a`, hueso `#f4f0e6`. Sin azul. El logo es un cuadrado negro, luna naranja y chispa amarilla.
+
+Las landings `alternativa-a-{marca}` citan marcas ajenas con publicidad comparativa (Ley 3/1991 art. 10, Ley 17/2001, STS 105/2016): no usamos su logo ni su nombre como si fuéramos ellos. El producto se llama Luna Oficio.
 
 Aparcado: PDF a Word, vídeo, quitar fondo, ampliar con IA.
 

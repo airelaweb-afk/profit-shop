@@ -434,4 +434,133 @@ export const extraPosts: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "unir-pdf-sin-subir-el-archivo",
+    title: "Unir PDF sin subir el archivo a un conversor",
+    meta: "Juntar PDF en el navegador. Si has buscado un conversor conocido, el atasco es el mismo: varios archivos, uno solo, sin mandarlo a internet.",
+    kicker: "Unir PDF",
+    date: "2026-09-30",
+    keywords: [
+      "unir pdf sin subir",
+      "juntar pdf sin internet",
+      "combinar pdf navegador",
+      "pdf en el navegador",
+    ],
+    toolHref: "/unir-pdf",
+    blocks: [
+      {
+        type: "p",
+        text: "La búsqueda no siempre es «unir PDF». A veces es el nombre de un producto que sale primero. El problema es el mismo: tres PDFs y un cliente que quiere uno. La diferencia objetiva es dónde corre el archivo. En Luna Oficio, en este navegador. No en un servidor nuestro.",
+      },
+      {
+        type: "h2",
+        text: "Qué no hacemos",
+      },
+      {
+        type: "ul",
+        items: [
+          "No nos llamamos como ellos. El producto es Luna Oficio.",
+          "No usamos su logotipo. En España eso sería confusión de origen (Ley 17/2001).",
+          "No vendemos «Alternativa + su marca» como nombre de producto. La comparativa es una ficha, con hechos.",
+          "No convertimos a Word: el .docx saldría desordenado y no lo fingimos.",
+        ],
+      },
+      {
+        type: "cta",
+        href: "/unir-pdf",
+        label: "Unir PDF ahora",
+        text: "Elige los archivos, ordénalos, descarga. En el teléfono: Guardar en Archivos.",
+      },
+      {
+        type: "cta",
+        href: "/comparar",
+        label: "Ver comparativas",
+        text: "Si has llegado por el nombre de otro, las fichas dicen qué es de ellos y qué es nuestro.",
+      },
+    ],
+  },
+  {
+    slug: "publicidad-comparativa-pdf-en-espana",
+    title: "Cómo se puede comparar un conversor PDF en España sin copiarle el nombre",
+    meta: "Publicidad comparativa lícita: Ley 3/1991 art. 10, Ley 17/2001, STS 105/2016. Por qué Luna Oficio cita marcas ajenas y no se hace pasar por ellas.",
+    kicker: "Legal",
+    date: "2026-09-30",
+    keywords: [
+      "publicidad comparativa espana",
+      "ley competencia desleal articulo 10",
+      "usar marca ajena seo",
+    ],
+    toolHref: "/comparar",
+    blocks: [
+      {
+        type: "p",
+        text: "Quien busca unir PDF a menudo escribe el nombre de un conversor famoso. Captar esa búsqueda es legal si ofreces una alternativa real y no te haces pasar por ellos. No lo es si usas su marca como si fuera la tuya.",
+      },
+      {
+        type: "h2",
+        text: "Qué dice la norma",
+      },
+      {
+        type: "ul",
+        items: [
+          "Ley 3/1991 art. 10 (Ley 29/2009): la comparación pública está permitida si los servicios tienen la misma finalidad y se contrastan características esenciales, pertinentes y verificables.",
+          "No se puede presentar el servicio como imitación o réplica de una marca protegida.",
+          "No cabe engaño, denigración ni explotación de la reputación ajena (arts. 5, 7, 9, 12 y 20 LCD).",
+          "Ley 17/2001 de Marcas: el signo ajeno no puede ser nuestro nombre comercial.",
+          "STS 105/2016: usar una marca como palabra clave tiene «justa causa» si propones una alternativa genuina, sin imitación ni dilución.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Cómo lo aplicamos",
+      },
+      {
+        type: "p",
+        text: "El H1 dice que no somos ellos. El hecho comparado es uno: el archivo se queda en tu navegador o se sube. No hay logos ajenos. Las URLs van de «alternativa a…» (descriptivo), no de un producto llamado «Alternativa iLovePDF». El aviso legal lo detalla.",
+      },
+      {
+        type: "cta",
+        href: "/aviso-legal",
+        label: "Leer el aviso legal",
+        text: "Marcas de terceros y el marco de la comparativa, en claro.",
+      },
+    ],
+  },
+  {
+    slug: "comprimir-pdf-sin-mandarlo-a-la-nube",
+    title: "Comprimir PDF sin mandarlo a la nube",
+    meta: "Aligerar un PDF para el correo en el navegador. Si el conversor te pide subir el archivo, aquí no: se reescribe en este aparato.",
+    kicker: "Comprimir PDF",
+    date: "2026-09-30",
+    keywords: [
+      "comprimir pdf sin subir",
+      "aligerar pdf navegador",
+      "pdf pesado gmail",
+    ],
+    toolHref: "/comprimir-pdf",
+    blocks: [
+      {
+        type: "p",
+        text: "Un escaneo de 18 MB no entra en Gmail. La búsqueda es «comprimir PDF» o el nombre de un producto. El archivo lleva NIF, importes, a veces un DNI. Subirlo a un conversor «gratis» es un viaje que el autónomo no tiene por qué hacer.",
+      },
+      {
+        type: "h2",
+        text: "Ligera o fuerte, aquí",
+      },
+      {
+        type: "ul",
+        items: [
+          "Ligera: reescribe y mantiene el texto. Si el PDF ya estaba bien, casi no adelgaza.",
+          "Fuerte: cada página pasa a foto. Baja más. Ya no seleccionas texto.",
+          "No es Adobe Acrobat. Para un escaneo suele bastar.",
+        ],
+      },
+      {
+        type: "cta",
+        href: "/comprimir-pdf",
+        label: "Comprimir PDF",
+        text: "O, si has buscado «aligerar», la misma herramienta: /aligerar-pdf.",
+      },
+    ],
+  },
 ];
