@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { prepareInteractiveFormLayer, type PdfFormField } from "@/lib/pdf-fill";
+import { applyKnownCheckboxState, type PdfFormField } from "@/lib/pdf-fill";
 import { loadPdfjs } from "@/lib/pdfjs-worker";
 import "@/components/pdfjs-form-layer.css";
 
@@ -9,18 +9,11 @@ type PdfjsNs = Awaited<ReturnType<typeof loadPdfjs>>;
 type PdfDoc = Awaited<ReturnType<PdfjsNs["getDocument"]>["promise"]>;
 
 const linkService = {
-  externalLinkEnabled: false,
-  addLinkAttributes(element: HTMLAnchorElement, url: string) {
+  externalLinkEnabled: true,
+  addLinkAttributes(element: HTMLAnchorElement, url: string, newWindow?: boolean) {
     element.href = url;
     element.rel = "noopener noreferrer";
-    element.addEventListener(
-      "click",
-      (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      },
-      true,
-    );
+    if (newWindow) element.target = "_blank";
   },
   getDestinationHash() {
     return "#";
@@ -144,20 +137,6 @@ export function PdfFormViewer({
     let cancelled = false;
     let renderTask: { cancel: () => void; promise: Promise<unknown> } | null =
       null;
-    const blockPdfNav = (event: Event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (target.closest("a, .linkAnnotation")) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    };
-    const keepKeysInForm = (event: KeyboardEvent) => {
-      event.stopPropagation();
-    };
-    wrap.addEventListener("keydown", keepKeysInForm);
-    wrap.addEventListener("keyup", keepKeysInForm);
-    layer.addEventListener("click", blockPdfNav, true);
     void (async () => {
       const pdfjs = await loadPdfjs();
       const page = await pdf.getPage(pageIndex + 1);
@@ -197,6 +176,8 @@ export function PdfFormViewer({
 
       canvas.hidden = false;
       layer.className = "annotationLayer";
+      // Without this map, PDF.js paints every checkbox “On” appearance onto the
+      // page, so empty boxes look filled with X. Text widgets stay HTML inputs.
       const annotationCanvasMap = new Map();
       renderTask = page.render({
         canvas,
@@ -217,19 +198,6 @@ export function PdfFormViewer({
       }
       if (cancelled) return;
       const annotations = await page.getAnnotations({ intent: "display" });
-      const keepCanvas = new Set(
-        annotations
-          .filter(
-            (annotation: { checkBox?: boolean; radioButton?: boolean; fieldType?: string }) =>
-              annotation.checkBox ||
-              annotation.radioButton ||
-              annotation.fieldType === "Btn",
-          )
-          .map((annotation: { id: string }) => annotation.id),
-      );
-      for (const id of [...annotationCanvasMap.keys()]) {
-        if (!keepCanvas.has(id)) annotationCanvasMap.delete(id);
-      }
       const fieldObjects = await pdf.getFieldObjects();
       const annotationLayer = new pdfjs.AnnotationLayer({
         div: layer,
@@ -251,7 +219,7 @@ export function PdfFormViewer({
         fieldObjects: fieldObjects as never,
       });
       if (cancelled) return;
-      prepareInteractiveFormLayer(layer, pdf.annotationStorage, fields);
+      applyKnownCheckboxState(layer, pdf.annotationStorage, fields);
     })().catch((caught) => {
       if (!cancelled) {
         setError(
@@ -263,9 +231,6 @@ export function PdfFormViewer({
     });
     return () => {
       cancelled = true;
-      wrap.removeEventListener("keydown", keepKeysInForm);
-      wrap.removeEventListener("keyup", keepKeysInForm);
-      layer.removeEventListener("click", blockPdfNav, true);
       try {
         renderTask?.cancel();
       } catch {

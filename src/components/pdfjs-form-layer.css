@@ -794,42 +794,4 @@
   display: none !important;
 }
 
-.luna-pdf-page > .annotationLayer,
-.luna-pdf-page > .xfaLayer {
-  z-index: 1;
-}
-.luna-pdf-page .linkAnnotation,
-.luna-pdf-page .buttonWidgetAnnotation.pushButton,
-.luna-pdf-page .popupAnnotation,
-.luna-pdf-page .textAnnotation,
-.luna-pdf-page .squareAnnotation,
-.luna-pdf-page .fileAttachmentAnnotation {
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-.luna-pdf-page .textWidgetAnnotation,
-.luna-pdf-page .choiceWidgetAnnotation {
-  z-index: 24 !important;
-}
-.luna-pdf-page .buttonWidgetAnnotation {
-  z-index: 2 !important;
-}
-.luna-pdf-page .textWidgetAnnotation canvas,
-.luna-pdf-page .choiceWidgetAnnotation canvas {
-  display: none !important;
-  pointer-events: none !important;
-}
-.luna-pdf-page .textWidgetAnnotation.hasOwnCanvas :is(input, textarea),
-.luna-pdf-page .choiceWidgetAnnotation.hasOwnCanvas :is(input, select) {
-  display: block !important;
-}
-.luna-pdf-page .textWidgetAnnotation :is(input, textarea),
-.luna-pdf-page .choiceWidgetAnnotation :is(input, select) {
-  pointer-events: auto !important;
-  -webkit-user-select: text !important;
-     -moz-user-select: text !important;
-          user-select: text !important;
-  color: #12110f;
-}
-
 
