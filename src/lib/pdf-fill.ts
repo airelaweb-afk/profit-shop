@@ -586,7 +586,6 @@ export function applyKnownCheckboxState(
   storage: { setValue: (id: string, value: { value: boolean }) => void } | undefined,
   fields: PdfFormField[],
 ) {
-  if (!fields.length) return;
   const byName = new Map(fields.map((field) => [field.name, field]));
   for (const input of layer.querySelectorAll("input[type=checkbox]")) {
     if (!(input instanceof HTMLInputElement)) continue;
@@ -595,5 +594,50 @@ export function applyKnownCheckboxState(
     input.checked = field.checked;
     const id = input.getAttribute("data-element-id");
     if (id && storage) storage.setValue(id, { value: field.checked });
+  }
+}
+
+function isTypedEntry(
+  node: Element,
+): node is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
+  return (
+    node instanceof HTMLTextAreaElement ||
+    node instanceof HTMLSelectElement ||
+    (node instanceof HTMLInputElement &&
+      node.type !== "checkbox" &&
+      node.type !== "radio" &&
+      node.type !== "button" &&
+      node.type !== "submit")
+  );
+}
+
+/** Keep text fields above checkbox widgets and actually editable. */
+export function prepareInteractiveFormLayer(
+  layer: HTMLElement,
+  storage: { setValue: (id: string, value: { value: boolean }) => void } | undefined,
+  fields: PdfFormField[],
+) {
+  applyKnownCheckboxState(layer, storage, fields);
+  const byName = new Map(fields.map((field) => [field.name, field]));
+  for (const section of layer.querySelectorAll(
+    ".textWidgetAnnotation, .choiceWidgetAnnotation",
+  )) {
+    if (!(section instanceof HTMLElement)) continue;
+    section.classList.remove("hasOwnCanvas");
+    section.style.zIndex = "24";
+    for (const canvas of section.querySelectorAll("canvas")) {
+      if (canvas instanceof HTMLElement) canvas.style.display = "none";
+    }
+    for (const node of section.querySelectorAll("input, textarea, select")) {
+      if (!isTypedEntry(node)) continue;
+      const field = byName.get(node.name);
+      const locked = field?.readOnly === true;
+      node.disabled = locked;
+      if ("readOnly" in node) node.readOnly = locked;
+      node.style.display = "block";
+      node.style.pointerEvents = "auto";
+      node.style.userSelect = "text";
+      node.style.color = "#12110f";
+    }
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { applyKnownCheckboxState, type PdfFormField } from "@/lib/pdf-fill";
+import { prepareInteractiveFormLayer, type PdfFormField } from "@/lib/pdf-fill";
 import { loadPdfjs } from "@/lib/pdfjs-worker";
 import "@/components/pdfjs-form-layer.css";
 
@@ -196,6 +196,19 @@ export function PdfFormViewer({
       }
       if (cancelled) return;
       const annotations = await page.getAnnotations({ intent: "display" });
+      const keepCanvas = new Set(
+        annotations
+          .filter(
+            (annotation: { checkBox?: boolean; radioButton?: boolean; fieldType?: string }) =>
+              annotation.checkBox ||
+              annotation.radioButton ||
+              annotation.fieldType === "Btn",
+          )
+          .map((annotation: { id: string }) => annotation.id),
+      );
+      for (const id of [...annotationCanvasMap.keys()]) {
+        if (!keepCanvas.has(id)) annotationCanvasMap.delete(id);
+      }
       const fieldObjects = await pdf.getFieldObjects();
       const annotationLayer = new pdfjs.AnnotationLayer({
         div: layer,
@@ -217,7 +230,7 @@ export function PdfFormViewer({
         fieldObjects: fieldObjects as never,
       });
       if (cancelled) return;
-      applyKnownCheckboxState(layer, pdf.annotationStorage, fields);
+      prepareInteractiveFormLayer(layer, pdf.annotationStorage, fields);
     })().catch((caught) => {
       if (!cancelled) {
         setError(
