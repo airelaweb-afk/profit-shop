@@ -1,5 +1,10 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
 import * as fontkitNs from "@pdf-lib/fontkit";
+import {
+  extractEmbeddedFonts,
+  pickEmbeddedFont,
+} from "@/lib/pdf-embedded-fonts";
+import { loadPdfjs } from "@/lib/pdfjs-worker";
 
 function fontkit() {
   const rec = fontkitNs as unknown as {
@@ -10,11 +15,6 @@ function fontkit() {
   if (typeof rec.default?.create === "function") return rec.default;
   throw new Error("No se pudo cargar el motor de fuentes.");
 }
-import {
-  extractEmbeddedFonts,
-  pickEmbeddedFont,
-} from "@/lib/pdf-embedded-fonts";
-import { loadPdfjs } from "@/lib/pdfjs-worker";
 
 export const TINOS_FONT_URL = "/fonts/Tinos-Regular.ttf";
 

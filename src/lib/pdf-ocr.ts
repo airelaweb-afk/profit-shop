@@ -56,7 +56,7 @@ export async function ocrPdfPage(
   }
   const worker = await createWorker("spa", 1, {
     workerPath: "/tesseract/worker.min.js",
-    corePath: "/tesseract-core/tesseract-core-simd-lstm.wasm.js",
+    corePath: "/tesseract-core",
     langPath: "/tessdata",
     gzip: true,
     workerBlobURL: false,

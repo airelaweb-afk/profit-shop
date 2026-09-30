@@ -16,17 +16,19 @@ copyFileSync(workerSrc, join(publicDir, "pdf.worker.min.js"));
 console.log("Copied pdf.worker.min.mjs and pdf.worker.min.js to public/");
 
 const tessWorker = join(root, "node_modules/tesseract.js/dist/worker.min.js");
-const tessCore = join(
-  root,
-  "node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js",
-);
-if (existsSync(tessWorker) && existsSync(tessCore)) {
+const tessCoreDir = join(root, "node_modules/tesseract.js-core");
+const tessCores = [
+  "tesseract-core-simd-lstm.wasm.js",
+  "tesseract-core-lstm.wasm.js",
+  "tesseract-core-relaxedsimd-lstm.wasm.js",
+];
+if (existsSync(tessWorker) && existsSync(join(tessCoreDir, tessCores[0]))) {
   mkdirSync(join(publicDir, "tesseract"), { recursive: true });
   mkdirSync(join(publicDir, "tesseract-core"), { recursive: true });
   copyFileSync(tessWorker, join(publicDir, "tesseract/worker.min.js"));
-  copyFileSync(
-    tessCore,
-    join(publicDir, "tesseract-core/tesseract-core-simd-lstm.wasm.js"),
-  );
-  console.log("Copied Tesseract worker and SIMD LSTM core to public/");
+  for (const name of tessCores) {
+    const from = join(tessCoreDir, name);
+    if (existsSync(from)) copyFileSync(from, join(publicDir, "tesseract-core", name));
+  }
+  console.log("Copied Tesseract worker and LSTM cores to public/");
 }
