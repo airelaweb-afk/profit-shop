@@ -1,5 +1,4 @@
-export const SITE_URL =
-  "https://lightyellow-sheep-110919.hostingersite.com";
+export const SITE_URL = "https://lunaoficio.com";
 
 export const SITE_NAME = "Luna Oficio";
 

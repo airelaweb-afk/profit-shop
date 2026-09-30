@@ -85,7 +85,7 @@ Hostinger construye **GitHub `main`** (`airelaweb-afk/profit-shop`), no el Git d
 
 ### Configuración que ya entra (hPanel)
 
-Sitio: `lightyellow-sheep-110919.hostingersite.com` (plan React).
+Sitio: `lunaoficio.com` (plan React; el temporal `lightyellow-sheep-110919.hostingersite.com` debe redirigir al dominio propio).
 
 | Campo | Valor |
 | --- | --- |
