@@ -10,7 +10,7 @@ export function CookieBanner() {
   if (consent.decidedAt) return null;
 
   return (
-    <div className="no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t border-border/80 bg-background/95 p-4 shadow-lg backdrop-blur-md xl:bottom-0">
+    <div className="no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t-2 border-foreground bg-background p-4 xl:bottom-0">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <p className="text-sm text-muted-foreground">
           Usamos almacenamiento local para tu cuenta y tus archivos (no se van a

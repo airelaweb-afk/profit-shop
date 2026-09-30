@@ -1,12 +1,13 @@
 import Link from "next/link";
+import { SiteBrand } from "@/components/site-brand";
 
 export function SiteFooter() {
   return (
-    <footer className="no-print mt-auto border-t border-border/80 pb-dock">
+    <footer className="no-print mt-auto border-t-2 border-foreground/90 pb-dock">
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-heading text-xl">Luna Oficio</p>
-          <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+          <SiteBrand />
+          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             Unir PDF, comprimir imagen y el oficio del autónomo. En el
             navegador. Los datos se quedan en tu aparato.
           </p>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SiteBrand } from "@/components/site-brand";
 import { logoutAccount } from "@/lib/auth";
 import { allNavLinks } from "@/lib/nav";
 import { useSession } from "@/lib/use-session";
@@ -56,11 +57,9 @@ const extraLinks = [
 
 export function SiteHeader() {
   return (
-    <header className="no-print sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md">
+    <header className="no-print sticky top-0 z-40 border-b-2 border-foreground/90 bg-background">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
-        <Link href="/" className="font-heading text-xl tracking-tight">
-          Luna Oficio
-        </Link>
+        <SiteBrand compact />
 
         <nav className="hidden items-center gap-4 text-sm 2xl:flex">
           {allNavLinks.map((link) => (

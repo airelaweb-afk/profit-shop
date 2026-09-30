@@ -108,6 +108,11 @@ export default function HomePage() {
         <div className="mt-8">
           <AdSlot label="Las búsquedas gordas (unir, comprimir, HEIC) son gratis." />
         </div>
+        <div className="mt-10 flex h-3 max-w-xs" aria-hidden="true">
+          <span className="flex-1 bg-primary" />
+          <span className="flex-1 bg-secondary" />
+          <span className="w-10 bg-accent" />
+        </div>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">

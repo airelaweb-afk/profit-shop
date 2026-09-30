@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Archivo, DM_Mono } from "next/font/google";
 import { JsonLd } from "@/components/json-ld";
 import { MobileDock } from "@/components/mobile-dock";
 import { Providers } from "@/components/providers";
@@ -8,14 +8,17 @@ import { SiteHeader } from "@/components/site-header";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
   subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -36,6 +39,10 @@ export const metadata: Metadata = {
     "marca de agua pdf",
     "rotar pdf",
   ],
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: "/brand/mark.jpg",
+  },
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
@@ -44,11 +51,13 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     description: SITE_TAGLINE,
     url: SITE_URL,
+    images: [{ url: "/brand/wordmark.jpg", width: 1376, height: 768 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_TAGLINE,
+    images: ["/brand/wordmark.jpg"],
   },
   robots: { index: true, follow: true },
 };
@@ -57,14 +66,14 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f4ebdd",
+  themeColor: "#f4f0e6",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${fraunces.variable} ${outfit.variable} h-full antialiased`}
+      className={`${archivo.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <JsonLd />

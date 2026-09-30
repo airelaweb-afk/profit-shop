@@ -30,7 +30,12 @@ La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el 
 ## Dinero (sin servidor)
 
 - **Gratis:** unir, comprimir, firmar, imagen, oficio. Anuncios de casa si aceptas publicidad (AdSense cuando haya ID de cliente).
-- **Pro (29 €/año):** sin anuncios en este navegador + marca de agua. Pagas por Bizum o transferencia a `airelaweb@gmail.com`; te enviamos la clave `LUNA-OFICIO-PRO`. Vive en `localStorage`.
+- **Pro (29 €/año):** sin anuncios en este navegador + marca de agua. Pago con **Stripe** (Payment Link) o **Revolut**. Pega los enlaces en `src/lib/payments.ts` o en Hostinger:
+
+  `NEXT_PUBLIC_STRIPE_PAYMENT_LINK`  
+  `NEXT_PUBLIC_REVOLUT_PAYMENT_LINK`
+
+  En Stripe, pon la URL de éxito a `/precios/?pago=ok`. Tras pagar, el usuario activa la clave en este navegador.
 
 Los PDF y la cuenta **no salen** de este navegador.
 

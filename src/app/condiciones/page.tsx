@@ -24,8 +24,8 @@ export default function CondicionesPage() {
         Las herramientas de búsqueda (unir PDF, comprimir, HEIC a JPG, etc.)
         son gratis, con anuncios si aceptas cookies de publicidad. Pro quita
         anuncios en este navegador y desbloquea la marca de agua en PDF. El
-        cobro con tarjeta (Stripe) se activará cuando haya pasarela; hasta
-        entonces la clave se envía a quien pague por el canal que indiquemos en{" "}
+        cobro es con Stripe (tarjeta) o Revolut; al pagar te enviamos una clave
+        que activas en{" "}
         <Link href="/precios/">Precios</Link>. La clave vive en este aparato.
       </p>
       <h2>Uso prohibido</h2>
