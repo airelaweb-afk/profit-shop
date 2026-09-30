@@ -104,6 +104,10 @@ export const toolFaqs: Record<string, FaqItem[]> = {
       q: "¿El PDF sigue siendo un formulario al descargarlo?",
       a: "Sí. Escribimos en los campos originales y no aplanamos el formulario. Lo puedes seguir editando en Acrobat u otro visor.",
     },
+    {
+      q: "¿Por qué salían todas las casillas con una X?",
+      a: "Eso era un fallo del visor: pintaba el dibujo de «marcado» de cada casilla aunque el PDF original estuviera en blanco. Ahora solo se ve la X si tú la marcas, y al guardar no se escriben cruces que no hayas puesto.",
+    },
   ],
   "/marca-de-agua-pdf": [
     {

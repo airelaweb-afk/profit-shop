@@ -14,6 +14,7 @@ import {
   createSampleForm,
   listPdfFields,
   suggestedFillFileName,
+  type PdfFormField,
 } from "@/lib/pdf-fill";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
@@ -35,6 +36,7 @@ export function PdfFillTool() {
   const [notice, setNotice] = useState("");
   const [fileName, setFileName] = useState("");
   const [source, setSource] = useState<ArrayBuffer | null>(null);
+  const [fields, setFields] = useState<PdfFormField[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageCount, setPageCount] = useState(1);
   const [fieldCount, setFieldCount] = useState(0);
@@ -52,6 +54,7 @@ export function PdfFillTool() {
       );
     }
     const found = await listPdfFields(data.slice(0));
+    setFields(found);
     setFileName(name);
     setPageIndex(0);
     setSource(data.slice(0));
@@ -80,6 +83,7 @@ export function PdfFillTool() {
       await openBytes(await file.arrayBuffer(), file.name);
     } catch (caught) {
       setSource(null);
+      setFields([]);
       setError(
         caught instanceof Error
           ? caught.message
@@ -99,6 +103,7 @@ export function PdfFillTool() {
       await openBytes(await createSampleForm(), "ejemplo-campos.pdf");
     } catch (caught) {
       setSource(null);
+      setFields([]);
       setError(
         caught instanceof Error ? caught.message : "No se pudo crear el ejemplo.",
       );
@@ -270,6 +275,7 @@ export function PdfFillTool() {
         data={source}
         pageIndex={pageIndex}
         scale={scale}
+        fields={fields}
         onMeta={(meta) => {
           handle.current = meta;
           setPageCount(meta.pageCount);

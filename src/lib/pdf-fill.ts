@@ -579,3 +579,21 @@ export function suggestedFillFileName(originalName: string) {
   const base = originalName.replace(/\.pdf$/i, "").trim() || "formulario";
   return `${base}-relleno.pdf`;
 }
+
+/** PDF.js often treats widget /AS as the value; Adobe uses the field /V. */
+export function applyKnownCheckboxState(
+  layer: HTMLElement,
+  storage: { setValue: (id: string, value: { value: boolean }) => void } | undefined,
+  fields: PdfFormField[],
+) {
+  if (!fields.length) return;
+  const byName = new Map(fields.map((field) => [field.name, field]));
+  for (const input of layer.querySelectorAll("input[type=checkbox]")) {
+    if (!(input instanceof HTMLInputElement)) continue;
+    const field = byName.get(input.name);
+    if (!field || field.kind !== "check") continue;
+    input.checked = field.checked;
+    const id = input.getAttribute("data-element-id");
+    if (id && storage) storage.setValue(id, { value: field.checked });
+  }
+}

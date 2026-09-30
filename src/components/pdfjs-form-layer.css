@@ -785,3 +785,13 @@
   }
 }
 
+.luna-pdf-page .buttonWidgetAnnotation.checkBox:not(:has(input:checked)) [data-canvas-name="checked"],
+.luna-pdf-page .buttonWidgetAnnotation.radioButton:not(:has(input:checked)) [data-canvas-name="checked"] {
+  display: none !important;
+}
+.luna-pdf-page .buttonWidgetAnnotation.checkBox:has(input:checked) [data-canvas-name="unchecked"],
+.luna-pdf-page .buttonWidgetAnnotation.radioButton:has(input:checked) [data-canvas-name="unchecked"] {
+  display: none !important;
+}
+
+

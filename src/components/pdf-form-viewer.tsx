@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { applyKnownCheckboxState, type PdfFormField } from "@/lib/pdf-fill";
 import { loadPdfjs } from "@/lib/pdfjs-worker";
 import "@/components/pdfjs-form-layer.css";
 
@@ -40,11 +41,13 @@ export function PdfFormViewer({
   data,
   pageIndex,
   scale,
+  fields,
   onMeta,
 }: {
   data: ArrayBuffer;
   pageIndex: number;
   scale: number;
+  fields: PdfFormField[];
   onMeta: (meta: PdfFormHandle) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -132,6 +135,8 @@ export function PdfFormViewer({
     const wrap = wrapRef.current;
     if (!canvas || !layer || !wrap) return;
     let cancelled = false;
+    let renderTask: { cancel: () => void; promise: Promise<unknown> } | null =
+      null;
     void (async () => {
       const pdfjs = await loadPdfjs();
       const page = await pdf.getPage(pageIndex + 1);
@@ -171,11 +176,24 @@ export function PdfFormViewer({
 
       canvas.hidden = false;
       layer.className = "annotationLayer";
-      await page.render({
+      const annotationCanvasMap = new Map();
+      renderTask = page.render({
         canvas,
         viewport,
         annotationMode: pdfjs.AnnotationMode.ENABLE_FORMS,
-      }).promise;
+        annotationCanvasMap,
+      });
+      try {
+        await renderTask.promise;
+      } catch (caught) {
+        if (
+          cancelled ||
+          (caught instanceof Error && /cancel/i.test(caught.message))
+        ) {
+          return;
+        }
+        throw caught;
+      }
       if (cancelled) return;
       const annotations = await page.getAnnotations({ intent: "display" });
       const fieldObjects = await pdf.getFieldObjects();
@@ -184,6 +202,7 @@ export function PdfFormViewer({
         page,
         viewport,
         annotationStorage: pdf.annotationStorage,
+        annotationCanvasMap,
         linkService: linkService as never,
       } as never);
       await annotationLayer.render({
@@ -193,9 +212,12 @@ export function PdfFormViewer({
         page,
         renderForms: true,
         annotationStorage: pdf.annotationStorage,
+        annotationCanvasMap,
         linkService: linkService as never,
         fieldObjects: fieldObjects as never,
       });
+      if (cancelled) return;
+      applyKnownCheckboxState(layer, pdf.annotationStorage, fields);
     })().catch((caught) => {
       if (!cancelled) {
         setError(
@@ -207,8 +229,13 @@ export function PdfFormViewer({
     });
     return () => {
       cancelled = true;
+      try {
+        renderTask?.cancel();
+      } catch {
+        // render ya terminó
+      }
     };
-  }, [ready, pageIndex, scale]);
+  }, [ready, pageIndex, scale, fields]);
 
   return (
     <div className="overflow-auto">
