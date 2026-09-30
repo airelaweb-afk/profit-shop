@@ -185,7 +185,7 @@ export function PdfFillTool() {
 
   return (
     <div className="grid gap-4 pb-24">
-      <div className="no-print sticky top-[5.5rem] z-30 flex flex-wrap items-center gap-2 rounded-[2px] bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 backdrop-blur-md sm:top-[6.25rem] sm:p-3">
+      <div className="no-print flex flex-wrap items-center gap-2 rounded-[2px] bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 sm:p-3">
         <Button
           type="button"
           variant="outline"
