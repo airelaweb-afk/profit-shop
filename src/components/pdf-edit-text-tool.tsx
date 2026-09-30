@@ -540,16 +540,16 @@ export function PdfEditTextTool() {
         >
           Páginas
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 xl:hidden"
-          onClick={() => setStylesOpen(true)}
-        >
-          Estilos
-        </Button>
         </div>
-        <div className="shrink-0 pr-2 sm:pr-3">
+        <div className="flex shrink-0 items-center gap-1 pr-2 sm:pr-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 xl:hidden"
+            onClick={() => setStylesOpen(true)}
+          >
+            Estilos
+          </Button>
           <Button
             type="button"
             className="h-11 min-w-[7.5rem] px-3 text-sm sm:h-12 sm:min-w-[12rem] sm:px-4 sm:text-base"
