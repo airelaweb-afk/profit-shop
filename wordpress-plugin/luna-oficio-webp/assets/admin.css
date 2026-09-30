@@ -1,0 +1,84 @@
+.luna-webp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.luna-webp-card {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-left: 4px solid #ff4b1a;
+  padding: 16px 20px;
+}
+
+.luna-webp-card h2 {
+  margin-top: 0;
+}
+
+.luna-webp-ok {
+  color: #00a32a;
+  font-weight: 600;
+}
+
+.luna-webp-ko {
+  color: #d63638;
+  font-weight: 600;
+}
+
+.luna-webp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.luna-webp-progress {
+  margin-top: 12px;
+}
+
+.luna-webp-bar {
+  height: 10px;
+  background: #f0f0f1;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.luna-webp-bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #ff4b1a;
+  transition: width 0.3s ease;
+}
+
+.luna-webp-log {
+  max-height: 240px;
+  overflow: auto;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+}
+
+.luna-webp-log li {
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+.luna-webp-log li.ok {
+  color: #1d2327;
+}
+
+.luna-webp-log li.info {
+  color: #646970;
+}
+
+.luna-webp-log li.ko {
+  color: #d63638;
+}
+
+.luna-webp-foot {
+  margin-top: 24px;
+}

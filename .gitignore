@@ -21,6 +21,9 @@
 # production
 /build
 
+# generated at build time by scripts/build-wp-plugin.mjs
+/public/downloads/
+
 # misc
 .DS_Store
 *.pem

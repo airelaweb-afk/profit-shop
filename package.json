@@ -6,10 +6,11 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "node scripts/copy-pdf-worker.mjs && next dev --port 43147",
-    "build": "node scripts/copy-pdf-worker.mjs && next build --webpack && node scripts/verify-static-export.mjs",
+    "dev": "node scripts/copy-pdf-worker.mjs && node scripts/build-wp-plugin.mjs && next dev --port 43147",
+    "build": "node scripts/copy-pdf-worker.mjs && node scripts/build-wp-plugin.mjs && next build --webpack && node scripts/verify-static-export.mjs",
     "start": "npx --yes serve out -p 43147",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:plugin": "node scripts/build-wp-plugin.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
