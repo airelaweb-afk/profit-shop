@@ -1,5 +1,15 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
-import * as fontkit from "@pdf-lib/fontkit";
+import * as fontkitNs from "@pdf-lib/fontkit";
+
+function fontkit() {
+  const rec = fontkitNs as unknown as {
+    create?: (bytes: Uint8Array) => unknown;
+    default?: { create?: (bytes: Uint8Array) => unknown };
+  };
+  if (typeof rec.create === "function") return rec;
+  if (typeof rec.default?.create === "function") return rec.default;
+  throw new Error("No se pudo cargar el motor de fuentes.");
+}
 import {
   extractEmbeddedFonts,
   pickEmbeddedFont,
@@ -265,7 +275,7 @@ export async function applyTextEdits(
   const doc = await PDFDocument.load(new Uint8Array(copyBuffer(data)), {
     ignoreEncryption: true,
   });
-  doc.registerFontkit(fontkit);
+  doc.registerFontkit(fontkit() as never);
   const regular = await doc.embedFont(StandardFonts.Helvetica);
   const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
   const files = extractEmbeddedFonts(doc);
@@ -346,7 +356,7 @@ export async function applyTextEdits(
 
 export async function createSampleArticle(): Promise<ArrayBuffer> {
   const doc = await PDFDocument.create();
-  doc.registerFontkit(fontkit);
+  doc.registerFontkit(fontkit() as never);
   const tinos = await tinosBytes();
   const serif = tinos
     ? await doc.embedFont(tinos, { subset: true })
