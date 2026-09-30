@@ -60,7 +60,7 @@ export const pdfKit = [
     slug: "edit" as const,
     name: "Editar texto PDF",
     problem: "El cartel o el contrato no es un formulario y quiero cambiar una frase.",
-    does: "Pulsa el texto de la página, lo cambias y lo descargas. Un escaneo no tiene texto.",
+    does: "Pulsa el texto de la página. Un escaneo se lee con OCR aquí, sin servidor.",
     search: "editar pdf",
   },
 ] as const;

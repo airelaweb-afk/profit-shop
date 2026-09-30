@@ -67,7 +67,7 @@ const BLURB: Record<string, string> = {
   "/pdf-a-jpg": "Cada hoja, un JPG.",
   "/pdf": "Rúbrica y marcas encima.",
   "/rellenar-pdf": "Campos originales del formulario.",
-  "/editar-pdf": "Cambia frases de la página, no casillas.",
+  "/editar-pdf": "Frases de la página u OCR del escaneo.",
   "/rotar-pdf": "90, 180 o 270 grados.",
   "/numerar-pdf": "Número al pie de cada hoja.",
   "/eliminar-paginas-pdf": "Quita 2, 5-7 y descarga el resto.",

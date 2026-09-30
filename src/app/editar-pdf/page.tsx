@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Editar texto de un PDF en el navegador",
   description:
-    "Cambia frases de un PDF que tiene capa de texto, sin subirlo. No es un formulario ni un escaneo. El archivo no sale de tu aparato.",
+    "Cambia frases de un PDF en el navegador. Reutiliza la fuente embebida si hay TTF. Un escaneo se lee con OCR local, sin subir el archivo.",
   path: "/editar-pdf",
   keywords: [
     "editar pdf",
@@ -29,11 +29,11 @@ export default function EditarPdfPage() {
         Cambiar el texto que ya está en la página.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Como el «Editar texto» de iLove, pero aquí: el archivo no se sube. Hace
-        falta que el PDF tenga letras de verdad (se puedan seleccionar). Un
-        escaneo es una foto: eso no se edita, se pinta encima en Firmar PDF. Al
-        guardar tapamos la frase vieja y escribimos la nueva; no rehacemos el
-        diseño como Word.
+        Como el «Editar texto» de iLove, pero el archivo no se sube. Si hay
+        letras seleccionables, las cambiamos aquí. Si el PDF trae la fuente
+        embebida (TTF/OTF), al guardar se reutiliza. Un escaneo es una foto:
+        pulsa «Leer con OCR» y Tesseract corre en este navegador (sin servidor).
+        No es Word: no rehacemos el diseño.
       </p>
       <AdSlot label="Editar texto es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">

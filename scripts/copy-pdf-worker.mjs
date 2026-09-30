@@ -3,17 +3,30 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const src = join(root, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs");
-const destDir = join(root, "public");
-const destMjs = join(destDir, "pdf.worker.min.mjs");
-const destJs = join(destDir, "pdf.worker.min.js");
+const publicDir = join(root, "public");
+mkdirSync(publicDir, { recursive: true });
 
-if (!existsSync(src)) {
+const workerSrc = join(root, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs");
+if (!existsSync(workerSrc)) {
   console.error("Missing pdfjs-dist worker. Run npm install first.");
   process.exit(1);
 }
-
-mkdirSync(destDir, { recursive: true });
-copyFileSync(src, destMjs);
-copyFileSync(src, destJs);
+copyFileSync(workerSrc, join(publicDir, "pdf.worker.min.mjs"));
+copyFileSync(workerSrc, join(publicDir, "pdf.worker.min.js"));
 console.log("Copied pdf.worker.min.mjs and pdf.worker.min.js to public/");
+
+const tessWorker = join(root, "node_modules/tesseract.js/dist/worker.min.js");
+const tessCore = join(
+  root,
+  "node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js",
+);
+if (existsSync(tessWorker) && existsSync(tessCore)) {
+  mkdirSync(join(publicDir, "tesseract"), { recursive: true });
+  mkdirSync(join(publicDir, "tesseract-core"), { recursive: true });
+  copyFileSync(tessWorker, join(publicDir, "tesseract/worker.min.js"));
+  copyFileSync(
+    tessCore,
+    join(publicDir, "tesseract-core/tesseract-core-simd-lstm.wasm.js"),
+  );
+  console.log("Copied Tesseract worker and SIMD LSTM core to public/");
+}

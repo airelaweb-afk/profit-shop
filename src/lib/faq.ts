@@ -32,7 +32,7 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Puedo cambiar el texto de un PDF que no es formulario, como iLove?",
-    a: "Sí, en Editar texto PDF, si el archivo tiene letras seleccionables. Pulsas la frase, la cambias y al guardar se tapa la vieja y se escribe la nueva. Un escaneo no tiene texto: ahí usa Firmar PDF. No rehacemos el diseño como Word.",
+      a: "Sí, en Editar texto PDF, si el archivo tiene letras seleccionables. Pulsas la frase, la cambias y al guardar se tapa la vieja y se escribe la nueva, reutilizando la fuente TTF si venía en el PDF. Un escaneo se lee con OCR en este navegador (revisa el resultado).",
     href: "/editar-pdf",
   },
   {
@@ -121,15 +121,15 @@ export const toolFaqs: Record<string, FaqItem[]> = {
     },
     {
       q: "¿Queda la misma fuente y el mismo diseño?",
-      a: "No siempre. Tapamos la frase vieja con un recuadro blanco y escribimos encima con Helvetica. Si el original era una fuente rara o curva, se nota. Un escaneo no se edita: no hay letras, hay una foto.",
+      a: "Si el PDF trae la fuente embebida en TTF u OpenType, la reutilizamos al guardar. Helvetica de las 14 estándar no es un archivo de fuente: ahí seguimos con Helvetica. No clonamos fuentes Type1 raras ni texto en curva. El diseño no se recompone como Word: tapamos la frase vieja y escribimos encima.",
     },
     {
       q: "¿El archivo se sube, como en iLove?",
-      a: "No. Se lee y se guarda en este navegador.",
+      a: "No. El PDF se lee y se guarda en este navegador. El OCR descarga un modelo de español (unos megas) la primera vez; eso no es tu documento.",
     },
     {
-      q: "¿Es muy difícil editar cualquier PDF, como hace iLove?",
-      a: "Editar un PDF con texto seleccionable se puede hacer aquí, en el navegador. Lo difícil de iLove es otra liga: OCR de escaneos, clonar la fuente original y reescribir el dibujo interno del PDF en sus servidores. Eso no lo fingimos. Un escaneo (página-foto) no tiene letras: usa Firmar PDF y escribe encima.",
+      q: "¿Cómo leéis un escaneo sin servidor?",
+      a: "Con Tesseract en el propio navegador, página a página. Es más lento y menos fino que el OCR de iLove en sus servidores. Revisa el texto antes de guardar. Si falla, Firmar PDF deja escribir encima de la foto.",
     },
   ],
   "/marca-de-agua-pdf": [

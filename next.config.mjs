@@ -7,7 +7,7 @@ const nextConfig = {
   },
   // Keep the Next.js N badge off the phone dock during preview.
   devIndicators: false,
-  transpilePackages: ["heic-to"],
+  transpilePackages: ["heic-to", "tesseract.js"],
 };
 
 export default nextConfig;

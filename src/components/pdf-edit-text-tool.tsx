@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Download, FileUp } from "lucide-react";
+import { Download, FileUp, ScanText } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
 import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
 import { useJobGuard } from "@/components/use-job-guard";
@@ -12,10 +12,12 @@ import { bytesLabel } from "@/lib/limits";
 import {
   applyTextEdits,
   createSampleArticle,
+  createSampleScan,
   extractPdfText,
   suggestedEditName,
   type PdfTextLine,
 } from "@/lib/pdf-edit-text";
+import { ocrPdfPage } from "@/lib/pdf-ocr";
 import { loadPdfjs } from "@/lib/pdfjs-worker";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
@@ -41,6 +43,8 @@ export function PdfEditTextTool() {
   const [pageCount, setPageCount] = useState(1);
   const [active, setActive] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
+  const [fontNames, setFontNames] = useState<string[]>([]);
+  const [ocrStatus, setOcrStatus] = useState("");
 
   async function openBytes(data: ArrayBuffer, name: string) {
     if (data.byteLength > limit.pdfBytes) {
@@ -64,13 +68,18 @@ export function PdfEditTextTool() {
     setPageCount(found.pageCount);
     setSource(data.slice(0));
     setActive(null);
+    setFontNames(found.fontNames);
     if (found.lines.length === 0) {
       setNotice(
-        "Este PDF no trae texto seleccionable (escaneo o páginas-foto). No se puede editar como iLove. Usa Firmar PDF y escribe encima.",
+        "Este PDF no trae texto seleccionable (escaneo o página-foto). Puedes leer esta página con OCR en este navegador: el archivo no se sube; sí se carga un modelo de español. Es más lento y se equivoca más que iLove.",
       );
     } else {
+      const fonts =
+        found.fontNames.length > 0
+          ? ` Fuente detectada: ${found.fontNames.slice(0, 3).join(", ")}.`
+          : "";
       setNotice(
-        `${found.lines.length} línea${found.lines.length === 1 ? "" : "s"} de texto. Pulsa una y cambia el contenido. Al guardar se tapa el original y se escribe el nuevo (no es Word: no recompone el diseño).`,
+        `${found.lines.length} línea${found.lines.length === 1 ? "" : "s"} de texto.${fonts} Pulsa una y cambia el contenido. Al guardar se tapa el original y se reescribe con la fuente embebida si el PDF trae TTF/OTF; si no, Helvetica.`,
       );
     }
   }
@@ -116,9 +125,62 @@ export function PdfEditTextTool() {
     }
   }
 
+  async function openScan() {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await openBytes(await createSampleScan(), "escaneo-prueba.pdf");
+    } catch (caught) {
+      setSource(null);
+      setLines([]);
+      setError(
+        caught instanceof Error ? caught.message : "No se pudo crear el escaneo.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function runOcr() {
+    if (!source) return;
+    setBusy(true);
+    setError("");
+    setOcrStatus("Cargando OCR…");
+    try {
+      const found = await ocrPdfPage(source.slice(0), pageIndex, (info) => {
+        setOcrStatus(`${info.status} ${info.pct}%`);
+      });
+      if (found.length === 0) {
+        setError(
+          "El OCR no leyó letras en esta página. Prueba con más contraste o usa Firmar PDF y escribe encima.",
+        );
+        return;
+      }
+      setLines((current) => [
+        ...current.filter((line) => line.pageIndex !== pageIndex),
+        ...found,
+      ]);
+      setNotice(
+        `OCR: ${found.length} línea${found.length === 1 ? "" : "s"} en esta página. Revísalas: un escaneo se equivoca. Al guardar se tapa la foto en esas zonas y se escribe texto de verdad (Tinos).`,
+      );
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "No se pudo leer el escaneo. El motor OCR ocupa varios MB la primera vez.",
+      );
+    } finally {
+      setOcrStatus("");
+      setBusy(false);
+    }
+  }
+
   useEffect(() => {
-    if (!demo || source) return;
-    void openSample();
+    if (!source) {
+      if (search.get("ocr") === "1") void openScan();
+      else if (demo) void openSample();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [demo]);
 
@@ -171,13 +233,17 @@ export function PdfEditTextTool() {
     setBusy(true);
     setError("");
     try {
-      const bytes = await applyTextEdits(source, lines);
-      const blob = new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
-      const result = await saveBlob(blob, suggestedEditName(fileName));
+      const result = await applyTextEdits(source, lines);
+      const blob = new Blob([new Uint8Array(result.bytes)], {
+        type: "application/pdf",
+      });
+      const saved = await saveBlob(blob, suggestedEditName(fileName));
       setNotice(
         noticeForSave(
-          result,
-          "Guardado. El texto nuevo tapa el original. Si la fuente no coincidía, se ve Helvetica.",
+          saved,
+          result.usedEmbedded
+            ? "Guardado con la fuente que venía en el PDF (TTF/OTF embebida). Si faltaban glifos, esa línea puede haber caído a Helvetica."
+            : "Guardado. Este PDF no traía una fuente TTF reutilizable; el texto nuevo va en Helvetica.",
         ),
       );
       afterRun();
@@ -200,14 +266,14 @@ export function PdfEditTextTool() {
           dropTitle="PDF con texto"
           tapTitle="Elige el PDF del teléfono"
           cta="Elegir PDF"
-          hint="Tiene que traer texto seleccionable. Un escaneo no: ahí no hay letras, hay una foto."
+          hint="Si tiene texto seleccionable, se edita al momento. Si es un escaneo, luego pulsa «Leer con OCR»."
           busyHint="Leyendo el texto del PDF."
           onFiles={(list) => void takeFile(list[0])}
         />
         <p className="mt-4 text-center text-sm text-muted-foreground">
           ¿No tienes un PDF a mano?
         </p>
-        <div className="mt-2 flex justify-center">
+        <div className="mt-2 flex flex-wrap justify-center gap-2">
           <Button
             type="button"
             className="h-12"
@@ -215,6 +281,15 @@ export function PdfEditTextTool() {
             disabled={busy}
           >
             Probar ahora con un cartel
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-12"
+            onClick={() => void openScan()}
+            disabled={busy}
+          >
+            Probar un escaneo (OCR)
           </Button>
         </div>
         <FreeCapNote
@@ -278,6 +353,16 @@ export function PdfEditTextTool() {
         ) : null}
         <Button
           type="button"
+          variant="outline"
+          className="h-11"
+          onClick={() => void runOcr()}
+          disabled={busy}
+        >
+          <ScanText />
+          {ocrStatus || "Leer con OCR"}
+        </Button>
+        <Button
+          type="button"
           className="ml-auto h-11"
           onClick={() => void download()}
           disabled={busy || !dirty || lines.length === 0}
@@ -319,7 +404,9 @@ export function PdfEditTextTool() {
                   width: `${Math.max(line.widthPct, 0.04) * 100}%`,
                   height: `${Math.max(line.heightPct, 0.012) * 100}%`,
                   fontSize: `${line.fontSize * scale}px`,
-                  fontFamily: "Helvetica, Arial, sans-serif",
+                  fontFamily: /tinos|times|serif/i.test(line.fontHint)
+                    ? "Tinos, Times New Roman, serif"
+                    : "Helvetica, Arial, sans-serif",
                   fontWeight: line.bold ? 700 : 400,
                 }}
               >
@@ -361,6 +448,8 @@ export function PdfEditTextTool() {
             <Link href="/pdf/" className="text-primary underline-offset-4 hover:underline">
               Ir a Firmar PDF
             </Link>
+          ) : fontNames.length ? (
+            <span> Fuentes: {fontNames.slice(0, 4).join(", ")}.</span>
           ) : null}
         </p>
       ) : null}

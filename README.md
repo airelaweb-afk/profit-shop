@@ -19,6 +19,7 @@ En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Documentos), botones gr
 - **Parte de horas** (`/horas`): pegas la semana y sacas un papel para el cliente o el jefe.
 - **Relación de gastos** (`/gastos`): pegas los tickets y sale base + IVA para el gestor.
 - **Rellenar y firmar PDF** (`/pdf`): subes el PDF (modelo 145 u otro), marcas casillas, escribes, firmas y descargas. El archivo no se sube a ningún servidor.
+- **Editar texto PDF** (`/editar-pdf`): cambia frases de la página. Si el PDF trae TTF/OTF embebida, se reutiliza. Un escaneo se lee con OCR (Tesseract) **en el navegador**, sin servidor.
 - **Unir / dividir / comprimir PDF** (`/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`): las búsquedas gordas. En el navegador.
 - **JPG a PDF** y **PDF a JPG** (`/jpg-a-pdf`, `/pdf-a-jpg`): fotos ↔ hojas.
 - **Rotar, numerar y eliminar páginas PDF** (`/rotar-pdf`, `/numerar-pdf`, `/eliminar-paginas-pdf`).

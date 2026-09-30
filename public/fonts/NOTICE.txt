@@ -1,0 +1,4 @@
+Tinos Regular (Apache License 2.0)
+Chrome OS core fonts / Croscore.
+Metric-compatible with Times New Roman.
+https://github.com/googlefonts/tinos
