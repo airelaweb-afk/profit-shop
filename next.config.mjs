@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 /** @type {import("next").NextConfig} */
-=======
-/** @type {import('next').NextConfig} */
->>>>>>> 35e3a9e (Match the Hostinger deploy: webpack build and next.config.mjs.)
 const nextConfig = {
   output: "export",
   trailingSlash: true,
