@@ -127,6 +127,10 @@ export const toolFaqs: Record<string, FaqItem[]> = {
       q: "¿El archivo se sube, como en iLove?",
       a: "No. Se lee y se guarda en este navegador.",
     },
+    {
+      q: "¿Es muy difícil editar cualquier PDF, como hace iLove?",
+      a: "Editar un PDF con texto seleccionable se puede hacer aquí, en el navegador. Lo difícil de iLove es otra liga: OCR de escaneos, clonar la fuente original y reescribir el dibujo interno del PDF en sus servidores. Eso no lo fingimos. Un escaneo (página-foto) no tiene letras: usa Firmar PDF y escribe encima.",
+    },
   ],
   "/marca-de-agua-pdf": [
     {

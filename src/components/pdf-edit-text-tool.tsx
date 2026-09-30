@@ -140,8 +140,8 @@ export function PdfEditTextTool() {
       }
       const page = await pdf.getPage(pageIndex + 1);
       const viewport = page.getViewport({ scale: 1.15 });
-      wrap.style.width = `${Math.floor(viewport.width)}px`;
-      wrap.style.height = `${Math.floor(viewport.height)}px`;
+      wrap.style.width = `${viewport.width}px`;
+      wrap.style.height = `${viewport.height}px`;
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
       canvas.style.width = `${viewport.width}px`;
@@ -290,7 +290,7 @@ export function PdfEditTextTool() {
       <p className="no-print text-sm text-muted-foreground">
         {fileName}
         {lines.length ? ` · ${lines.length} líneas` : ""}
-        . Pulsa el texto azul para editarlo.
+        . Pulsa una línea para escribir encima.
       </p>
 
       <div className="overflow-auto">
@@ -300,33 +300,39 @@ export function PdfEditTextTool() {
         >
           <canvas ref={canvasRef} className="block" />
           {pageLines.map((line) => {
-            const left = (line.x / line.pageWidth) * 100;
-            const width = (line.width / line.pageWidth) * 100;
-            const height = (line.height / line.pageHeight) * 100;
-            const top =
-              ((line.pageHeight - line.y - line.height) / line.pageHeight) * 100;
             const selected = active === line.id;
+            const changed = line.text !== line.original;
+            const covering = selected || changed;
             return (
               <label
                 key={line.id}
-                className={`absolute cursor-text ${
+                className={`absolute cursor-text overflow-hidden ${
                   selected
                     ? "z-20 ring-2 ring-primary"
-                    : "z-10 bg-[rgba(0,54,255,0.12)] hover:bg-[rgba(0,54,255,0.2)]"
+                    : changed
+                      ? "z-10 ring-1 ring-primary/40"
+                      : "z-10 bg-[rgba(0,90,255,0.14)] hover:bg-[rgba(0,90,255,0.24)]"
                 }`}
                 style={{
-                  left: `${left}%`,
-                  top: `${top}%`,
-                  width: `${Math.max(width, 4)}%`,
-                  height: `${Math.max(height, 1.8)}%`,
-                  fontSize: `${Math.max(10, line.fontSize * scale)}px`,
+                  left: `${line.leftPct * 100}%`,
+                  top: `${line.topPct * 100}%`,
+                  width: `${Math.max(line.widthPct, 0.04) * 100}%`,
+                  height: `${Math.max(line.heightPct, 0.012) * 100}%`,
+                  fontSize: `${line.fontSize * scale}px`,
+                  fontFamily: "Helvetica, Arial, sans-serif",
+                  fontWeight: line.bold ? 700 : 400,
                 }}
               >
                 <span className="sr-only">Editar texto</span>
                 <textarea
                   value={line.text}
                   rows={1}
-                  className="h-full w-full resize-none border-0 bg-transparent p-0 leading-[1.15] text-[#12110f] outline-none"
+                  spellCheck={false}
+                  className={`h-full w-full resize-none border-0 p-0 leading-none outline-none ${
+                    covering
+                      ? "bg-white text-[#12110f]"
+                      : "bg-transparent text-transparent caret-transparent"
+                  }`}
                   onFocus={() => setActive(line.id)}
                   onChange={(event) => {
                     const value = event.target.value;

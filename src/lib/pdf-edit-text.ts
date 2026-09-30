@@ -11,8 +11,14 @@ export type PdfTextLine = {
   width: number;
   height: number;
   fontSize: number;
+  bold: boolean;
   pageWidth: number;
   pageHeight: number;
+  /** Viewport fractions (top-left origin) so the overlay matches the painted page. */
+  leftPct: number;
+  topPct: number;
+  widthPct: number;
+  heightPct: number;
 };
 
 export type PdfTextExtract = {
@@ -49,9 +55,41 @@ type RawItem = {
   width: number;
   height: number;
   fontSize: number;
+  bold: boolean;
   pageWidth: number;
   pageHeight: number;
+  leftPct: number;
+  topPct: number;
+  widthPct: number;
+  heightPct: number;
 };
+
+function isBoldFont(name: string) {
+  return /bold|black|heavy|semibold/i.test(name);
+}
+
+function overlayFractions(
+  viewport: { width: number; height: number; convertToViewportPoint: (x: number, y: number) => number[] },
+  x: number,
+  y: number,
+  width: number,
+  fontSize: number,
+) {
+  const ascent = fontSize * 0.75;
+  const descent = fontSize * 0.22;
+  const [left] = viewport.convertToViewportPoint(x, y);
+  const [right] = viewport.convertToViewportPoint(x + Math.max(width, 4), y);
+  const [, top] = viewport.convertToViewportPoint(x, y + ascent);
+  const [, bottom] = viewport.convertToViewportPoint(x, y - descent);
+  const pxLeft = Math.min(left, right);
+  const pxTop = Math.min(top, bottom);
+  return {
+    leftPct: pxLeft / viewport.width,
+    topPct: pxTop / viewport.height,
+    widthPct: Math.abs(right - left) / viewport.width,
+    heightPct: Math.abs(bottom - top) / viewport.height,
+  };
+}
 
 function groupLines(items: RawItem[]): PdfTextLine[] {
   const sorted = [...items].sort(
@@ -91,6 +129,14 @@ function groupLines(items: RawItem[]): PdfTextLine[] {
       const fontSize =
         parts.reduce((sum, part) => sum + part.fontSize, 0) / parts.length;
       const first = parts[0];
+      const leftPct = Math.min(...parts.map((part) => part.leftPct));
+      const topPct = Math.min(...parts.map((part) => part.topPct));
+      const rightPct = Math.max(
+        ...parts.map((part) => part.leftPct + part.widthPct),
+      );
+      const bottomPct = Math.max(
+        ...parts.map((part) => part.topPct + part.heightPct),
+      );
       return {
         id: `p${first.pageIndex}-l${index}`,
         pageIndex: first.pageIndex,
@@ -101,8 +147,13 @@ function groupLines(items: RawItem[]): PdfTextLine[] {
         width: Math.max(8, right - x),
         height: Math.max(fontSize * 0.85, top - y),
         fontSize,
+        bold: parts.some((part) => part.bold),
         pageWidth: first.pageWidth,
         pageHeight: first.pageHeight,
+        leftPct,
+        topPct,
+        widthPct: Math.max(0.04, rightPct - leftPct),
+        heightPct: Math.max(0.01, bottomPct - topPct),
       };
     })
     .filter((line) => line.text.length > 0);
@@ -123,6 +174,7 @@ export async function extractPdfText(data: ArrayBuffer): Promise<PdfTextExtract>
     const view = page.view;
     const pageWidth = view[2] - view[0];
     const pageHeight = view[3] - view[1];
+    const viewport = page.getViewport({ scale: 1 });
     pages.push({ width: pageWidth, height: pageHeight });
     const content = await page.getTextContent();
     for (const item of content.items) {
@@ -138,6 +190,11 @@ export async function extractPdfText(data: ArrayBuffer): Promise<PdfTextExtract>
         11;
       const width = Math.max(item.width || fontSize * str.length * 0.5, 4);
       const height = Math.max(item.height || fontSize, fontSize * 0.8);
+      const fontName =
+        "fontName" in item && typeof item.fontName === "string"
+          ? item.fontName
+          : "";
+      const family = content.styles?.[fontName]?.fontFamily ?? "";
       items.push({
         pageIndex: number - 1,
         str: str.trim(),
@@ -146,8 +203,10 @@ export async function extractPdfText(data: ArrayBuffer): Promise<PdfTextExtract>
         width,
         height,
         fontSize,
+        bold: isBoldFont(fontName) || isBoldFont(family),
         pageWidth,
         pageHeight,
+        ...overlayFractions(viewport, x, y, width, fontSize),
       });
     }
   }
@@ -166,23 +225,27 @@ export async function applyTextEdits(
   const doc = await PDFDocument.load(new Uint8Array(copyBuffer(data)), {
     ignoreEncryption: true,
   });
-  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const regular = await doc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
   const pages = doc.getPages();
   for (const line of lines) {
     if (line.text === line.original) continue;
     const page = pages[line.pageIndex];
     if (!page) continue;
     const next = forWinAnsi(line.text).slice(0, 600);
-    const size = Math.max(7, Math.min(line.fontSize || 11, 22));
+    const size = Math.max(7, Math.min(line.fontSize || 11, 28));
+    const font = line.bold ? boldFont : regular;
     const writtenWidth = font.widthOfTextAtSize(next || " ", size);
+    const ascent = size * 0.75;
+    const descent = size * 0.25;
     page.drawRectangle({
       x: Math.max(0, line.x - 1),
-      y: Math.max(0, line.y - 1.2),
+      y: Math.max(0, line.y - descent),
       width: Math.min(
         line.pageWidth - line.x + 1,
-        Math.max(line.width, writtenWidth) + 3,
+        Math.max(line.width, writtenWidth) + 4,
       ),
-      height: Math.max(line.height, size) + 2.4,
+      height: ascent + descent + 1.2,
       color: rgb(1, 1, 1),
     });
     if (!next.trim()) continue;

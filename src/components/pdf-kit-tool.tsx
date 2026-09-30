@@ -40,7 +40,7 @@ function acceptFor(kind: PdfKitSlug) {
   return "application/pdf,.pdf";
 }
 
-function copyFor(kind: Exclude<PdfKitSlug, "sign">) {
+function copyFor(kind: Exclude<PdfKitSlug, "sign" | "fill" | "edit">) {
   switch (kind) {
     case "merge":
       return {
@@ -82,7 +82,7 @@ function copyFor(kind: Exclude<PdfKitSlug, "sign">) {
   }
 }
 
-export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign"> }) {
+export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill" | "edit"> }) {
   const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
