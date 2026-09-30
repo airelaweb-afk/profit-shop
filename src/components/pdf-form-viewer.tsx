@@ -9,11 +9,18 @@ type PdfjsNs = Awaited<ReturnType<typeof loadPdfjs>>;
 type PdfDoc = Awaited<ReturnType<PdfjsNs["getDocument"]>["promise"]>;
 
 const linkService = {
-  externalLinkEnabled: true,
-  addLinkAttributes(element: HTMLAnchorElement, url: string, newWindow?: boolean) {
+  externalLinkEnabled: false,
+  addLinkAttributes(element: HTMLAnchorElement, url: string) {
     element.href = url;
     element.rel = "noopener noreferrer";
-    if (newWindow) element.target = "_blank";
+    element.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      },
+      true,
+    );
   },
   getDestinationHash() {
     return "#";
@@ -137,6 +144,20 @@ export function PdfFormViewer({
     let cancelled = false;
     let renderTask: { cancel: () => void; promise: Promise<unknown> } | null =
       null;
+    const blockPdfNav = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("a, .linkAnnotation")) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    const keepKeysInForm = (event: KeyboardEvent) => {
+      event.stopPropagation();
+    };
+    wrap.addEventListener("keydown", keepKeysInForm);
+    wrap.addEventListener("keyup", keepKeysInForm);
+    layer.addEventListener("click", blockPdfNav, true);
     void (async () => {
       const pdfjs = await loadPdfjs();
       const page = await pdf.getPage(pageIndex + 1);
@@ -242,6 +263,9 @@ export function PdfFormViewer({
     });
     return () => {
       cancelled = true;
+      wrap.removeEventListener("keydown", keepKeysInForm);
+      wrap.removeEventListener("keyup", keepKeysInForm);
+      layer.removeEventListener("click", blockPdfNav, true);
       try {
         renderTask?.cancel();
       } catch {

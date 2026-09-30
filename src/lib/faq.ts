@@ -112,6 +112,10 @@ export const toolFaqs: Record<string, FaqItem[]> = {
       q: "Puedo marcar las X pero no escribir en las líneas.",
       a: "En muchos modelos las cruces y el texto son campos distintos y a veces se pisan. El visor deja las casillas de texto encima para que puedas escribir; las X solo en los cuadraditos.",
     },
+    {
+      q: "Al escribir se me abre otra pestaña.",
+      a: "El PDF trae enlaces invisibles encima de las casillas (ayuda, sede electrónica). Al pulsar para escribir el navegador seguía el enlace. En Rellenar PDF esos enlaces no se abren: el clic va al campo.",
+    },
   ],
   "/marca-de-agua-pdf": [
     {

@@ -184,10 +184,7 @@ export function PdfFillTool() {
   }
 
   return (
-    <form
-      className="grid gap-4 pb-24"
-      onSubmit={(event) => event.preventDefault()}
-    >
+    <div className="grid gap-4 pb-24">
       <div className="no-print sticky top-[5.5rem] z-30 flex flex-wrap items-center gap-2 rounded-[2px] bg-card/95 p-2 shadow-sm ring-1 ring-foreground/10 backdrop-blur-md sm:top-[6.25rem] sm:p-3">
         <Button
           type="button"
@@ -300,6 +297,6 @@ export function PdfFillTool() {
         </p>
       ) : null}
       {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
-    </form>
+    </div>
   );
 }

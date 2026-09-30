@@ -798,6 +798,15 @@
 .luna-pdf-page > .xfaLayer {
   z-index: 1;
 }
+.luna-pdf-page .linkAnnotation,
+.luna-pdf-page .buttonWidgetAnnotation.pushButton,
+.luna-pdf-page .popupAnnotation,
+.luna-pdf-page .textAnnotation,
+.luna-pdf-page .squareAnnotation,
+.luna-pdf-page .fileAttachmentAnnotation {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
 .luna-pdf-page .textWidgetAnnotation,
 .luna-pdf-page .choiceWidgetAnnotation {
   z-index: 24 !important;
