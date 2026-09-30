@@ -77,6 +77,8 @@ Lo que falle en PDF o en el móvil, se corrige. Siguiente atasco concreto (albar
 
 Hecho (móvil): barra inferior, textos “elegir del teléfono”, recorte sin mover la página, botones de 44 px, guardar con compartir en iPhone.
 
+Hostinger (chat Tienda Luna Oficio): plan React, GitHub `main`, `out/`, `next build --webpack`, `next.config.mjs`. No Turbopack en el deploy.
+
 ### Paso 10 — Que Google las encuentre
 
 Una URL, un título, un problema. Textos para búsquedas reales.

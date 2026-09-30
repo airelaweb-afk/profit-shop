@@ -47,28 +47,28 @@ Eso genera la carpeta `out/` (HTML/CSS/JS estáticos) y la sirve en el puerto 43
 
 El plan **React** de Hostinger no ejecuta un servidor Node (`next start`). Sirve archivos estáticos. Esta web ya está configurada para eso: `npm run build` deja todo en `out/`.
 
-### Opción A — GitHub (recomendada)
+Hostinger construye **GitHub `main`** (`airelaweb-afk/profit-shop`), no el Git de Cursor. Cada `git push` a `main` en GitHub vuelve a publicar.
 
-Necesitas el código en un repositorio de GitHub. Si todavía no lo tienes, créalo desde Cursor (el botón de crear repo) y después:
+### Configuración que ya entra (hPanel)
 
-1. En hPanel: **Websites → Add website → Node.js Web App**.
-2. **Import Git repository** y conecta GitHub.
-3. Elige este repo y la rama `main`.
-4. Revisa (y corrige si hace falta) estos campos:
+Sitio: `lightyellow-sheep-110919.hostingersite.com` (plan React).
 
 | Campo | Valor |
 | --- | --- |
-| Application type | `next` (o React, si te lo ofrece así el plan) |
-| Node.js | 20 o 22 |
-| Build script | `build` |
+| Framework preset | React (no Next.js si eso pone `.next`) |
+| Branch | `main` |
+| Node.js | 20, 22 o 24 (`engines`: `>=20`) |
+| Root directory | `./` |
+| Build command | `npm run build` |
+| Package manager | `npm` |
 | Output directory | `out` |
 | Entry file | vacío |
 
-Si Hostinger detecta Next.js y pone `out` como `.next` o rellena un entry file, cámbialo: con el plan React tiene que quedar **`out`** y **sin** entry file. Si dejas `.next`, la web sale en blanco o falla al arrancar.
+El `build` del repo ya hace `next build --webpack` (en Hostinger Turbopack se cae al compilar el CSS). No hace falta poner `--webpack` en hPanel.
 
-Si el build de Next termina bien pero Hostinger dice «No output directory found», pulsa **Redistribuir** (la carpeta `out/` ya no está en `.gitignore`). Si sigue fallando, cambia el preajuste del marco de Next.js a **React** y deja el directorio de salida en `out`.
+Si Hostinger detecta Next.js y pone `out` como `.next` o rellena un entry file, cámbialo. Si dejas `.next`, la web sale en blanco.
 
-5. Pulsa **Deploy**. Cada `git push` a `main` vuelve a publicar.
+Si el build de Next termina bien pero Hostinger dice «No output directory found», pulsa **Redistribuir**. No vuelvas a ignorar `out/` en `.gitignore`.
 
 ### Opción B — subir `out/` a mano
 
