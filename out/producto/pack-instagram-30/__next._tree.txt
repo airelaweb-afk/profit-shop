@@ -1,4 +1,0 @@
-:HL["/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-:HL["/_next/static/media/af4bf8399d1aacdf-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-:HL["/_next/static/css/89a3ba37420d02ee.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"producto","param":null,"prefetchHints":4160,"slots":{"children":{"name":"slug","param":{"type":"d","key":"pack-instagram-30","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"cYkLs63BBG9X-yay7vA2q"}

@@ -1,5 +1,0 @@
-User-Agent: *
-Allow: /
-
-Host: https://lightyellow-sheep-110919.hostingersite.com
-Sitemap: https://lightyellow-sheep-110919.hostingersite.com/sitemap.xml
