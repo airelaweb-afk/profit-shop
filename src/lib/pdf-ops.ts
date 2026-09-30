@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import { zipSync } from "fflate";
 import { MAX_PDF_BYTES } from "@/lib/pdf-fill";
+import { loadPdfjs } from "@/lib/pdfjs-worker";
 import { saveBytes } from "@/lib/save-file";
 
 export { MAX_PDF_BYTES };
@@ -192,8 +193,7 @@ async function renderPdfPages(
   data: ArrayBuffer,
   options: { scale: number; type: "image/jpeg" | "image/png"; quality: number },
 ) {
-  const pdfjs = await import("pdfjs-dist");
-  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+  const pdfjs = await loadPdfjs();
   const task = pdfjs.getDocument({
     data: new Uint8Array(copyBuffer(data)),
     useWasm: false,

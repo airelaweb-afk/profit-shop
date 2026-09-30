@@ -28,6 +28,7 @@ const required = [
   join(dir, "sitemap.xml"),
   join(dir, "robots.txt"),
   join(dir, "pdf.worker.min.mjs"),
+  join(dir, "pdf.worker.min.js"),
   join(dir, "favicon.svg"),
   join(dir, "brand", "wordmark.jpg"),
 ];

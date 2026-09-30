@@ -142,6 +142,8 @@ El plan **React** de Hostinger no ejecuta un servidor Node (`next start`). Sirve
 
 Hostinger construye **GitHub `main`** (`airelaweb-afk/profit-shop`), no el Git de Cursor. Cada `git push` a `main` en GitHub vuelve a publicar.
 
+PDF.js necesita `pdf.worker.min.js` (no `.mjs`): Hostinger sirve `.mjs` como `text/plain` y el navegador bloquea el worker al firmar o convertir PDF. El `out/.htaccess` también declara el MIME de `.mjs` por si acaso.
+
 ### Configuración que ya entra (hPanel)
 
 Sitio: `lunaoficio.com` (plan React; el temporal `lightyellow-sheep-110919.hostingersite.com` debe redirigir al dominio propio).

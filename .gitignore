@@ -24,6 +24,9 @@
 # generated at build time by scripts/build-wp-plugin.mjs
 /public/downloads/
 
+# duplicate of pdf.worker.min.mjs for Hostinger MIME (scripts/copy-pdf-worker.mjs)
+/public/pdf.worker.min.js
+
 # misc
 .DS_Store
 *.pem

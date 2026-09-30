@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 import { bytesLabel } from "@/lib/limits";
+import { loadPdfjs } from "@/lib/pdfjs-worker";
 import {
   TEXT_SIZE,
   clickToPdfPoint,
@@ -242,8 +243,7 @@ export function PdfSignTool() {
   }, [loaded]);
 
   const renderPages = useCallback(async (data: ArrayBuffer) => {
-    const pdfjs = await import("pdfjs-dist");
-    pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+    const pdfjs = await loadPdfjs();
     const task = pdfjs.getDocument({
       data: new Uint8Array(data.slice(0)),
       useWasm: false,

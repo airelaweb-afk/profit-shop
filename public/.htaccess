@@ -1,4 +1,7 @@
 Options -MultiViews
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+</IfModule>
 RewriteEngine On
 
 RewriteCond %{REQUEST_FILENAME} -f [OR]
