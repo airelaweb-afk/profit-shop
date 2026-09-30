@@ -2,7 +2,12 @@
 
 Herramientas de administración para **autónomos, secretaría y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (presupuestos, cobros, horas, gastos, firmar PDF) y se puede encontrar en Google.
 
-Las herramientas piden **iniciar sesión**. La cuenta se guarda en este navegador (`localStorage`, contraseña con PBKDF2). No hay base de datos ni servidor propio: si cambias de teléfono u ordenador, hay que crear la cuenta otra vez. Los PDF no se suben a ningún sitio.
+Las herramientas piden **iniciar sesión**. Hay dos modos, y la web elige solo según haya o no variables de Supabase:
+
+- **Modo nube (recomendado):** con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`, las cuentas viven en Supabase (Postgres en la UE). Valen en cualquier aparato, hay «recuperar contraseña», Stripe activa Pro solo y el panel `/admin` ve todos los registros. Ver [Supabase](#supabase-cuentas-pro-y-panel-con-base-de-datos).
+- **Modo local (sin variables):** la cuenta se guarda en este navegador (`localStorage`, PBKDF2). No hay base de datos: si cambias de teléfono, hay que crearla otra vez.
+
+En los dos modos, **los PDF, fotos y presupuestos no se suben a ningún sitio**: se procesan en el navegador.
 
 En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Oficio), botones grandes, recorte que no mueve la página, y al guardar se abre el menú de compartir (Guardar en Archivos).
 
@@ -56,6 +61,57 @@ Sin servidor, el panel vive en **tu** navegador (contraseña propia, PBKDF2). De
 Para que la web acepte tus claves firmadas: `/admin` → Claves → copiar clave pública → Hostinger, variable `NEXT_PUBLIC_PRO_PUBLIC_KEY` → Redistribuir. Hasta entonces la web solo acepta la clave maestra de pruebas `LUNA-OFICIO-PRO`. Revocaciones: `NEXT_PUBLIC_PRO_REVOKED=SERIAL1,SERIAL2`.
 
 Descarga la copia del panel cada vez que des un alta: si borras datos del navegador, se pierde el libro.
+
+Con Supabase configurado, `/admin` cambia a **modo nube**: entras con tu cuenta normal (el correo de `admin_allowlist` es administrador automáticamente) y ves registros reales, socios, cobros de Stripe, notas compartidas y ajustes. La pestaña Claves sigue ahí como plan B para regalar Pro a alguien sin cuenta.
+
+## Supabase: cuentas, Pro y panel con base de datos
+
+Todo lo que necesita Supabase está en la carpeta `supabase/` y se despliega desde este repositorio:
+
+| Ruta | Qué es |
+| --- | --- |
+| `supabase/migrations/*.sql` | Esquema: `profiles`, `memberships` (cobros), `admin_notes`, `admin_allowlist`, RLS, triggers y RPC del panel |
+| `supabase/functions/stripe-webhook/` | Edge Function: recibe el pago de Stripe y activa Pro |
+| `supabase/config.toml` | Config de la CLI (auth, redirects, `verify_jwt=false` para el webhook) |
+| `.github/workflows/supabase.yml` | Despliega migraciones y funciones en cada push a `main` si hay secretos |
+
+### 1. Crear el proyecto
+
+Supabase → **New project** (región **EU**, plan Free). Anota: **Project URL**, **anon key** (Project Settings → API), **Project ref** (la parte `xxxx` de `xxxx.supabase.co`) y la **contraseña de la base de datos**.
+
+En **Authentication → URL Configuration**: Site URL `https://lunaoficio.com`, Redirect URLs `https://lunaoficio.com/cuenta/` y `https://lunaoficio.com/entrar/`. En **Authentication → Providers → Email** decide si quieres «Confirm email» (más seguro; el usuario confirma por correo antes de entrar).
+
+### 2. Conectar GitHub (dos formas, vale cualquiera)
+
+- **Integración de Supabase con GitHub** (Project Settings → Integrations → GitHub): elige este repo, directorio `supabase`, rama `main`. Cada push aplica las migraciones y despliega las funciones.
+- **GitHub Actions** (ya incluido): en GitHub → Settings → Secrets and variables → Actions añade `SUPABASE_ACCESS_TOKEN` (supabase.com/dashboard/account/tokens), `SUPABASE_PROJECT_ID` (el ref) y `SUPABASE_DB_PASSWORD`. El flujo `Supabase · migraciones y funciones` hace `db push` y `functions deploy`.
+
+Sin ninguna de las dos, también vale pegar el contenido de `supabase/migrations/*.sql` en el **SQL Editor** de Supabase y desplegar la función con la CLI (`supabase functions deploy stripe-webhook`).
+
+### 3. Stripe automático
+
+1. Stripe → Developers → Webhooks → **Add endpoint**: `https://<ref>.supabase.co/functions/v1/stripe-webhook`. Eventos: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`. Copia el **signing secret** (`whsec_…`).
+2. Supabase → Edge Functions → **Secrets**: `STRIPE_SECRET_KEY` (`sk_live_…`) y `STRIPE_WEBHOOK_SECRET` (`whsec_…`). Opcional `PRO_MONTHS` (12).
+3. En el Payment Link de Stripe, redirige tras el pago a `https://lunaoficio.com/precios/?pago=ok`.
+
+La web abre el Payment Link con `prefilled_email` y `client_reference_id` (id de la cuenta), así el webhook enlaza el cobro con el usuario aunque pague con otro correo. Si el comprador no tiene cuenta, el cobro queda «sin cuenta» y se activa solo cuando se registre con ese correo.
+
+### 4. Hostinger
+
+En el sitio de Hostinger, variables de entorno:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
+NEXT_PUBLIC_STRIPE_PAYMENT_LINK=https://buy.stripe.com/...
+NEXT_PUBLIC_REVOLUT_PAYMENT_LINK=https://checkout.revolut.com/pay/...
+```
+
+Redistribuir. Sin las dos primeras, la web sigue funcionando en modo local.
+
+### Qué guarda la base de datos
+
+Solo correo, nombre, fecha de alta, último acceso y los cobros (método, importe, periodo). **Ningún archivo**. Por el RGPD: región UE, aviso de privacidad actualizado y el DPA de Supabase aceptado en el dashboard.
 
 El orden de trabajo está en [`PLAN.md`](PLAN.md): un paso, se prueba en Hostinger, luego el siguiente.
 
