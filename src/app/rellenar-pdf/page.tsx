@@ -28,10 +28,9 @@ export default function RellenarPdfPage() {
         Los campos de verdad. No texto encima.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Si el PDF nació con casillas (Hacienda, Word con controles, Acrobat),
-        las rellenas en su sitio y el archivo sigue siendo un formulario. Un
-        escaneo o un PDF «impreso» no tiene campos: no los inventamos. Para
-        marcar encima, Firmar PDF.
+        Si el PDF nació con casillas, las ves y las rellenas en su sitio (las
+        mismas que en Adobe). Un escaneo no tiene campos: no los inventamos.
+        Para marcar encima, Firmar PDF.
       </p>
       <AdSlot label="Rellenar campos es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">
