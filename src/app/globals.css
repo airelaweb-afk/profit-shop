@@ -103,6 +103,9 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+  body:has([data-luna-studio]) .luna-cookie-banner {
+    display: none;
+  }
   html {
     @apply font-sans;
   }

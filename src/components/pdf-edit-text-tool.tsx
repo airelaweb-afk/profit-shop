@@ -124,7 +124,7 @@ export function PdfEditTextTool() {
     setLines(found.lines);
     setPageCount(found.pageCount);
     setSource(data.slice(0));
-    setActive(null);
+    setActive(found.lines.find((line) => line.pageIndex === 0)?.id ?? null);
     setFontNames(found.fontNames);
     if (found.lines.length === 0) {
       setNotice(
@@ -466,8 +466,12 @@ export function PdfEditTextTool() {
   );
 
   return (
-    <div className="fixed inset-x-0 top-14 z-[45] flex flex-col bg-[#e8e4dc] sm:top-16 bottom-0">
-      <div className="flex h-12 shrink-0 items-center gap-1 overflow-x-auto border-b border-foreground/10 bg-card px-2 sm:h-14 sm:px-3">
+    <div
+      data-luna-studio
+      className="fixed inset-x-0 top-14 z-[45] flex flex-col bg-[#e8e4dc] sm:top-16 bottom-0"
+    >
+      <div className="flex h-12 shrink-0 items-center gap-1 border-b border-foreground/10 bg-card sm:h-14">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto px-2 sm:px-3">
         <Button
           type="button"
           variant="ghost"
@@ -528,26 +532,27 @@ export function PdfEditTextTool() {
           <FileUp />
           <span className="hidden sm:inline">Cambiar</span>
         </Button>
-        <div className="ml-auto flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 lg:hidden"
+          onClick={() => setPagesOpen(true)}
+        >
+          Páginas
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 xl:hidden"
+          onClick={() => setStylesOpen(true)}
+        >
+          Estilos
+        </Button>
+        </div>
+        <div className="shrink-0 pr-2 sm:pr-3">
           <Button
             type="button"
-            variant="outline"
-            className="h-10 lg:hidden"
-            onClick={() => setPagesOpen(true)}
-          >
-            Páginas
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 xl:hidden"
-            onClick={() => setStylesOpen(true)}
-          >
-            Estilos
-          </Button>
-          <Button
-            type="button"
-            className="h-11 min-w-[9.5rem] px-4 text-base sm:h-12 sm:min-w-[12rem]"
+            className="h-11 min-w-[7.5rem] px-3 text-sm sm:h-12 sm:min-w-[12rem] sm:px-4 sm:text-base"
             onClick={() => void download()}
             disabled={busy || !dirty || lines.length === 0}
           >

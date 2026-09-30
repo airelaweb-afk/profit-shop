@@ -13,7 +13,7 @@ export function CookieBanner() {
   if (consent.decidedAt) return null;
 
   return (
-    <div className="no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t-2 border-primary bg-foreground p-3 text-background sm:p-4 xl:bottom-0">
+    <div className="luna-cookie-banner no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t-2 border-primary bg-foreground p-3 text-background sm:p-4 xl:bottom-0">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
         <p className="text-xs text-background/75 sm:text-sm">
           {cloud
