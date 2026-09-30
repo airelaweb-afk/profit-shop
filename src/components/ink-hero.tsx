@@ -10,6 +10,18 @@ const ORBIT = [
   { label: "heic", top: "80%", left: "70%" },
   { label: "firmar", top: "42%", left: "86%" },
   { label: "jpg↔pdf", top: "52%", left: "4%" },
+  { label: "webp", top: "62%", left: "90%" },
+];
+
+const TOP_SEARCHES = [
+  { href: "/unir-pdf", label: "Unir PDF" },
+  { href: "/comprimir-pdf", label: "Comprimir PDF" },
+  { href: "/comprimir-imagen", label: "Comprimir imagen" },
+  { href: "/heic-a-jpg", label: "HEIC a JPG" },
+  { href: "/jpg-a-pdf", label: "JPG a PDF" },
+  { href: "/pdf", label: "Firmar PDF" },
+  { href: "/jpg-a-webp", label: "JPG a WebP" },
+  { href: "/dividir-pdf", label: "Dividir PDF" },
 ];
 
 export function InkHero() {
@@ -40,17 +52,19 @@ export function InkHero() {
 
       <div className="relative mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
         <p className="stamp-mark inline-block border-2 border-accent px-3 py-1 font-mono text-[0.68rem] font-medium tracking-[0.2em] text-accent uppercase">
-          En este navegador · 0 MB a la nube
+          Gratis · En tu navegador · El archivo no se sube
         </p>
         <h1 className="mt-6 max-w-4xl font-heading text-4xl leading-[1.05] tracking-tight text-background sm:text-6xl lg:text-7xl">
-          Unir PDF y comprimir la foto.{" "}
-          <span className="text-primary">Sin subir nada.</span>{" "}
-          <span className="text-accent">Negro, naranja, amarillo.</span>
+          Unir PDF, comprimir imagen, HEIC a JPG.{" "}
+          <span className="text-primary">Sin subir nada</span>{" "}
+          <span className="text-accent">a ningún servidor.</span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-background/75">
-          Quien busca juntar, comprimir o firmar suele caer en un conversor que
-          se queda el archivo. Aquí el PDF se queda en tu aparato. Cuenta
-          local. Oficio del autónomo: presupuestos, cobros, horas, gastos.
+          Las herramientas de archivo que más se buscan, resueltas en tu
+          navegador: unes, comprimes, conviertes y firmas, y el PDF o la foto
+          no salen de tu aparato. Además, documentos de trabajo listos en un
+          minuto: presupuestos, partes de horas, relación de gastos y avisos
+          de cobro en PDF.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button
@@ -77,23 +91,29 @@ export function InkHero() {
             render={<Link href="/entrar/?tab=crear" />}
             nativeButton={false}
           >
-            Crear cuenta
+            Crear cuenta gratis
           </Button>
         </div>
-        <dl className="mt-12 grid max-w-3xl grid-cols-3 gap-3 border-t border-background/20 pt-8 font-mono text-[0.7rem] tracking-[0.14em] uppercase">
-          <div>
-            <dt className="text-background/50">Servidores nuestros</dt>
-            <dd className="mt-1 font-heading text-3xl tracking-tight text-accent">0</dd>
-          </div>
-          <div>
-            <dt className="text-background/50">Este navegador</dt>
-            <dd className="mt-1 font-heading text-3xl tracking-tight text-primary">1</dd>
-          </div>
-          <div>
-            <dt className="text-background/50">MB que se van</dt>
-            <dd className="mt-1 font-heading text-3xl tracking-tight text-background">0</dd>
-          </div>
-        </dl>
+        <nav
+          aria-label="Herramientas más buscadas"
+          className="mt-12 max-w-3xl border-t border-background/20 pt-6"
+        >
+          <p className="font-mono text-[0.7rem] tracking-[0.18em] text-background/50 uppercase">
+            Lo más buscado
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {TOP_SEARCHES.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="inline-flex min-h-9 items-center rounded-[2px] border border-background/25 px-3 font-mono text-[0.7rem] tracking-[0.14em] text-background/85 uppercase transition hover:border-accent hover:text-accent"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
       <div className="signal-bar" aria-hidden="true">
         <span />

@@ -7,7 +7,7 @@ export const metadata = pageMeta({
   description:
     "Pega las horas de la semana y saca un parte limpio para el cliente o el jefe. Sin fichaje. En el navegador.",
   path: "/horas",
-  keywords: ["parte de horas", "plantilla horas autonomo", "horas trabajadas pdf"],
+  keywords: ["parte de horas", "plantilla parte de horas", "horas trabajadas pdf"],
 });
 
 export default function HorasPage() {

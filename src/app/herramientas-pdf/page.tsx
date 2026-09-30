@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Herramientas PDF",
   description:
-    "Unir, dividir, comprimir, JPG a PDF, PDF a JPG, firmar, rotar y numerar. Marca de agua Pro. En el navegador, sin subir el archivo.",
+    "Unir, dividir, comprimir, JPG a PDF, PDF a JPG, firmar, rotar, numerar y eliminar páginas. Marca de agua Pro. En el navegador, sin subir el archivo.",
   path: "/herramientas-pdf",
   keywords: ["herramientas pdf", "unir pdf", "comprimir pdf", "firmar pdf"],
 });
@@ -21,14 +21,12 @@ export default function HerramientasPdfPage() {
         Unir, comprimir, firmar. En este aparato.
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Las que más se buscan: unir, dividir, comprimir, JPG ↔ PDF. Firmar,
-        rotar y numerar también. Marca de agua es Pro. No convertimos a Word:
-        en el navegador el resultado queda mal y no merece mentir. Los archivos
-        no salen de aquí.
+        Las que más se buscan: unir, dividir, comprimir, JPG ↔ PDF. También
+        firmar, rotar, numerar y eliminar páginas. La marca de agua es Pro. No
+        convertimos a Word: en el navegador el resultado queda mal y no vamos a
+        fingirlo. Los archivos no salen de aquí.
       </p>
-      <div className="mt-6">
-        <AdSlot label="Unir y comprimir son gratis. Pro desbloquea la marca de agua." />
-      </div>
+      <AdSlot label="Unir y comprimir son gratis. Pro desbloquea la marca de agua." wrapClassName="mt-6" />
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {allPdfTools.map((tool) => (
           <li key={tool.href}>

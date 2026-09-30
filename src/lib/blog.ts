@@ -8,7 +8,7 @@ const corePosts: BlogPost[] = [
   {
     slug: "unir-varios-pdf-en-uno",
     title: "Cómo unir varios PDF en uno solo sin subirlos a internet",
-    meta: "Une PDF en el navegador: DNI, presupuesto y contrato en un archivo. Sin iLovePDF ni servidor. Guía para autónomos.",
+    meta: "Une PDF en el navegador: DNI, presupuesto y contrato en un archivo. Sin iLovePDF ni servidor. Guía paso a paso.",
     kicker: "Unir PDF",
     date: "2026-09-30",
     keywords: [
@@ -29,7 +29,7 @@ const corePosts: BlogPost[] = [
       },
       {
         type: "p",
-        text: "Un PDF de autónomo casi siempre lleva NIF, domicilio o importes. Si lo subes a un conversor “gratis”, el archivo viaja a un servidor que no controlas. Para un ticket da igual. Para un contrato, no. Unir PDF en el navegador evita ese viaje.",
+        text: "Un PDF de trabajo casi siempre lleva NIF, domicilio o importes. Si lo subes a un conversor “gratis”, el archivo viaja a un servidor que no controlas. Para un ticket da igual. Para un contrato, no. Unir PDF en el navegador evita ese viaje.",
       },
       {
         type: "h2",
@@ -248,13 +248,13 @@ const corePosts: BlogPost[] = [
   {
     slug: "presupuestos-en-lote-para-autonomos",
     title: "Hacer diez presupuestos iguales sin un CRM",
-    meta: "Tanda de presupuestos en PDF para autónomos: pegas la lista, sales con un papel por cliente y mensaje listo.",
+    meta: "Tanda de presupuestos en PDF: pegas la lista de clientes, sales con un papel por cada uno y el mensaje listo para enviar.",
     kicker: "Presupuestos",
     date: "2026-09-30",
     keywords: [
       "hacer presupuestos",
       "varios presupuestos a la vez",
-      "plantilla presupuesto autonomo",
+      "plantilla presupuesto pdf",
     ],
     toolHref: "/presupuestos",
     blocks: [

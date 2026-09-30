@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { posts } from "@/lib/blog";
 import { competitors } from "@/lib/comparisons";
 import { siteFaqs } from "@/lib/faq";
-import { imageKit } from "@/lib/image-kit";
+import { imageKit, imageProKit } from "@/lib/image-kit";
 import { allPdfTools } from "@/lib/pdf-kit";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta({
-  title: "Unir PDF, comprimir imagen y presupuestos en el navegador",
+  title: "Unir PDF, comprimir imagen y HEIC a JPG gratis, sin subir archivos",
   description:
-    "Herramientas admin para autónomos: unir PDF, comprimir, HEIC a JPG, firmar y presupuestos. Los archivos se quedan en tu navegador.",
+    "Herramientas online gratis que funcionan en tu navegador: unir y comprimir PDF, comprimir imagen, HEIC a JPG, JPG a WebP, firmar PDF y documentos de trabajo. El archivo no se sube a ningún servidor.",
   path: "/",
   keywords: [
     "unir pdf",
@@ -22,8 +22,9 @@ export const metadata = pageMeta({
     "comprimir imagen",
     "heic a jpg",
     "firmar pdf",
-    "presupuestos autonomos",
+    "jpg a webp",
     "juntar pdf",
+    "herramientas pdf gratis",
     "alternativa a ilovepdf",
   ],
 });
@@ -32,32 +33,32 @@ const tools = [
   {
     href: "/presupuestos",
     name: "Presupuestos",
-    problem: "Tengo que mandar el mismo trabajo a diez clientes.",
-    does: "Pegar la lista. Un PDF por cliente, con tu logo.",
+    problem: "Hay que enviar el mismo presupuesto a varios clientes.",
+    does: "Pegas la lista y sale un PDF por cliente, con tu logo.",
   },
   {
     href: "/versiones",
     name: "Versiones",
-    problem: "El cliente quiere ver básico, recomendado y urgente.",
-    does: "Un encargo, varias ofertas. Elige en el papel.",
+    problem: "El cliente quiere comparar opción básica, recomendada y completa.",
+    does: "Un encargo, varias ofertas en el mismo PDF.",
   },
   {
     href: "/cobros",
-    name: "Cobros",
-    problem: "Me deben y no quiero pelearme por WhatsApp.",
+    name: "Avisos de cobro",
+    problem: "Tienes facturas pendientes y hay que reclamarlas con educación.",
     does: "Lista de impagos → mensaje listo, amable o último aviso.",
   },
   {
     href: "/horas",
-    name: "Horas",
-    problem: "La semana se me ha ido en notas sueltas.",
-    does: "Un parte de horas para el cliente o el jefe.",
+    name: "Parte de horas",
+    problem: "La semana está en notas sueltas y hay que justificarla.",
+    does: "Un parte de horas en PDF para el cliente o el equipo.",
   },
   {
     href: "/gastos",
-    name: "Gastos",
-    problem: "El gestor me pide los tickets y los tengo en el cajón.",
-    does: "Pegas fecha, tienda e importe. Sale base e IVA.",
+    name: "Relación de gastos",
+    problem: "Los tickets están en un cajón y hace falta un resumen.",
+    does: "Pegas fecha, tienda e importe. Sale base e IVA en PDF.",
   },
 ];
 
@@ -69,8 +70,31 @@ export default function HomePage() {
       <FaqJsonLd items={siteFaqs} />
       <InkHero />
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-        <AdSlot label="Las búsquedas gordas (unir, comprimir, HEIC) son gratis." />
+      <AdSlot
+        label="Unir PDF, comprimir y HEIC a JPG son gratis."
+        wrapClassName="mx-auto w-full max-w-6xl px-4 pt-12 sm:px-6"
+      />
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className="font-heading text-2xl sm:text-3xl">PDF, lo que más se busca</h2>
+        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+          Unir, dividir, comprimir, pasar fotos a PDF, rotar, numerar o quitar
+          páginas. Todo gratis; la marca de agua es Pro. No convertimos a Word:
+          quedaría mal y no lo vamos a fingir.
+        </p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {allPdfTools.map((tool) => (
+            <li key={tool.href}>
+              <ToolCard
+                href={tool.href}
+                name={tool.name}
+                problem={tool.problem}
+                does={tool.does}
+                pro={"pro" in tool && tool.pro}
+              />
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="bg-foreground py-14 text-background">
@@ -82,10 +106,10 @@ export default function HomePage() {
             No nos hacemos pasar por ellos. Te decimos en qué nos diferenciamos.
           </h2>
           <p className="mt-4 max-w-2xl text-background/70">
-            Quien teclea un conversor famoso suele querer unir o comprimir un
-            PDF. Esa búsqueda puede aterrizar aquí. El nombre de esta web es
-            Luna Oficio. Las fichas citan la marca ajena y un hecho: el archivo
-            se queda en tu navegador.
+            Quien teclea el nombre de un conversor famoso suele querer unir o
+            comprimir un PDF. Esa búsqueda puede aterrizar aquí. Esta web se
+            llama Luna Oficio; las fichas citan la marca ajena y un hecho
+            comprobable: aquí el archivo se queda en tu navegador.
           </p>
           <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {competitors.slice(0, 6).map((item) => (
@@ -113,13 +137,13 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className="font-heading text-2xl sm:text-3xl">PDF, lo que más se busca</h2>
+        <h2 className="font-heading text-2xl sm:text-3xl">Imágenes: comprimir, convertir, recortar</h2>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Unir, comprimir, foto a PDF, rotar, numerar. Marca de agua es Pro. No
-          convertimos a Word: quedaría mal.
+          Que la foto pese menos, que el HEIC del iPhone se abra en Windows, que
+          el PNG sea JPG o WebP. Para webs, la conversión a WebP en lote es Pro.
         </p>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {allPdfTools.map((tool) => (
+          {[...imageKit, ...imageProKit].map((tool) => (
             <li key={tool.href}>
               <ToolCard
                 href={tool.href}
@@ -134,29 +158,10 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
-        <h2 className="font-heading text-2xl sm:text-3xl">Fotos, lo de cada martes</h2>
+        <h2 className="font-heading text-2xl sm:text-3xl">Documentos de trabajo en un minuto</h2>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Comprimir, PNG a JPG, HEIC del iPhone. Quitar fondo e IA, no.
-        </p>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {imageKit.map((tool) => (
-            <li key={tool.href}>
-              <ToolCard
-                href={tool.href}
-                name={tool.name}
-                problem={tool.problem}
-                does={tool.does}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
-        <h2 className="font-heading text-2xl sm:text-3xl">Oficio, sin CRM</h2>
-        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Entras con tu cuenta y abres la del atasco de hoy. Si no sirve, se
-          corrige. Si sirve, se queda.
+          Pegas los datos y sale el PDF. Sin plantillas de Word ni programas de
+          gestión: presupuestos, avisos de cobro, partes de horas y gastos.
         </p>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map((tool) => (
@@ -176,10 +181,11 @@ export default function HomePage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-heading text-2xl sm:text-3xl">
-              Cómo se usa, con las palabras que busca la gente
+              Guías paso a paso
             </h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              Guías long-tail: unir PDF, sede electrónica, HEIC, cobros.
+              Cómo unir un PDF, bajar el peso de una foto para una sede
+              electrónica, abrir un HEIC o reclamar un cobro sin discutir.
             </p>
           </div>
           <Button

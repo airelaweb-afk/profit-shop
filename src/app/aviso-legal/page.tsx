@@ -18,8 +18,9 @@ export default function AvisoLegalPage() {
       </p>
       <h2>Objeto</h2>
       <p>
-        Herramientas puntuales para autónomos y administración (unir PDF,
-        comprimir imagen, presupuestos, cobros, etc.). No es un CRM, no es
+        Herramientas para trabajar con archivos y documentos (unir PDF,
+        comprimir imagen, convertir a WebP, presupuestos, avisos de cobro,
+        etc.). No es un CRM, no es
         Cl@ve ni un certificado digital, no es software de facturación
         Verifactu.
       </p>

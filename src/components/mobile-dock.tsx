@@ -36,7 +36,7 @@ const items = [
   },
   {
     href: "/presupuestos",
-    label: "Oficio",
+    label: "Documentos",
     icon: NotebookPen,
     match: "office" as const,
   },

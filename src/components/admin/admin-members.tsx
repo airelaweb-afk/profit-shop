@@ -41,7 +41,7 @@ function mailtoFor(member: Member) {
     "",
     `Actívala en ${SITE_URL}/precios/ (apartado «Activar clave»). Vale hasta el ${formatDateEs(member.expires)} y vive en el navegador donde la actives; si cambias de aparato, vuelve a pegarla.`,
     "",
-    "Sin anuncios y con marca de agua en PDF. Los archivos siguen en tu navegador.",
+    "Sin anuncios, marca de agua en PDF, WebP en lote y plugin de WordPress. Los archivos siguen en tu navegador.",
     "",
     `Luna Oficio · ${LEGAL.email}`,
   ].join("\n");

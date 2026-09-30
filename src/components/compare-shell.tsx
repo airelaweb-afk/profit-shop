@@ -47,9 +47,7 @@ export function CompareShell({ item }: { item: Competitor }) {
         viaja a un servidor nuestro. {item.name} trabaja en la nube o con
         software de escritorio: el archivo se sube o se instala.
       </p>
-      <div className="mt-6">
-        <AdSlot label="Unir y comprimir son gratis." />
-      </div>
+      <AdSlot label="Unir y comprimir son gratis." wrapClassName="mt-6" />
       <div className="mt-10 overflow-x-auto">
         <table className="w-full min-w-[32rem] border-2 border-foreground text-sm">
           <thead className="bg-foreground text-background">

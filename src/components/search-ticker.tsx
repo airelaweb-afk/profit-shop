@@ -10,7 +10,8 @@ const ITEMS = [
   "comprimir imagen",
   "pdf a jpg",
   "rotar pdf",
-  "presupuestos autonomos",
+  "jpg a webp",
+  "eliminar paginas pdf",
 ];
 
 export function SearchTicker({

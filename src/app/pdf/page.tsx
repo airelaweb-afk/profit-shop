@@ -28,9 +28,7 @@ export default function PdfPage() {
         escribe y firma. Te lo descargas. El PDF no sale de este navegador. No
         es Cl@ve ni un certificado digital: es tu rúbrica, como en papel.
       </p>
-      <div className="no-print mt-6">
-        <AdSlot label="Firmar en el navegador es gratis." />
-      </div>
+      <AdSlot label="Firmar en el navegador es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">
         <AuthGate>
           <PdfSignTool />

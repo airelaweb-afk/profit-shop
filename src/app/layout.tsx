@@ -24,7 +24,7 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — unir PDF, comprimir imagen y presupuestos`,
+    default: `${SITE_NAME} — unir PDF, comprimir imagen y HEIC a JPG en el navegador`,
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_TAGLINE,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "heic a jpg",
     "firmar pdf",
     "jpg a pdf",
-    "presupuestos autonomos",
+    "jpg a webp",
     "marca de agua pdf",
     "rotar pdf",
   ],

@@ -24,9 +24,7 @@ export function OfficePageShell({
         {title}
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">{lead}</p>
-      <div className="no-print mt-6">
-        <AdSlot label="La herramienta es gratis." />
-      </div>
+      <AdSlot label="La herramienta es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">
         <AuthGate>{children}</AuthGate>
       </div>

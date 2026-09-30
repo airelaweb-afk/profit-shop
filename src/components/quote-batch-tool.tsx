@@ -299,7 +299,7 @@ export function QuoteBatchTool() {
             </div>
 
             <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
-              <Field label="Negocio / autónomo" htmlFor="issuer-name">
+              <Field label="Nombre o negocio" htmlFor="issuer-name">
                 <Input
                   id="issuer-name"
                   className="h-10"

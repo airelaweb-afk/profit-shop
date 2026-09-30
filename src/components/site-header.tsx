@@ -87,7 +87,7 @@ export function SiteHeader() {
             Imagen
           </Link>
           <Link href="/presupuestos" className="ink-link">
-            Oficio
+            Documentos
           </Link>
           <Link href="/comparar" className="ink-link">
             Comparar

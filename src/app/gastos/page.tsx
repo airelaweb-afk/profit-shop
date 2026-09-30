@@ -7,7 +7,7 @@ export const metadata = pageMeta({
   description:
     "Pega los tickets del mes y saca una lista con base e IVA para el gestor. Sin Excel. En el navegador.",
   path: "/gastos",
-  keywords: ["relacion de gastos", "gastos autonomo iva", "tickets gestor"],
+  keywords: ["relacion de gastos", "relacion de gastos iva", "tickets gestor"],
 });
 
 export default function GastosPage() {

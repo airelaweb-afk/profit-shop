@@ -4,7 +4,7 @@ import { posts } from "@/lib/blog";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta({
-  title: "Blog: unir PDF, comprimir imagen y el atasco del autónomo",
+  title: "Blog: guías para unir PDF, comprimir imágenes y documentos de trabajo",
   description:
     "Guías con las búsquedas reales: unir PDF, comprimir para el correo, HEIC a JPG, firmar sin Adobe. En el navegador, sin subir el archivo.",
   path: "/blog",
@@ -22,9 +22,7 @@ export default function BlogIndexPage() {
         Unir PDF, comprimir, HEIC, presupuestos. Cada pieza enlaza a la
         herramienta. Los archivos no salen de tu navegador.
       </p>
-      <div className="mt-8">
-        <AdSlot label="Las herramientas de PDF están en el menú de arriba o en el muelle del teléfono." />
-      </div>
+      <AdSlot label="Las herramientas de PDF están en el menú de arriba o en el muelle del teléfono." wrapClassName="mt-8" />
       <ul className="mt-10 grid gap-4 sm:grid-cols-2">
         {posts.map((post) => (
           <li key={post.slug}>

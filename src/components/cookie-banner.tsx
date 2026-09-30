@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { saveConsent } from "@/lib/consent";
+import { hasCloud } from "@/lib/supabase";
 import { useConsent } from "@/lib/use-consent";
+
+const cloud = hasCloud();
 
 export function CookieBanner() {
   const consent = useConsent();
@@ -13,9 +16,9 @@ export function CookieBanner() {
     <div className="no-print fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-50 border-t-2 border-primary bg-foreground p-3 text-background sm:p-4 xl:bottom-0">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
         <p className="text-xs text-background/75 sm:text-sm">
-          Usamos almacenamiento local para tu cuenta y tus archivos (no se van a
-          ningún servidor nuestro). Si aceptas publicidad, más adelante podrán
-          cargarse anuncios de terceros.{" "}
+          {cloud
+            ? "Tus archivos se procesan en este navegador y no se suben. Usamos almacenamiento local para la sesión y el consentimiento; la cuenta se guarda en nuestra base de datos. Si aceptas publicidad, más adelante podrán cargarse anuncios de terceros."
+            : "Usamos almacenamiento local para tu cuenta y tus archivos (no se van a ningún servidor nuestro). Si aceptas publicidad, más adelante podrán cargarse anuncios de terceros."}{" "}
           <Link href="/cookies/" className="text-accent underline-offset-4 hover:underline">
             Política de cookies
           </Link>

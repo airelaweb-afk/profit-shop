@@ -5,9 +5,9 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Tanda de presupuestos",
   description:
-    "Genera hasta 30 presupuestos a la vez para autónomos. Pegas la lista, sales con un PDF por cliente. Sin CRM, en el navegador.",
+    "Genera hasta 30 presupuestos en PDF a la vez. Pegas la lista de clientes, sales con un PDF por cada uno, con tu logo. Sin CRM, en el navegador.",
   path: "/presupuestos",
-  keywords: ["hacer presupuestos", "varios presupuestos a la vez", "plantilla presupuesto autonomo"],
+  keywords: ["hacer presupuestos", "varios presupuestos a la vez", "plantilla presupuesto pdf"],
 });
 
 export default function PresupuestosPage() {

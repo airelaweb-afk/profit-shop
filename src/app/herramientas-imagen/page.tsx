@@ -1,12 +1,12 @@
 import { AdSlot } from "@/components/ad-slot";
 import { ToolCard } from "@/components/tool-card";
-import { audioKit, imageKit } from "@/lib/image-kit";
+import { audioKit, imageKit, imageProKit } from "@/lib/image-kit";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta({
   title: "Herramientas de imagen",
   description:
-    "Comprimir, recortar, girar, PNG a JPG, HEIC a JPG. En el navegador. Sin quitar fondo ni IA. El archivo no se sube.",
+    "Comprimir imagen, HEIC a JPG, PNG a JPG, JPG a WebP, recortar y girar. WebP en lote y plugin WordPress para Pro. En el navegador, sin subir el archivo.",
   path: "/herramientas-imagen",
   keywords: ["comprimir imagen", "heic a jpg", "png a jpg", "recortar imagen"],
 });
@@ -19,21 +19,21 @@ export default function HerramientasImagenPage() {
         Comprimir, convertir, recortar. En este aparato.
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Lo que un despacho pide cada día: que la foto pese menos, que el iPhone
-        se abra en Windows, que el PNG sea JPG. Quitar fondo, ampliar con IA,
-        PDF a Word y vídeo quedan aparcados.
+        Lo que más se pide: que la foto pese menos, que el HEIC del iPhone se
+        abra en Windows, que el PNG sea JPG o WebP. Para webs, la conversión a
+        WebP en lote y el plugin de WordPress son Pro. Quitar fondo, ampliar
+        con IA y vídeo no están: piden servidor.
       </p>
-      <div className="mt-6">
-        <AdSlot label="Comprimir y HEIC a JPG son gratis." />
-      </div>
+      <AdSlot label="Comprimir y HEIC a JPG son gratis." wrapClassName="mt-6" />
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[...imageKit, ...audioKit].map((tool) => (
+        {[...imageKit, ...imageProKit, ...audioKit].map((tool) => (
           <li key={tool.href}>
             <ToolCard
               href={tool.href}
               name={tool.name}
               problem={tool.problem}
               does={tool.does}
+              pro={"pro" in tool && tool.pro}
             />
           </li>
         ))}

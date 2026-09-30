@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { legalMeta, LegalShell } from "@/components/legal-shell";
 import { LEGAL } from "@/lib/site";
+import { hasCloud } from "@/lib/supabase";
+
+const cloud = hasCloud();
 
 export const metadata = legalMeta(
   "Condiciones",
-  "Condiciones de uso de Luna Oficio: herramientas gratis, Pro sin anuncios y marca de agua, datos en tu navegador.",
+  "Condiciones de uso de Luna Oficio: herramientas gratis, Pro (sin anuncios, marca de agua, WebP en lote, plugin WordPress), archivos en tu navegador.",
   "/condiciones",
 );
 
@@ -16,17 +19,24 @@ export default function CondicionesPage() {
       <p>
         Al crear cuenta aceptas estas condiciones, el{" "}
         <Link href="/aviso-legal/">aviso legal</Link> y la{" "}
-        <Link href="/privacidad/">privacidad</Link>. La cuenta es local: no hay
-        SLA ni copia de seguridad nuestra.
+        <Link href="/privacidad/">privacidad</Link>.{" "}
+        {cloud
+          ? "La cuenta se guarda en nuestra base de datos (correo, nombre y estado Pro); los archivos que procesas nunca se suben. No hay SLA."
+          : "La cuenta es local: no hay SLA ni copia de seguridad nuestra."}
       </p>
       <h2>Gratis y Pro</h2>
       <p>
         Las herramientas de búsqueda (unir PDF, comprimir, HEIC a JPG, etc.)
-        son gratis, con anuncios si aceptas cookies de publicidad. Pro quita
-        anuncios en este navegador y desbloquea la marca de agua en PDF. El
-        cobro es con Stripe (tarjeta) o Revolut; al pagar te enviamos una clave
-        que activas en{" "}
-        <Link href="/precios/">Precios</Link>. La clave vive en este aparato.
+        son gratis, con anuncios si aceptas cookies de publicidad. Pro (29 €
+        al año) quita los anuncios y desbloquea la marca de agua en PDF, la
+        conversión de imágenes a WebP en lote y el plugin de WordPress para
+        WebP. El plugin se licencia bajo GPL v2 o posterior; puedes instalarlo
+        en los WordPress que administres. El cobro es con Stripe (tarjeta) o
+        Revolut.{" "}
+        {cloud
+          ? "Al pagar, Pro se activa en tu cuenta y vale en cualquier aparato en el que entres."
+          : "Al pagar te enviamos una clave que activas en Precios; la clave vive en este aparato."}
+        {" "}Ver <Link href="/precios/">Precios</Link>.
       </p>
       <h2>Uso prohibido</h2>
       <p>

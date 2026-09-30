@@ -158,7 +158,7 @@ export function ExpenseTool() {
                 placeholder="Marina Ruiz"
               />
             </Field>
-            <Field label="Empresa o autónomo" htmlFor="ex-company">
+            <Field label="Empresa o nombre" htmlFor="ex-company">
               <Input
                 id="ex-company"
                 className="h-10"

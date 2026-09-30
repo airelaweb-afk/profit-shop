@@ -108,9 +108,7 @@ export function ImageKitPage({ kind }: { kind: ImageKitSlug }) {
         {item.title}
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
-      <div className="mt-6">
-        <AdSlot label="Comprimir y convertir fotos es gratis." />
-      </div>
+      <AdSlot label="Comprimir y convertir fotos es gratis." wrapClassName="mt-6" />
       <div className="mt-10">
         <AuthGate>
           <ImageKitTool kind={kind} />

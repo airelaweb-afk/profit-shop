@@ -78,9 +78,7 @@ export default async function BlogPostPage({
       <p className="mt-3 text-sm text-muted-foreground">
         {post.date} · {post.keywords.slice(0, 3).join(" · ")}
       </p>
-      <div className="mt-8">
-        <AdSlot label="La herramienta de esta guía está un clic más abajo." />
-      </div>
+      <AdSlot label="La herramienta de esta guía está un clic más abajo." wrapClassName="mt-8" />
       <div className="mt-8 space-y-4 text-muted-foreground">
         {post.blocks.map((block, index) => {
           if (block.type === "p") {

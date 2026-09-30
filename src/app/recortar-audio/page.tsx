@@ -26,9 +26,7 @@ export default function Page() {
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Marcas inicio y fin. Sale un WAV. Extraer el audio de un MP4 no está.
       </p>
-      <div className="mt-6">
-        <AdSlot label="Recortar es gratis." />
-      </div>
+      <AdSlot label="Recortar es gratis." wrapClassName="mt-6" />
       <div className="mt-10">
         <AuthGate>
           <AudioKitTool kind="trim" />

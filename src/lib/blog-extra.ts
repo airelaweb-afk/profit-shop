@@ -4,7 +4,7 @@ export const extraPosts: BlogPost[] = [
   {
     slug: "dividir-pdf-extraer-paginas",
     title: "Dividir un PDF y quedarte solo con las páginas que piden",
-    meta: "Extrae un rango (1-3, 5) o un PDF por hoja. En el navegador, sin subir el archivo. Guía para autónomos.",
+    meta: "Extrae un rango (1-3, 5) o un PDF por hoja. En el navegador, sin subir el archivo. Guía paso a paso.",
     kicker: "Dividir PDF",
     date: "2026-09-30",
     keywords: [
@@ -244,7 +244,7 @@ export const extraPosts: BlogPost[] = [
     date: "2026-09-30",
     keywords: [
       "parte de horas",
-      "plantilla horas autonomo",
+      "plantilla parte de horas",
       "registro horario semana",
       "horas trabajadas pdf",
     ],
@@ -278,7 +278,7 @@ export const extraPosts: BlogPost[] = [
     date: "2026-09-30",
     keywords: [
       "relacion de gastos",
-      "gastos autonomo iva",
+      "relacion de gastos iva",
       "tickets gestor",
       "lista gastos iva",
     ],
@@ -303,13 +303,13 @@ export const extraPosts: BlogPost[] = [
   {
     slug: "versiones-basico-recomendado-urgente",
     title: "Mandar básico, recomendado y urgente sin tres Word distintos",
-    meta: "Un cliente, un encargo, varias ofertas en PDF. El cliente elige en el papel. Para autónomos.",
+    meta: "Un cliente, un encargo, varias ofertas en PDF. El cliente elige en el papel, sin CRM.",
     kicker: "Versiones",
     date: "2026-09-30",
     keywords: [
       "presupuesto basico y premium",
       "varias versiones presupuesto",
-      "oferta recomendada autonomo",
+      "presupuesto con opciones",
     ],
     toolHref: "/versiones",
     blocks: [
@@ -373,15 +373,15 @@ export const extraPosts: BlogPost[] = [
   },
   {
     slug: "herramientas-del-dia-a-dia-del-autonomo",
-    title: "Qué herramientas usa un autónomo de verdad un martes cualquiera",
+    title: "Las herramientas de archivo que se usan un martes cualquiera",
     meta: "Unir PDF, comprimir la foto de la sede, un recordatorio de cobro y un presupuesto. Sin CRM y sin subir archivos.",
     kicker: "Día a día",
     date: "2026-09-30",
     keywords: [
-      "herramientas autonomos",
-      "unir pdf autonomo",
+      "herramientas pdf del dia a dia",
+      "unir pdf y comprimir foto",
       "oficina sin crm",
-      "administracion autonomo",
+      "documentos de trabajo pdf",
     ],
     toolHref: "/herramientas-pdf",
     blocks: [
@@ -541,7 +541,7 @@ export const extraPosts: BlogPost[] = [
     blocks: [
       {
         type: "p",
-        text: "Un escaneo de 18 MB no entra en Gmail. La búsqueda es «comprimir PDF» o el nombre de un producto. El archivo lleva NIF, importes, a veces un DNI. Subirlo a un conversor «gratis» es un viaje que el autónomo no tiene por qué hacer.",
+        text: "Un escaneo de 18 MB no entra en Gmail. La búsqueda es «comprimir PDF» o el nombre de un producto. El archivo lleva NIF, importes, a veces un DNI. Subirlo a un conversor «gratis» es un viaje que ese archivo no tiene por qué hacer.",
       },
       {
         type: "h2",

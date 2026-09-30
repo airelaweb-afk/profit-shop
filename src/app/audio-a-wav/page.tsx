@@ -27,9 +27,7 @@ export default function Page() {
         El navegador ya sabe leer MP3 y M4A. El WAV sale aquí. Convertir a MP3
         o sacar el audio de un vídeo queda aparcado: pide un motor gordo.
       </p>
-      <div className="mt-6">
-        <AdSlot label="La conversión es gratis." />
-      </div>
+      <AdSlot label="La conversión es gratis." wrapClassName="mt-6" />
       <div className="mt-10">
         <AuthGate>
           <AudioKitTool kind="to-wav" />

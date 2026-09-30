@@ -69,7 +69,7 @@ export const competitors: Competitor[] = [
       },
       {
         label: "Límites y pago",
-        ours: "Unir, comprimir y firmar gratis; Pro quita anuncios y marca de agua.",
+        ours: "Unir, comprimir y firmar gratis; Pro quita anuncios y añade marca de agua, WebP en lote y plugin de WordPress.",
         theirs: "Plan gratuito con límites; suscripción para el resto.",
       },
       {
@@ -86,7 +86,7 @@ export const competitors: Competitor[] = [
     href: "/alternativa-a-pdf24",
     search: "unir pdf, herramientas pdf gratis",
     title: "Herramientas PDF en el navegador (comparativa objetiva con PDF24)",
-    meta: "Herramientas PDF en el navegador para autónomos. Comparativa objetiva con PDF24 (marca ajena).",
+    meta: "Herramientas PDF que funcionan en el navegador, sin subir el archivo. Comparativa objetiva con PDF24 (marca ajena).",
     keywords: [
       "herramientas pdf navegador",
       "unir pdf gratis",
@@ -100,7 +100,7 @@ export const competitors: Competitor[] = [
       },
       {
         label: "Enfoque",
-        ours: "El atasco del autónomo: unir, comprimir, HEIC, presupuestos, cobros.",
+        ours: "Lo más buscado: unir, comprimir, HEIC a JPG, WebP, y documentos de trabajo en PDF.",
         theirs: "Suite amplia de conversión.",
       },
       {
@@ -163,7 +163,7 @@ export const competitors: Competitor[] = [
       },
       {
         label: "Precio del uso diario",
-        ours: "Unir y comprimir gratis. Pro 29 €/año (marca de agua y sin anuncios).",
+        ours: "Unir y comprimir gratis. Pro 29 €/año (sin anuncios, marca de agua, WebP en lote, plugin WordPress).",
         theirs: "Licencia o suscripción de Adobe.",
       },
       {
@@ -215,8 +215,8 @@ export const competitors: Competitor[] = [
         theirs: "Se envía a su servicio online.",
       },
       {
-        label: "Oficio del autónomo",
-        ours: "Además: presupuestos, cobros, horas, gastos, HEIC.",
+        label: "Documentos de trabajo",
+        ours: "Además: presupuestos, avisos de cobro, partes de horas, gastos y HEIC a JPG.",
         theirs: "Suite de conversión generalista.",
       },
     ],
