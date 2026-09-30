@@ -11,10 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { bytesLabel } from "@/lib/limits";
 import {
+  clipWidget,
   exportSignedPdf,
   humanFieldName,
   listPdfFields,
   suggestedFillFileName,
+  type PdfFieldWidget,
   type PdfFormField,
 } from "@/lib/pdf-fill";
 import { loadPdfjs } from "@/lib/pdfjs-worker";
@@ -26,6 +28,27 @@ function isPdfFile(file: File) {
   const type = file.type.toLowerCase();
   const name = file.name.toLowerCase();
   return type === "application/pdf" || name.endsWith(".pdf");
+}
+
+function boxStyle(widget: PdfFieldWidget, page: PageSize) {
+  const clipped = clipWidget(widget, page);
+  if (!clipped) return null;
+  return {
+    left: `${(clipped.x / page.width) * 100}%`,
+    top: `${((page.height - clipped.y - clipped.height) / page.height) * 100}%`,
+    width: `${(clipped.width / page.width) * 100}%`,
+    height: `${(clipped.height / page.height) * 100}%`,
+  };
+}
+
+function canvasToJpeg(canvas: HTMLCanvasElement) {
+  return new Promise<string | null>((resolve) => {
+    canvas.toBlob(
+      (blob) => resolve(blob ? URL.createObjectURL(blob) : null),
+      "image/jpeg",
+      0.72,
+    );
+  });
 }
 
 function updateField(
@@ -50,6 +73,13 @@ export function PdfFillTool() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [sizes, setSizes] = useState<PageSize[]>([]);
   const [active, setActive] = useState<string>("");
+  const [viewPage, setViewPage] = useState(0);
+  const previewUrls = useRef<string[]>([]);
+
+  const revokePreviews = useCallback(() => {
+    for (const url of previewUrls.current) URL.revokeObjectURL(url);
+    previewUrls.current = [];
+  }, []);
 
   const renderPages = useCallback(async (data: ArrayBuffer) => {
     const pdfjs = await loadPdfjs();
@@ -61,25 +91,30 @@ export function PdfFillTool() {
     const nextSizes: PageSize[] = [];
     const nextPreviews: string[] = [];
     const max = Math.min(pdf.numPages, 40);
+    const scale = pdf.numPages > 8 ? 0.85 : 1;
+    revokePreviews();
     for (let number = 1; number <= max; number += 1) {
       const page = await pdf.getPage(number);
       const base = page.getViewport({ scale: 1 });
       nextSizes.push({ width: base.width, height: base.height });
-      const viewport = page.getViewport({ scale: 1.35 });
+      const viewport = page.getViewport({ scale });
       const canvas = document.createElement("canvas");
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { alpha: false });
       if (!ctx) continue;
       await page.render({ canvas, viewport }).promise;
-      nextPreviews.push(canvas.toDataURL("image/png"));
+      const url = await canvasToJpeg(canvas);
+      if (url) nextPreviews.push(url);
     }
     await pdf.cleanup();
     await task.destroy();
+    previewUrls.current = nextPreviews;
     setSizes(nextSizes);
     setPreviews(nextPreviews);
+    setViewPage(0);
     return pdf.numPages;
-  }, []);
+  }, [revokePreviews]);
 
   async function openBytes(data: ArrayBuffer, name: string) {
     setBusy(true);
@@ -110,9 +145,8 @@ export function PdfFillTool() {
         );
       } else {
         setNotice(
-          `${found.length} campo${found.length === 1 ? "" : "s"} del propio PDF. Escribes dentro de cada caja; el archivo sigue siendo un formulario, no texto pintado.${extra}`,
+          `${found.length} campo${found.length === 1 ? "" : "s"} del propio PDF. Escribe en la lista o pulsa una caja. El archivo sigue siendo un formulario.`,
         );
-        setActive(found[0]?.name ?? "");
       }
     } catch (caught) {
       setError(
@@ -189,9 +223,22 @@ export function PdfFillTool() {
   }
 
   const editable = fields.filter((field) => !field.readOnly);
+  const pageIndex = Math.min(viewPage, Math.max(0, previews.length - 1));
+  const size = sizes[pageIndex];
+  const pageSrc = previews[pageIndex];
+
+  function focusField(name: string) {
+    setActive(name);
+    const field = fields.find((item) => item.name === name);
+    const page = field?.widgets[0]?.pageIndex;
+    if (typeof page === "number") setViewPage(page);
+  }
 
   return (
-    <div className="grid gap-6 pb-24 xl:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] xl:pb-0">
+    <form
+      className="grid gap-6 pb-24 xl:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] xl:pb-0"
+      onSubmit={(event) => event.preventDefault()}
+    >
       <div className="no-print flex flex-col gap-4">
         <section className="rounded-[2px] bg-card p-4 ring-1 ring-foreground/10 sm:p-5">
           <h2 className="font-heading text-xl">Tu PDF</h2>
@@ -231,21 +278,21 @@ export function PdfFillTool() {
               Los mismos que verías en Adobe. Pulsa uno para ir a su caja.
             </p>
             <ul className="mt-4 flex flex-col gap-3">
-              {fields.map((field) => (
-                <li key={field.name} className="grid gap-1.5">
-                  <Label htmlFor={`fill-${field.name}`}>
+              {fields.map((field, index) => (
+                <li key={`${field.name}-${index}`} className="grid gap-1.5">
+                  <Label htmlFor={`fill-field-${index}`}>
                     {humanFieldName(field.name)}
                     {field.readOnly ? " · solo lectura" : ""}
                   </Label>
                   {field.kind === "check" ? (
                     <label className="flex min-h-11 items-center gap-2 text-sm">
                       <input
-                        id={`fill-${field.name}`}
+                        id={`fill-field-${index}`}
                         type="checkbox"
                         checked={field.checked}
                         disabled={field.readOnly}
                         onChange={(event) => {
-                          setActive(field.name);
+                          focusField(field.name);
                           setFields((current) =>
                             updateField(current, field.name, {
                               checked: event.target.checked,
@@ -257,11 +304,11 @@ export function PdfFillTool() {
                     </label>
                   ) : field.kind === "choice" || field.kind === "radio" ? (
                     <select
-                      id={`fill-${field.name}`}
+                      id={`fill-field-${index}`}
                       className="h-11 rounded-[2px] border border-input bg-transparent px-2.5 text-sm"
                       value={field.value}
                       disabled={field.readOnly}
-                      onFocus={() => setActive(field.name)}
+                      onFocus={() => focusField(field.name)}
                       onChange={(event) =>
                         setFields((current) =>
                           updateField(current, field.name, {
@@ -279,11 +326,11 @@ export function PdfFillTool() {
                     </select>
                   ) : field.multiline ? (
                     <textarea
-                      id={`fill-${field.name}`}
+                      id={`fill-field-${index}`}
                       className="min-h-24 rounded-[2px] border border-input bg-transparent px-2.5 py-2 text-sm"
                       value={field.value}
                       disabled={field.readOnly}
-                      onFocus={() => setActive(field.name)}
+                      onFocus={() => focusField(field.name)}
                       onChange={(event) =>
                         setFields((current) =>
                           updateField(current, field.name, {
@@ -294,11 +341,12 @@ export function PdfFillTool() {
                     />
                   ) : (
                     <Input
-                      id={`fill-${field.name}`}
+                      id={`fill-field-${index}`}
                       className="h-11"
+                      autoComplete="off"
                       value={field.value}
                       disabled={field.readOnly}
-                      onFocus={() => setActive(field.name)}
+                      onFocus={() => focusField(field.name)}
                       onChange={(event) =>
                         setFields((current) =>
                           updateField(current, field.name, {
@@ -333,138 +381,171 @@ export function PdfFillTool() {
       </div>
 
       <div className="min-w-0">
-        <ol className="flex flex-col gap-6">
-          {previews.map((src, pageIndex) => {
-            const size = sizes[pageIndex];
-            if (!size) return null;
-            const pageFields = fields.filter((field) =>
-              field.widgets.some((widget) => widget.pageIndex === pageIndex),
-            );
-            return (
-              <li key={pageIndex} id={`fill-page-${pageIndex}`}>
-                <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
-                  Página {pageIndex + 1}
-                </p>
-                <div className="relative overflow-hidden rounded-sm bg-white shadow-[0_24px_50px_-18px_rgba(40,24,10,0.45)] ring-1 ring-foreground/10">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={`Página ${pageIndex + 1}`}
-                    className="block w-full select-none"
-                    draggable={false}
-                  />
-                  {pageFields.flatMap((field) =>
-                    field.widgets
-                      .filter((widget) => widget.pageIndex === pageIndex)
-                      .map((widget, widgetIndex) => {
-                        const style = {
-                          left: `${(widget.x / size.width) * 100}%`,
-                          top: `${((size.height - widget.y - widget.height) / size.height) * 100}%`,
-                          width: `${(widget.width / size.width) * 100}%`,
-                          height: `${(widget.height / size.height) * 100}%`,
-                        };
-                        const hot =
-                          active === field.name
-                            ? "ring-2 ring-primary"
-                            : "ring-1 ring-primary/40";
-                        if (field.kind === "check") {
-                          return (
-                            <button
-                              key={`${field.name}-${widgetIndex}`}
-                              type="button"
-                              style={style}
-                              className={`absolute z-10 bg-accent/20 ${hot}`}
-                              aria-label={humanFieldName(field.name)}
-                              disabled={field.readOnly}
-                              onClick={() => {
-                                setActive(field.name);
-                                setFields((current) =>
-                                  updateField(current, field.name, {
-                                    checked: !field.checked,
-                                  }),
-                                );
-                              }}
-                            />
-                          );
+        {previews.length > 1 ? (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10"
+              disabled={pageIndex <= 0}
+              onClick={() => setViewPage((current) => Math.max(0, current - 1))}
+            >
+              Anterior
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Página {pageIndex + 1} de {previews.length}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10"
+              disabled={pageIndex >= previews.length - 1}
+              onClick={() =>
+                setViewPage((current) =>
+                  Math.min(previews.length - 1, current + 1),
+                )
+              }
+            >
+              Siguiente
+            </Button>
+          </div>
+        ) : (
+          <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
+            Página 1
+          </p>
+        )}
+        {pageSrc && size ? (
+          <div className="relative overflow-hidden rounded-sm bg-white shadow-[0_24px_50px_-18px_rgba(40,24,10,0.45)] ring-1 ring-foreground/10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={pageSrc}
+              alt={`Página ${pageIndex + 1}`}
+              className="pointer-events-none block w-full select-none"
+              draggable={false}
+            />
+            {fields.flatMap((field, fieldIndex) =>
+              field.widgets
+                .filter((widget) => widget.pageIndex === pageIndex)
+                .map((widget, widgetIndex) => {
+                  const style = boxStyle(widget, size);
+                  if (!style) return null;
+                  const live = active === field.name;
+                  const hot = live
+                    ? "ring-2 ring-primary"
+                    : "ring-1 ring-primary/35";
+                  if (field.kind === "check" || field.kind === "radio") {
+                    return (
+                      <button
+                        key={`${field.name}-${widgetIndex}`}
+                        type="button"
+                        style={style}
+                        className={`absolute z-10 bg-accent/15 ${hot}`}
+                        aria-label={humanFieldName(field.name)}
+                        disabled={field.readOnly}
+                        onClick={() => {
+                          focusField(field.name);
+                          if (field.kind === "check") {
+                            setFields((current) =>
+                              updateField(current, field.name, {
+                                checked: !field.checked,
+                              }),
+                            );
+                          } else {
+                            setFields((current) =>
+                              updateField(current, field.name, {
+                                value: widget.option ?? "",
+                              }),
+                            );
+                          }
+                        }}
+                      />
+                    );
+                  }
+                  if (!live) {
+                    return (
+                      <button
+                        key={`${field.name}-${widgetIndex}`}
+                        type="button"
+                        style={style}
+                        className={`absolute z-10 bg-white/20 ${hot}`}
+                        aria-label={humanFieldName(field.name)}
+                        disabled={field.readOnly}
+                        onClick={() => focusField(field.name)}
+                      />
+                    );
+                  }
+                  if (field.kind === "choice") {
+                    return (
+                      <select
+                        key={`${field.name}-${widgetIndex}`}
+                        style={style}
+                        className={`absolute z-10 bg-white text-[11px] ${hot}`}
+                        value={field.value}
+                        disabled={field.readOnly}
+                        onChange={(event) =>
+                          setFields((current) =>
+                            updateField(current, field.name, {
+                              value: event.target.value,
+                            }),
+                          )
                         }
-                        if (field.kind === "radio") {
-                          const option = widget.option ?? "";
-                          return (
-                            <button
-                              key={`${field.name}-${widgetIndex}`}
-                              type="button"
-                              style={style}
-                              className={`absolute z-10 bg-accent/20 ${hot}`}
-                              aria-label={option || humanFieldName(field.name)}
-                              disabled={field.readOnly}
-                              onClick={() => {
-                                setActive(field.name);
-                                setFields((current) =>
-                                  updateField(current, field.name, {
-                                    value: option,
-                                  }),
-                                );
-                              }}
-                            />
-                          );
+                      >
+                        <option value="">—</option>
+                        {field.options.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    );
+                  }
+                  if (field.multiline) {
+                    return (
+                      <textarea
+                        key={`${field.name}-${widgetIndex}`}
+                        style={style}
+                        className={`absolute z-10 bg-white/90 px-1 text-[12px] leading-tight ${hot}`}
+                        value={field.value}
+                        disabled={field.readOnly}
+                        autoFocus={widgetIndex === 0}
+                        onChange={(event) =>
+                          setFields((current) =>
+                            updateField(current, field.name, {
+                              value: event.target.value,
+                            }),
+                          )
                         }
-                        if (field.kind === "choice") {
-                          return (
-                            <select
-                              key={`${field.name}-${widgetIndex}`}
-                              style={style}
-                              className={`absolute z-10 bg-white/90 text-[11px] ${hot}`}
-                              value={field.value}
-                              disabled={field.readOnly}
-                              onFocus={() => setActive(field.name)}
-                              onChange={(event) =>
-                                setFields((current) =>
-                                  updateField(current, field.name, {
-                                    value: event.target.value,
-                                  }),
-                                )
-                              }
-                            >
-                              <option value="">—</option>
-                              {field.options.map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                          );
-                        }
-                        const Tag = field.multiline ? "textarea" : "input";
-                        return (
-                          <Tag
-                            key={`${field.name}-${widgetIndex}`}
-                            style={style}
-                            className={`absolute z-10 bg-white/85 px-1 text-[12px] leading-tight text-foreground ${hot}`}
-                            value={field.value}
-                            disabled={field.readOnly}
-                            onFocus={() => {
-                              setActive(field.name);
-                              document
-                                .getElementById(`fill-${field.name}`)
-                                ?.scrollIntoView({ block: "nearest" });
-                            }}
-                            onChange={(event) =>
-                              setFields((current) =>
-                                updateField(current, field.name, {
-                                  value: event.currentTarget.value,
-                                }),
-                              )
-                            }
-                          />
-                        );
-                      }),
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+                      />
+                    );
+                  }
+                  return (
+                    <input
+                      key={`${field.name}-${widgetIndex}`}
+                      type="text"
+                      autoComplete="off"
+                      name={`luna-fill-${fieldIndex}`}
+                      style={style}
+                      className={`absolute z-10 bg-white/90 px-1 text-[12px] leading-tight ${hot}`}
+                      value={field.value}
+                      disabled={field.readOnly}
+                      autoFocus={widgetIndex === 0}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") event.preventDefault();
+                      }}
+                      onChange={(event) =>
+                        setFields((current) =>
+                          updateField(current, field.name, {
+                            value: event.target.value,
+                          }),
+                        )
+                      }
+                    />
+                  );
+                }),
+            )}
+          </div>
+        ) : null}
       </div>
-    </div>
+    </form>
   );
 }

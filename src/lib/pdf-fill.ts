@@ -37,6 +37,29 @@ export type PdfFormField = {
   widgets: PdfFieldWidget[];
 };
 
+export function clipWidget(
+  widget: PdfFieldWidget,
+  page: { width: number; height: number },
+): PdfFieldWidget | null {
+  if (
+    page.width < 8 ||
+    page.height < 8 ||
+    !Number.isFinite(widget.x) ||
+    !Number.isFinite(widget.y) ||
+    !Number.isFinite(widget.width) ||
+    !Number.isFinite(widget.height)
+  ) {
+    return null;
+  }
+  const x = Math.min(page.width - 4, Math.max(0, widget.x));
+  const y = Math.min(page.height - 4, Math.max(0, widget.y));
+  const width = Math.min(widget.width, page.width - x);
+  const height = Math.min(widget.height, page.height - y);
+  if (width < 4 || height < 4) return null;
+  if (width / page.width > 0.96 && height / page.height > 0.96) return null;
+  return { ...widget, x, y, width, height };
+}
+
 export function humanFieldName(name: string) {
   const parts = name.split(/[.\]]/).map((part) => part.replace(/\[/g, "").trim());
   const last = [...parts].reverse().find((part) => part && !/^\d+$/.test(part));
