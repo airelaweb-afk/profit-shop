@@ -1,5 +1,8 @@
 import { loadPdfjs } from "@/lib/pdfjs-worker";
-import type { PdfTextLine } from "@/lib/pdf-edit-text";
+import {
+  DEFAULT_TEXT_COLOR,
+  type PdfTextLine,
+} from "@/lib/pdf-edit-text";
 
 export type OcrProgress = {
   pct: number;
@@ -100,8 +103,15 @@ export async function ocrPdfPage(
         width: (widthPx / canvas.width) * pageWidth,
         height,
         fontSize,
+        originalFontSize: fontSize,
         bold: false,
+        originalBold: false,
+        italic: false,
+        underline: false,
+        color: DEFAULT_TEXT_COLOR,
+        originalColor: DEFAULT_TEXT_COLOR,
         fontHint: "Tinos-Regular",
+        originalFontHint: "Tinos-Regular",
         pageWidth,
         pageHeight,
         leftPct: x0 / canvas.width,

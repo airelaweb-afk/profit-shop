@@ -29,11 +29,11 @@ export default function EditarPdfPage() {
         Cambiar el texto que ya está en la página.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
-        Como el «Editar texto» de iLove, pero el archivo no se sube. Si hay
-        letras seleccionables, las cambiamos aquí. Si el PDF trae la fuente
-        embebida (TTF/OTF), al guardar se reutiliza. Un escaneo es una foto:
-        pulsa «Leer con OCR» y Tesseract corre en este navegador (sin servidor).
-        No es Word: no rehacemos el diseño.
+        Como el «Editar texto» de iLove: miniaturas, página en el centro y
+        estilos a la derecha. El archivo no se sube. Si hay letras
+        seleccionables, las cambias aquí. Si el PDF trae TTF/OTF, al guardar se
+        reutiliza. Un escaneo: «Leer con OCR» en este navegador. No es Word: no
+        rehacemos el diseño.
       </p>
       <AdSlot label="Editar texto es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">

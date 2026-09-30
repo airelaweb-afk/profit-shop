@@ -18,6 +18,8 @@ function fontkit() {
 
 export const TINOS_FONT_URL = "/fonts/Tinos-Regular.ttf";
 
+export const DEFAULT_TEXT_COLOR = "#1a1714";
+
 export type PdfTextLine = {
   id: string;
   pageIndex: number;
@@ -28,8 +30,15 @@ export type PdfTextLine = {
   width: number;
   height: number;
   fontSize: number;
+  originalFontSize: number;
   bold: boolean;
+  originalBold: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  color: string;
+  originalColor: string;
   fontHint: string;
+  originalFontHint: string;
   pageWidth: number;
   pageHeight: number;
   leftPct: number;
@@ -38,6 +47,37 @@ export type PdfTextLine = {
   heightPct: number;
   fromOcr?: boolean;
 };
+
+export function lineIsDirty(line: PdfTextLine) {
+  return (
+    line.text !== line.original ||
+    line.bold !== line.originalBold ||
+    !!line.italic ||
+    !!line.underline ||
+    Math.round(line.fontSize) !== Math.round(line.originalFontSize) ||
+    (line.color || DEFAULT_TEXT_COLOR).toLowerCase() !==
+      (line.originalColor || DEFAULT_TEXT_COLOR).toLowerCase() ||
+    (line.fontHint || "") !== (line.originalFontHint || "")
+  );
+}
+
+export function hexToRgb01(hex: string) {
+  const raw = hex.replace("#", "").trim();
+  const full =
+    raw.length === 3
+      ? raw
+          .split("")
+          .map((char) => char + char)
+          .join("")
+      : raw.padEnd(6, "0").slice(0, 6);
+  const n = Number.parseInt(full, 16);
+  if (!Number.isFinite(n)) return rgb(0.07, 0.06, 0.05);
+  return rgb(
+    ((n >> 16) & 255) / 255,
+    ((n >> 8) & 255) / 255,
+    (n & 255) / 255,
+  );
+}
 
 export type PdfTextExtract = {
   pageCount: number;
@@ -178,8 +218,15 @@ function groupLines(items: RawItem[]): PdfTextLine[] {
         width: Math.max(8, right - x),
         height: Math.max(fontSize * 0.85, top - y),
         fontSize,
+        originalFontSize: fontSize,
         bold: parts.some((part) => part.bold),
+        originalBold: parts.some((part) => part.bold),
+        italic: false,
+        underline: false,
+        color: DEFAULT_TEXT_COLOR,
+        originalColor: DEFAULT_TEXT_COLOR,
         fontHint,
+        originalFontHint: fontHint,
         pageWidth: first.pageWidth,
         pageHeight: first.pageHeight,
         leftPct,
@@ -278,18 +325,24 @@ export async function applyTextEdits(
   doc.registerFontkit(fontkit() as never);
   const regular = await doc.embedFont(StandardFonts.Helvetica);
   const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
+  const italicFont = await doc.embedFont(StandardFonts.HelveticaOblique);
+  const boldItalicFont = await doc.embedFont(StandardFonts.HelveticaBoldOblique);
   const files = extractEmbeddedFonts(doc);
   const needsTinos = lines.some(
-    (line) =>
-      line.text !== line.original && /tinos/i.test(line.fontHint || ""),
+    (line) => lineIsDirty(line) && /tinos/i.test(line.fontHint || ""),
   );
   if (needsTinos && !pickEmbeddedFont(files, "Tinos")) {
     const extra = await tinosBytes();
     if (extra) files.push({ name: "Tinos-Regular", bytes: extra });
   }
   const cache = new Map<string, PDFFont>();
-  async function fontFor(line: PdfTextLine): Promise<{ font: PDFFont; custom: boolean }> {
-    const file = pickEmbeddedFont(files, line.fontHint);
+  async function fontFor(
+    line: PdfTextLine,
+  ): Promise<{ font: PDFFont; custom: boolean }> {
+    const wantsHelvetica = /helvetica|arial|sans/i.test(line.fontHint || "");
+    const file = wantsHelvetica
+      ? null
+      : pickEmbeddedFont(files, line.fontHint);
     if (file) {
       const cached = cache.get(file.name);
       if (cached) return { font: cached, custom: true };
@@ -301,19 +354,23 @@ export async function applyTextEdits(
         /* Helvetica */
       }
     }
+    if (line.bold && line.italic)
+      return { font: boldItalicFont, custom: false };
+    if (line.italic) return { font: italicFont, custom: false };
     return { font: line.bold ? boldFont : regular, custom: false };
   }
   const pages = doc.getPages();
   let usedEmbedded = false;
   for (const line of lines) {
-    if (line.text === line.original) continue;
+    if (!lineIsDirty(line)) continue;
     const page = pages[line.pageIndex];
     if (!page) continue;
     const chosen = await fontFor(line);
     if (chosen.custom) usedEmbedded = true;
     const raw = line.text.slice(0, 600);
     const next = chosen.custom ? raw : forWinAnsi(raw);
-    const size = Math.max(7, Math.min(line.fontSize || 11, 28));
+    const size = Math.max(6, Math.min(line.fontSize || 11, 64));
+    const ink = hexToRgb01(line.color || DEFAULT_TEXT_COLOR);
     const writtenWidth = chosen.font.widthOfTextAtSize(next || " ", size);
     const ascent = size * 0.75;
     const descent = size * 0.25;
@@ -328,24 +385,31 @@ export async function applyTextEdits(
       color: rgb(1, 1, 1),
     });
     if (!next.trim()) continue;
+    const draw = (text: string, font: PDFFont) => {
+      page.drawText(text, {
+        x: line.x,
+        y: line.y,
+        size,
+        font,
+        color: ink,
+        maxWidth: Math.max(line.width, writtenWidth, 24),
+      });
+      if (line.underline) {
+        page.drawLine({
+          start: { x: line.x, y: Math.max(0, line.y - 1.2) },
+          end: {
+            x: line.x + Math.max(line.width, writtenWidth),
+            y: Math.max(0, line.y - 1.2),
+          },
+          thickness: Math.max(0.6, size * 0.06),
+          color: ink,
+        });
+      }
+    };
     try {
-      page.drawText(next, {
-        x: line.x,
-        y: line.y,
-        size,
-        font: chosen.font,
-        color: rgb(0.07, 0.06, 0.05),
-        maxWidth: Math.max(line.width, writtenWidth, 24),
-      });
+      draw(next, chosen.font);
     } catch {
-      page.drawText(forWinAnsi(raw), {
-        x: line.x,
-        y: line.y,
-        size,
-        font: line.bold ? boldFont : regular,
-        color: rgb(0.07, 0.06, 0.05),
-        maxWidth: Math.max(line.width, writtenWidth, 24),
-      });
+      draw(forWinAnsi(raw), line.bold ? boldFont : regular);
     }
   }
   return {

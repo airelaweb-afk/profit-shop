@@ -121,7 +121,7 @@ export const toolFaqs: Record<string, FaqItem[]> = {
     },
     {
       q: "¿Queda la misma fuente y el mismo diseño?",
-      a: "Si el PDF trae la fuente embebida en TTF u OpenType, la reutilizamos al guardar. Helvetica de las 14 estándar no es un archivo de fuente: ahí seguimos con Helvetica. No clonamos fuentes Type1 raras ni texto en curva. El diseño no se recompone como Word: tapamos la frase vieja y escribimos encima.",
+      a: "Si el PDF trae la fuente embebida en TTF u OpenType, la reutilizamos al guardar. En el panel de estilos puedes cambiar tamaño, negrita, color y subrayado. La cursiva solo se guarda con Helvetica. Helvetica de las 14 estándar no es un archivo de fuente. No clonamos Type1 ni texto en curva. El diseño no se recompone como Word: tapamos la frase vieja y escribimos encima.",
     },
     {
       q: "¿El archivo se sube, como en iLove?",
