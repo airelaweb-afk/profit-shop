@@ -427,16 +427,16 @@ export async function createSampleScan(): Promise<ArrayBuffer> {
   ctx.fillStyle = "#d9cbb3";
   ctx.fillRect(28, 36, 644, 918);
   ctx.fillStyle = "#1a1714";
-  ctx.font = "32px Times New Roman, serif";
+  ctx.font = "36px Tinos, Times New Roman, serif";
   ctx.fillText("Factura escaneada de prueba", 56, 120);
-  ctx.font = "18px Times New Roman, serif";
+  ctx.font = "22px Tinos, Times New Roman, serif";
   ctx.fillStyle = "#3a342c";
   ctx.fillText("Esta pagina es una foto: no hay texto seleccionable.", 56, 180);
-  ctx.fillText("Pulsa «Leer con OCR» para que el navegador lea las letras.", 56, 214);
+  ctx.fillText("Pulsa Leer con OCR para que el navegador lea las letras.", 56, 220);
   ctx.fillStyle = "#1a1714";
-  ctx.fillText("Cliente: Luna Oficio", 56, 300);
-  ctx.fillText("Importe: 40 euros al año en Madrid", 56, 340);
-  ctx.fillText("Año 2026. Revisar acentos: cañón, año, Andalucía.", 56, 380);
+  ctx.fillText("Cliente: Luna Oficio", 56, 310);
+  ctx.fillText("Importe: 40 euros al ano en Madrid", 56, 360);
+  ctx.fillText("Ano 2026. Revisar acentos: canon, ano, Andalucia.", 56, 410);
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
       (next) => (next ? resolve(next) : reject(new Error("No PNG"))),

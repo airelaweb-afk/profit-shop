@@ -68,13 +68,14 @@ export async function ocrPdfPage(
     },
   });
   try {
-    const result = await worker.recognize(canvas);
+    const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
     const lines: PdfTextLine[] = [];
     const blocks = result.data.blocks || [];
     let index = 0;
     const pushBox = (
       text: string,
       box: { x0: number; y0: number; x1: number; y1: number },
+      baselineY?: number,
     ) => {
       const clean = text.replace(/\s+/g, " ").trim();
       if (clean.length < 2) return;
@@ -86,7 +87,8 @@ export async function ocrPdfPage(
       const heightPx = Math.max(10, y1 - y0);
       const x = (x0 / canvas.width) * pageWidth;
       const height = (heightPx / canvas.height) * pageHeight;
-      const y = pageHeight - (y1 / canvas.height) * pageHeight;
+      const baseline = baselineY ?? y1;
+      const y = pageHeight - (baseline / canvas.height) * pageHeight;
       const fontSize = Math.max(9, Math.min(28, height * 0.78));
       lines.push({
         id: `ocr-p${pageIndex}-l${index}`,
@@ -112,17 +114,29 @@ export async function ocrPdfPage(
     };
     for (const block of blocks) {
       for (const para of block.paragraphs || []) {
-        for (const line of para.lines || []) {
-          pushBox(line.text || "", line.bbox);
+        const nested = para.lines || [];
+        if (nested.length) {
+          for (const line of nested) {
+            pushBox(line.text || "", line.bbox, line.baseline?.y0);
+          }
+        } else if (para.text) {
+          pushBox(para.text, para.bbox);
         }
       }
     }
-    if (lines.length === 0 && result.data.text.trim()) {
-      pushBox(result.data.text, {
-        x0: 20,
-        y0: 20,
-        x1: canvas.width - 20,
-        y1: 80,
+    if (lines.length === 0) {
+      const chunks = result.data.text
+        .split(/\n+/)
+        .map((part) => part.replace(/\s+/g, " ").trim())
+        .filter((part) => part.length >= 2);
+      chunks.forEach((chunk, i) => {
+        const top = 40 + i * 36;
+        pushBox(chunk, {
+          x0: 40,
+          y0: top,
+          x1: canvas.width - 40,
+          y1: top + 28,
+        });
       });
     }
     return lines;
