@@ -52,7 +52,7 @@ export function InkHero() {
 
       <div className="relative mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
         <p className="stamp-mark inline-block border-2 border-accent px-3 py-1 font-mono text-[0.68rem] font-medium tracking-[0.2em] text-accent uppercase">
-          Gratis · En tu navegador · El archivo no se sube
+          Gratis · Sin subir archivos
         </p>
         <h1 className="mt-6 max-w-4xl font-heading text-4xl leading-[1.05] tracking-tight text-background sm:text-6xl lg:text-7xl">
           Unir PDF, comprimir imagen, HEIC a JPG.{" "}

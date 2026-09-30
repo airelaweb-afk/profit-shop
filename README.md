@@ -1,6 +1,6 @@
 # Luna Oficio
 
-Herramientas de administración para **autónomos, secretaría y empresas pequeñas**. No es un CRM: cada página resuelve un trabajo pesado (presupuestos, cobros, horas, gastos, firmar PDF) y se puede encontrar en Google.
+Herramientas para trabajar con archivos **sin subirlos a ningún servidor**: unir y comprimir PDF, comprimir imagen, HEIC a JPG, JPG a WebP, firmar PDF y documentos de trabajo en PDF (presupuestos, avisos de cobro, partes de horas, gastos). Cada página resuelve una búsqueda concreta y está pensada para encontrarse en Google. Pro añade WebP en lote, un plugin de WordPress y la marca de agua.
 
 Las herramientas piden **iniciar sesión**. Hay dos modos, y la web elige solo según haya o no variables de Supabase:
 
@@ -9,7 +9,7 @@ Las herramientas piden **iniciar sesión**. Hay dos modos, y la web elige solo s
 
 En los dos modos, **los PDF, fotos y presupuestos no se suben a ningún sitio**: se procesan en el navegador.
 
-En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Oficio), botones grandes, recorte que no mueve la página, y al guardar se abre el menú de compartir (Guardar en Archivos).
+En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Documentos), botones grandes, recorte que no mueve la página, y al guardar se abre el menú de compartir (Guardar en Archivos).
 
 ## Herramientas
 
@@ -21,9 +21,11 @@ En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Oficio), botones grande
 - **Rellenar y firmar PDF** (`/pdf`): subes el PDF (modelo 145 u otro), marcas casillas, escribes, firmas y descargas. El archivo no se sube a ningún servidor.
 - **Unir / dividir / comprimir PDF** (`/unir-pdf`, `/dividir-pdf`, `/comprimir-pdf`): las búsquedas gordas. En el navegador.
 - **JPG a PDF** y **PDF a JPG** (`/jpg-a-pdf`, `/pdf-a-jpg`): fotos ↔ hojas.
-- **Rotar y numerar PDF** (`/rotar-pdf`, `/numerar-pdf`).
+- **Rotar, numerar y eliminar páginas PDF** (`/rotar-pdf`, `/numerar-pdf`, `/eliminar-paginas-pdf`).
 - **Marca de agua PDF** (`/marca-de-agua-pdf`): Pro.
 - **Imagen** (`/herramientas-imagen`): comprimir, PNG/JPG/WebP, HEIC a JPG, recortar, girar, redimensionar.
+- **WebP en lote** (`/webp-en-lote`): Pro. Hasta 300 imágenes o una carpeta entera a WebP, con calidad y ancho máximo, en un zip con los mismos nombres. Todo en el navegador (`src/components/webp-batch-tool.tsx`).
+- **Plugin WordPress WebP** (`/plugin-wordpress-webp`): Pro. Descarga de `luna-oficio-webp.zip`; ver [Plugin de WordPress](#plugin-de-wordpress-webp).
 - **Audio a WAV** y **recortar audio** (`/audio-a-wav`, `/recortar-audio`). No hay MP3 de salida ni vídeo.
 
 Blog (`/blog`), FAQ (`/faq`), precios (`/precios`), comparativas objetivas (`/comparar`, `alternativa-a-…`) y páginas legales (`/aviso-legal`, `/privacidad`, `/cookies`, `/condiciones`). Consentimiento de cookies en el pie; puedes cambiarlo en `/cookies`.
@@ -39,7 +41,7 @@ La tienda de plantillas (`/tienda`) sigue en el código, pero ya no está en el 
 ## Dinero (sin servidor)
 
 - **Gratis:** unir, comprimir, firmar, imagen, oficio. Anuncios de casa si aceptas publicidad (AdSense cuando haya ID de cliente).
-- **Pro (29 €/año):** sin anuncios en este navegador + marca de agua. Pago con **Stripe** (Payment Link) o **Revolut**. Pega los enlaces en `src/lib/payments.ts` o en Hostinger:
+- **Pro (29 €/año):** sin anuncios, marca de agua en PDF, WebP en lote y plugin de WordPress. Pago con **Stripe** (Payment Link) o **Revolut**. Pega los enlaces en `src/lib/payments.ts` o en Hostinger:
 
   `NEXT_PUBLIC_STRIPE_PAYMENT_LINK`  
   `NEXT_PUBLIC_REVOLUT_PAYMENT_LINK`
@@ -175,6 +177,20 @@ Sube **el contenido** de `out/` (incluido `.htaccess`) a `public_html` del domin
 
 Ahí sí podrías correr Next con servidor. Este repo, tal como está, **no** usa ese modo: está exportado a estático para el plan React. No hace falta cambiar nada si ya te funciona con `out/`.
 
+## Plugin de WordPress (WebP)
+
+El código PHP vive en `wordpress-plugin/luna-oficio-webp/` (GPL v2+). `scripts/build-wp-plugin.mjs` lo empaqueta en `public/downloads/luna-oficio-webp.zip` antes de cada `dev`/`build` (la carpeta `public/downloads/` está en `.gitignore`; el zip se genera en Hostinger al construir). La landing `/plugin-wordpress-webp` muestra el botón de descarga solo a cuentas Pro.
+
+Qué hace el plugin (Medios → WebP):
+
+- Convierte a WebP cada JPG/PNG que se sube (original + todas las miniaturas) con el editor de imágenes de WordPress (GD o Imagick).
+- Conversor por lotes de la biblioteca existente vía admin-ajax, con progreso, registro y «continúa donde lo dejó».
+- Actualiza `_wp_attached_file`, los metadatos, el `post_mime_type` y las URL dentro de `post_content` y `postmeta` (serializado y JSON con barras escapadas).
+- Conserva los originales por defecto y permite «Restaurar originales» (todo o por adjunto, desde la lista de Medios).
+- Si el WebP pesa más que el original, deja la imagen como está.
+
+Para probarlo en local hace falta un WordPress real: `php -l` sobre los archivos comprueba la sintaxis, y con WP-CLI puedes activar el plugin (`wp plugin activate luna-oficio-webp`) y lanzar la conversión con `Luna_WebP_Converter::convert()`.
+
 ## Scripts
 
 | Comando | Qué hace |
@@ -183,6 +199,7 @@ Ahí sí podrías correr Next con servidor. Este repo, tal como está, **no** us
 | `npm run build` | Genera `out/` para Hostinger |
 | `npm run start` | Sirve `out/` en el puerto 43147 |
 | `npm run lint` | ESLint |
+| `npm run build:plugin` | Solo empaqueta el plugin de WordPress en `public/downloads/` |
 
 ## Stack
 
