@@ -596,3 +596,29 @@ export function applyKnownCheckboxState(
     if (id && storage) storage.setValue(id, { value: field.checked });
   }
 }
+
+/** AEAT PDFs mark fillable text as read-only; PDF.js then hides the input. */
+export function unlockPdfTextWidgets(layer: HTMLElement) {
+  for (const section of layer.querySelectorAll(
+    ".textWidgetAnnotation, .choiceWidgetAnnotation",
+  )) {
+    section.classList.remove("hasOwnCanvas");
+  }
+  for (const node of layer.querySelectorAll(
+    "input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=file]), textarea, select",
+  )) {
+    if (
+      !(
+        node instanceof HTMLInputElement ||
+        node instanceof HTMLTextAreaElement ||
+        node instanceof HTMLSelectElement
+      )
+    ) {
+      continue;
+    }
+    node.disabled = false;
+    if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+      node.readOnly = false;
+    }
+  }
+}

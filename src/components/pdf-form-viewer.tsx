@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { applyKnownCheckboxState, type PdfFormField } from "@/lib/pdf-fill";
+import {
+  applyKnownCheckboxState,
+  unlockPdfTextWidgets,
+  type PdfFormField,
+} from "@/lib/pdf-fill";
 import { loadPdfjs } from "@/lib/pdfjs-worker";
 import "@/components/pdfjs-form-layer.css";
 
@@ -10,10 +14,9 @@ type PdfDoc = Awaited<ReturnType<PdfjsNs["getDocument"]>["promise"]>;
 
 const linkService = {
   externalLinkEnabled: true,
-  addLinkAttributes(element: HTMLAnchorElement, url: string, newWindow?: boolean) {
+  addLinkAttributes(element: HTMLAnchorElement, url: string) {
     element.href = url;
     element.rel = "noopener noreferrer";
-    if (newWindow) element.target = "_blank";
   },
   getDestinationHash() {
     return "#";
@@ -176,14 +179,12 @@ export function PdfFormViewer({
 
       canvas.hidden = false;
       layer.className = "annotationLayer";
-      // Without this map, PDF.js paints every checkbox “On” appearance onto the
-      // page, so empty boxes look filled with X. Text widgets stay HTML inputs.
-      const annotationCanvasMap = new Map();
+      // DISABLE: do not stamp widget appearances (those X) onto the page.
+      // The annotation layer still draws the real HTML fields on top.
       renderTask = page.render({
         canvas,
         viewport,
-        annotationMode: pdfjs.AnnotationMode.ENABLE_FORMS,
-        annotationCanvasMap,
+        annotationMode: pdfjs.AnnotationMode.DISABLE,
       });
       try {
         await renderTask.promise;
@@ -204,7 +205,6 @@ export function PdfFormViewer({
         page,
         viewport,
         annotationStorage: pdf.annotationStorage,
-        annotationCanvasMap,
         linkService: linkService as never,
       } as never);
       await annotationLayer.render({
@@ -214,12 +214,12 @@ export function PdfFormViewer({
         page,
         renderForms: true,
         annotationStorage: pdf.annotationStorage,
-        annotationCanvasMap,
         linkService: linkService as never,
         fieldObjects: fieldObjects as never,
       });
       if (cancelled) return;
       applyKnownCheckboxState(layer, pdf.annotationStorage, fields);
+      unlockPdfTextWidgets(layer);
     })().catch((caught) => {
       if (!cancelled) {
         setError(
