@@ -113,25 +113,11 @@ export function MobileDock() {
               </Link>
             ))}
             <Link
-              href="/comparar"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
-            >
-              Comparar
-            </Link>
-            <Link
               href="/blog"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Blog
-            </Link>
-            <Link
-              href="/precios"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
-            >
-              Precios
             </Link>
             <Link
               href="/faq"
@@ -146,6 +132,13 @@ export function MobileDock() {
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Cómo funciona
+            </Link>
+            <Link
+              href="/audio-a-wav"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+            >
+              Audio a WAV
             </Link>
             <Link
               href="/cookies"
@@ -201,6 +194,15 @@ export function MobileDock() {
                 </Button>
               </div>
             )}
+            <p className="mt-6 px-3 text-xs text-muted-foreground">
+              <Link href="/precios" onClick={() => setOpen(false)} className="hover:text-foreground">
+                Pro
+              </Link>
+              {" · "}
+              <Link href="/comparar" onClick={() => setOpen(false)} className="hover:text-foreground">
+                Fichas
+              </Link>
+            </p>
           </nav>
         </SheetContent>
       </Sheet>

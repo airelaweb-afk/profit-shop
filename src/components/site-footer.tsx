@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { SearchTicker } from "@/components/search-ticker";
 import { SiteBrand } from "@/components/site-brand";
-import { competitors } from "@/lib/comparisons";
 import { hasCloud } from "@/lib/supabase";
 
 export function SiteFooter() {
@@ -9,11 +8,11 @@ export function SiteFooter() {
   return (
     <footer className="no-print mt-auto border-t-2 border-foreground pb-dock">
       <SearchTicker reverse tone="orange" />
-      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="luna-wrap grid gap-8 py-12 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <SiteBrand />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            Herramientas para PDF, imágenes y documentos de trabajo que
+            Herramientas para PDF, imagen, audio y documentos de trabajo que
             funcionan en tu navegador. El archivo se procesa en tu aparato y no
             se sube a ningún servidor.
           </p>
@@ -57,6 +56,16 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/audio-a-wav" className="hover:text-foreground">
+                Audio a WAV
+              </Link>
+            </li>
+            <li>
+              <Link href="/recortar-audio" className="hover:text-foreground">
+                Recortar audio
+              </Link>
+            </li>
+            <li>
               <Link href="/presupuestos" className="hover:text-foreground">
                 Presupuestos en PDF
               </Link>
@@ -82,25 +91,8 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/comparar" className="hover:text-foreground">
-                Comparativas
-              </Link>
-            </li>
-            {competitors.slice(0, 3).map((item) => (
-              <li key={item.slug}>
-                <Link href={item.href} className="hover:text-foreground">
-                  Frente a {item.name}
-                </Link>
-              </li>
-            ))}
-            <li>
               <Link href="/faq" className="hover:text-foreground">
                 Preguntas frecuentes
-              </Link>
-            </li>
-            <li>
-              <Link href="/precios" className="hover:text-foreground">
-                Precios
               </Link>
             </li>
           </ul>
@@ -137,7 +129,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="bg-foreground text-background">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-background/70 sm:px-6">
+        <p className="luna-wrap py-4 text-xs text-background/70">
           Luna Oficio, de Airela Web. Herramientas para trabajar con archivos
           sin subirlos a un servidor. Marcas ajenas identificadas en{" "}
           <Link href="/aviso-legal" className="text-accent underline-offset-2 hover:underline">
@@ -146,6 +138,14 @@ export function SiteFooter() {
           .{" "}
           <Link href="/admin" className="text-background/50 underline-offset-2 hover:text-accent hover:underline">
             Panel
+          </Link>
+          {" · "}
+          <Link href="/precios" className="text-background/40 underline-offset-2 hover:text-accent hover:underline">
+            Pro
+          </Link>
+          {" · "}
+          <Link href="/comparar" className="text-background/40 underline-offset-2 hover:text-accent hover:underline">
+            Fichas
           </Link>
         </p>
       </div>

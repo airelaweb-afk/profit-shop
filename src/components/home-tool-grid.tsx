@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -25,9 +28,11 @@ import {
   Receipt,
   Clock3,
   Wallet,
+  AudioLines,
+  Music,
 } from "lucide-react";
 import { allPdfTools } from "@/lib/pdf-kit";
-import { imageKit, imageProKit } from "@/lib/image-kit";
+import { audioKit, imageKit, imageProKit } from "@/lib/image-kit";
 
 const ICONS: Record<string, LucideIcon> = {
   "/unir-pdf": Combine,
@@ -52,6 +57,8 @@ const ICONS: Record<string, LucideIcon> = {
   "/girar-imagen": RotateCw,
   "/webp-en-lote": Layers,
   "/plugin-wordpress-webp": Puzzle,
+  "/audio-a-wav": Music,
+  "/recortar-audio": AudioLines,
   "/presupuestos": FileText,
   "/versiones": ListOrdered,
   "/cobros": Receipt,
@@ -82,6 +89,8 @@ const BLURB: Record<string, string> = {
   "/girar-imagen": "Endereza la foto del móvil.",
   "/webp-en-lote": "Toda la carpeta a WebP, en un zip.",
   "/plugin-wordpress-webp": "Toda la biblioteca de medios a WebP.",
+  "/audio-a-wav": "MP3, M4A u OGG a WAV, en el navegador.",
+  "/recortar-audio": "Marcas inicio y fin; sales con un WAV.",
   "/presupuestos": "Un PDF por cliente, con tu logo.",
   "/versiones": "Varias ofertas en el mismo papel.",
   "/cobros": "Mensaje de impago, listo para enviar.",
@@ -97,96 +106,136 @@ const office = [
   { href: "/gastos", name: "Relación de gastos" },
 ];
 
-function Tile({
-  href,
-  name,
-  pro,
-}: {
-  href: string;
-  name: string;
-  pro?: boolean;
-}) {
+type TileData = { href: string; name: string; pro?: boolean };
+
+const ALL_TILES: TileData[] = [
+  ...allPdfTools.map((tool) => ({
+    href: tool.href,
+    name: tool.name,
+    pro: "pro" in tool && tool.pro,
+  })),
+  ...[...imageKit, ...imageProKit].map((tool) => ({
+    href: tool.href,
+    name: tool.name,
+    pro: "pro" in tool && tool.pro,
+  })),
+  ...audioKit.map((tool) => ({ href: tool.href, name: tool.name })),
+  ...office,
+];
+
+const FILTERS = [
+  { id: "all", label: "Todos" },
+  { id: "pdf", label: "PDF" },
+  { id: "sort", label: "Ordenar PDF" },
+  { id: "optimize", label: "Optimizar PDF" },
+  { id: "convert", label: "Convertir" },
+  { id: "edit", label: "Editar PDF" },
+  { id: "image", label: "Imagen" },
+  { id: "audio", label: "Audio" },
+  { id: "docs", label: "Documentos" },
+] as const;
+
+type FilterId = (typeof FILTERS)[number]["id"];
+
+const FILTER_HREFS: Record<Exclude<FilterId, "all">, string[]> = {
+  pdf: allPdfTools.map((tool) => tool.href),
+  sort: ["/unir-pdf", "/dividir-pdf", "/eliminar-paginas-pdf", "/rotar-pdf"],
+  optimize: ["/comprimir-pdf"],
+  convert: [
+    "/jpg-a-pdf",
+    "/pdf-a-jpg",
+    "/png-a-jpg",
+    "/jpg-a-png",
+    "/jpg-a-webp",
+    "/heic-a-jpg",
+    "/audio-a-wav",
+  ],
+  edit: [
+    "/editar-pdf",
+    "/rellenar-pdf",
+    "/pdf",
+    "/marca-de-agua-pdf",
+    "/numerar-pdf",
+  ],
+  image: [...imageKit, ...imageProKit].map((tool) => tool.href),
+  audio: audioKit.map((tool) => tool.href),
+  docs: office.map((tool) => tool.href),
+};
+
+function Tile({ href, name, pro }: TileData) {
   const Icon = ICONS[href] ?? FileText;
   return (
     <Link
       href={href}
-      className="group flex gap-3 rounded-[2px] border-2 border-foreground/10 bg-card p-4 transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-primary hover:shadow-[6px_6px_0_0_#ff4b1a]"
+      className="group flex h-full flex-col rounded-2xl border border-foreground/10 bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary hover:shadow-[6px_6px_0_0_#ff4b1a]"
     >
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-[2px] bg-foreground text-accent">
-        <Icon className="size-5" strokeWidth={2.2} />
+      <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Icon className="size-6" strokeWidth={2} />
       </span>
-      <span className="min-w-0">
-        <span className="flex items-baseline gap-2">
-          <span className="font-heading text-lg leading-tight">{name}</span>
-          {pro ? (
-            <span className="font-mono text-[0.65rem] tracking-[0.14em] text-primary uppercase">
-              Pro
-            </span>
-          ) : null}
-        </span>
-        <span className="mt-0.5 block text-sm text-muted-foreground">
-          {BLURB[href] ?? ""}
-        </span>
+      <span className="mt-4 flex items-baseline gap-2">
+        <span className="font-heading text-xl leading-tight">{name}</span>
+        {pro ? (
+          <span className="font-mono text-[0.65rem] tracking-[0.14em] text-primary uppercase">
+            Pro
+          </span>
+        ) : null}
+      </span>
+      <span className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+        {BLURB[href] ?? ""}
       </span>
     </Link>
   );
 }
 
 export function HomeToolGrid() {
+  const [filter, setFilter] = useState<FilterId>("all");
+  const tiles = useMemo(() => {
+    if (filter === "all") return ALL_TILES;
+    const allow = new Set(FILTER_HREFS[filter]);
+    return ALL_TILES.filter((tile) => allow.has(tile.href));
+  }, [filter]);
+
   return (
-    <div id="herramientas" className="scroll-mt-20">
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-        <p className="font-mono text-[0.7rem] tracking-[0.18em] text-primary uppercase">
-          PDF
-        </p>
-        <h2 className="mt-2 font-heading text-3xl sm:text-4xl">Herramientas PDF</h2>
-        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+    <div id="herramientas" className="scroll-mt-20 bg-[#f7f4ee] py-12 sm:py-16">
+      <div className="luna-wrap">
+        <h2 className="text-center font-heading text-3xl tracking-tight sm:text-5xl">
+          Herramientas online para PDF, imagen y audio
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
           Sin cuenta. El archivo no se sube. Gratis con un tope; Pro, sin límite.
         </p>
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {allPdfTools.map((tool) => (
-            <li key={tool.href}>
-              <Tile href={tool.href} name={tool.name} pro={"pro" in tool && tool.pro} />
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="border-y-2 border-foreground/10 bg-card/40">
-        <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-          <p className="font-mono text-[0.7rem] tracking-[0.18em] text-primary uppercase">
-            Imagen
-          </p>
-          <h2 className="mt-2 font-heading text-3xl sm:text-4xl">Herramientas de imagen</h2>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Comprimir, HEIC, WebP. En lote y el plugin de WordPress son Pro.
-          </p>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {[...imageKit, ...imageProKit].map((tool) => (
-              <li key={tool.href}>
-                <Tile href={tool.href} name={tool.name} pro={"pro" in tool && tool.pro} />
-              </li>
-            ))}
-          </ul>
+        <div className="mt-8 flex flex-wrap justify-center gap-2">
+          {FILTERS.map((item) => {
+            const on = filter === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setFilter(item.id)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  on
+                    ? "bg-foreground text-background"
+                    : "bg-card text-foreground ring-1 ring-foreground/10 hover:ring-foreground/30"
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-        <p className="font-mono text-[0.7rem] tracking-[0.18em] text-primary uppercase">
-          Documentos
-        </p>
-        <h2 className="mt-2 font-heading text-3xl sm:text-4xl">Documentos de trabajo</h2>
-        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Pegas los datos y sale el PDF. Gratis, con tope de tandas.
-        </p>
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {office.map((tool) => (
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {tiles.map((tool) => (
             <li key={tool.href}>
-              <Tile href={tool.href} name={tool.name} />
+              <Tile href={tool.href} name={tool.name} pro={tool.pro} />
             </li>
           ))}
         </ul>
-      </section>
+        {tiles.length === 0 ? (
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            No hay herramientas en este filtro.
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

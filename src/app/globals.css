@@ -103,6 +103,22 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+  .luna-wrap {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 92rem;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .luna-wrap {
+      padding-inline: 1.75rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .luna-wrap {
+      padding-inline: 2.5rem;
+    }
+  }
   body:has([data-luna-studio]) .luna-cookie-banner {
     display: none;
   }

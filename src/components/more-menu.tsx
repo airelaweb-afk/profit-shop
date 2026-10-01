@@ -6,10 +6,8 @@ import { ChevronDown } from "lucide-react";
 
 const moreLinks = [
   { href: "/blog", label: "Blog" },
-  { href: "/comparar", label: "Comparar" },
   { href: "/faq", label: "Preguntas" },
   { href: "/como-funciona", label: "Cómo funciona" },
-  { href: "/precios", label: "Precios" },
 ] as const;
 
 export function MoreMenu({ tone = "ink" }: { tone?: "ink" | "paper" }) {

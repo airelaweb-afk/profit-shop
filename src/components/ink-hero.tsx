@@ -18,7 +18,7 @@ export function InkHero() {
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <div className="relative luna-wrap py-10 sm:py-14">
         <p className="stamp-mark inline-block border-2 border-accent px-3 py-1 font-mono text-[0.68rem] font-medium tracking-[0.2em] text-accent uppercase">
           Gratis · Sin cuenta · Sin subir archivos
         </p>
@@ -27,8 +27,8 @@ export function InkHero() {
           <span className="text-primary">En tu navegador.</span>
         </h1>
         <p className="mt-4 max-w-xl text-lg text-background/75">
-          Unir, comprimir, convertir, firmar, rellenar, editar texto. El archivo
-          no se sube.
+          Unir, comprimir, convertir, firmar, rellenar, editar texto y audio a
+          WAV. El archivo no se sube.
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
           <Button

@@ -58,7 +58,7 @@ function AccountActions() {
 export function SiteHeader() {
   return (
     <header className="no-print sticky top-0 z-40 bg-foreground text-background">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
+      <div className="luna-wrap flex h-14 items-center justify-between gap-3 sm:h-16">
         <SiteBrand compact tone="ink" />
 
         <nav className="hidden items-center gap-4 text-sm 2xl:flex">
@@ -75,6 +75,9 @@ export function SiteHeader() {
           </Link>
           <Link href="/herramientas-imagen" className="ink-link">
             Imagen
+          </Link>
+          <Link href="/audio-a-wav" className="ink-link">
+            Audio
           </Link>
           <Link href="/presupuestos" className="ink-link">
             Documentos

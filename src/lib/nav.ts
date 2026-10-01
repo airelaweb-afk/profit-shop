@@ -9,6 +9,7 @@ export const officeLinks = [
 export const kitLinks = [
   { href: "/herramientas-pdf", label: "PDF" },
   { href: "/herramientas-imagen", label: "Imagen" },
+  { href: "/audio-a-wav", label: "Audio" },
 ] as const;
 
 export const allNavLinks = [...officeLinks, ...kitLinks];
