@@ -44,7 +44,7 @@ import {
   type PdfTextLine,
 } from "@/lib/pdf-edit-text";
 import { ocrPdfPage } from "@/lib/pdf-ocr";
-import { loadPdfjs } from "@/lib/pdfjs-worker";
+import { loadPdfjs, getPdfDocument, hasPdfMagic, isMobilePdfHost } from "@/lib/pdfjs-worker";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
 const PRESET_COLORS = [
@@ -59,7 +59,12 @@ const PRESET_COLORS = [
 function isPdfFile(file: File) {
   const type = file.type.toLowerCase();
   const name = file.name.toLowerCase();
-  return type === "application/pdf" || name.endsWith(".pdf");
+  return (
+    type.includes("pdf") ||
+    type === "application/octet-stream" ||
+    type === "" ||
+    name.endsWith(".pdf")
+  );
 }
 
 function fontLabel(hint: string) {
@@ -151,7 +156,12 @@ export function PdfEditTextTool() {
     setError("");
     setNotice("");
     try {
-      await openBytes(await file.arrayBuffer(), file.name);
+      const data = await file.arrayBuffer();
+      if (!hasPdfMagic(data)) {
+        setError("Ese archivo no es un PDF (el teléfono a veces lo manda sin extensión).");
+        return;
+      }
+      await openBytes(data, file.name || "documento.pdf");
     } catch (caught) {
       setSource(null);
       setLines([]);
@@ -249,17 +259,22 @@ export function PdfEditTextTool() {
   }, [source]);
 
   useEffect(() => {
+    if (isMobilePdfHost()) setViewScale(0.48);
+  }, []);
+
+  useEffect(() => {
     if (!source) {
+      setThumbs([]);
+      return;
+    }
+    if (isMobilePdfHost()) {
       setThumbs([]);
       return;
     }
     let gone = false;
     void (async () => {
       const pdfjs = await loadPdfjs();
-      const task = pdfjs.getDocument({
-        data: new Uint8Array(source.slice(0)),
-        useWasm: false,
-      });
+      const task = await getPdfDocument(source);
       const pdf = await task.promise;
       const next: string[] = [];
       for (let number = 1; number <= pdf.numPages; number += 1) {
@@ -293,17 +308,16 @@ export function PdfEditTextTool() {
     let gone = false;
     void (async () => {
       const pdfjs = await loadPdfjs();
-      const task = pdfjs.getDocument({
-        data: new Uint8Array(source.slice(0)),
-        useWasm: false,
-      });
+      const task = await getPdfDocument(source);
       const pdf = await task.promise;
       if (gone) {
         await task.destroy();
         return;
       }
       const page = await pdf.getPage(pageIndex + 1);
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = isMobilePdfHost()
+        ? 1
+        : Math.min(2, window.devicePixelRatio || 1);
       const css = page.getViewport({ scale: viewScale });
       const viewport = page.getViewport({ scale: viewScale * dpr });
       wrap.style.width = `${css.width}px`;
@@ -375,7 +389,7 @@ export function PdfEditTextTool() {
     return (
       <div className="mx-auto max-w-2xl">
         <FileDrop
-          accept="application/pdf,.pdf"
+          accept=".pdf,application/pdf,application/octet-stream"
           busy={busy}
           dropTitle="PDF con texto"
           tapTitle="Elige el PDF del teléfono"
@@ -523,7 +537,7 @@ export function PdfEditTextTool() {
           onClick={() => {
             const input = document.createElement("input");
             input.type = "file";
-            input.accept = "application/pdf,.pdf";
+            input.accept = ".pdf,application/pdf,application/octet-stream";
             input.onchange = () => void takeFile(input.files?.[0]);
             input.click();
           }}

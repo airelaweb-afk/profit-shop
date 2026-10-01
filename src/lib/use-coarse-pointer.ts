@@ -4,8 +4,12 @@ import { useSyncExternalStore } from "react";
 
 function subscribe(onStoreChange: () => void) {
   const media = window.matchMedia("(pointer: coarse)");
-  media.addEventListener("change", onStoreChange);
-  return () => media.removeEventListener("change", onStoreChange);
+  if (typeof media.addEventListener === "function") {
+    media.addEventListener("change", onStoreChange);
+    return () => media.removeEventListener("change", onStoreChange);
+  }
+  media.addListener(onStoreChange);
+  return () => media.removeListener(onStoreChange);
 }
 
 function getSnapshot() {

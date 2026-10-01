@@ -4,7 +4,7 @@ import {
   extractEmbeddedFonts,
   pickEmbeddedFont,
 } from "@/lib/pdf-embedded-fonts";
-import { loadPdfjs } from "@/lib/pdfjs-worker";
+import { getPdfDocument, isMobilePdfHost } from "@/lib/pdfjs-worker";
 
 function fontkit() {
   const rec = fontkitNs as unknown as {
@@ -239,16 +239,13 @@ function groupLines(items: RawItem[]): PdfTextLine[] {
 }
 
 export async function extractPdfText(data: ArrayBuffer): Promise<PdfTextExtract> {
-  const pdfjs = await loadPdfjs();
-  const task = pdfjs.getDocument({
-    data: new Uint8Array(copyBuffer(data)),
-    useWasm: false,
-  });
+  const task = await getPdfDocument(data);
   const pdf = await task.promise;
   const pageCount = pdf.numPages;
   const pages: { width: number; height: number }[] = [];
   const items: RawItem[] = [];
   const fontNames = new Set<string>();
+  const skipOps = isMobilePdfHost();
   for (let number = 1; number <= pageCount; number += 1) {
     const page = await pdf.getPage(number);
     const view = page.view;
@@ -257,7 +254,13 @@ export async function extractPdfText(data: ArrayBuffer): Promise<PdfTextExtract>
     const viewport = page.getViewport({ scale: 1 });
     pages.push({ width: pageWidth, height: pageHeight });
     const content = await page.getTextContent();
-    await page.getOperatorList();
+    if (!skipOps) {
+      try {
+        await page.getOperatorList();
+      } catch {
+        /* En el PC seguimos; si una página no carga ops, usamos el nombre de pdf.js. */
+      }
+    }
     for (const item of content.items) {
       if (!("str" in item) || typeof item.str !== "string") continue;
       const str = item.str.replace(/\s+/g, " ");

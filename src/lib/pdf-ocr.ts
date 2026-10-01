@@ -1,4 +1,4 @@
-import { loadPdfjs } from "@/lib/pdfjs-worker";
+import { getPdfDocument, isMobilePdfHost, loadPdfjs } from "@/lib/pdfjs-worker";
 import {
   DEFAULT_TEXT_COLOR,
   type PdfTextLine,
@@ -8,12 +8,6 @@ export type OcrProgress = {
   pct: number;
   status: string;
 };
-
-function copyBuffer(data: ArrayBuffer) {
-  const copy = new ArrayBuffer(data.byteLength);
-  new Uint8Array(copy).set(new Uint8Array(data));
-  return copy;
-}
 
 function labelForStatus(status: string) {
   if (status.includes("loading tesseract")) return "Cargando el motor OCR…";
@@ -29,16 +23,15 @@ export async function ocrPdfPage(
   onProgress?: (info: OcrProgress) => void,
 ): Promise<PdfTextLine[]> {
   const pdfjs = await loadPdfjs();
-  const task = pdfjs.getDocument({
-    data: new Uint8Array(copyBuffer(data)),
-    useWasm: false,
-  });
+  const task = await getPdfDocument(data);
   const pdf = await task.promise;
   const page = await pdf.getPage(pageIndex + 1);
   const view = page.view;
   const pageWidth = view[2] - view[0];
   const pageHeight = view[3] - view[1];
-  const viewport = page.getViewport({ scale: 2 });
+  const viewport = page.getViewport({
+    scale: isMobilePdfHost() ? 1.15 : 2,
+  });
   const canvas = document.createElement("canvas");
   canvas.width = Math.floor(viewport.width);
   canvas.height = Math.floor(viewport.height);
