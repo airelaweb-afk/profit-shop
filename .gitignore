@@ -27,9 +27,6 @@
 # duplicate of pdf.worker.min.mjs for Hostinger MIME (scripts/copy-pdf-worker.mjs)
 /public/pdf.worker.min.js
 
-# copied from onnxruntime-web at build time
-/public/onnx/
-
 # misc
 .DS_Store
 *.pem

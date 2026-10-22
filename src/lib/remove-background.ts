@@ -1,28 +1,56 @@
 import { isHeicFile, isImageFile, loadBitmap } from "@/lib/image-ops";
 
 const MODEL_URL = "/models/u2netp.onnx";
+const RUNTIME_URL = "/onnx/ort.wasm.min.js";
 const MODEL_SIZE = 320;
 const MAX_EDGE = 1600;
 const MEAN = [0.485, 0.456, 0.406];
 const STD = [0.229, 0.224, 0.225];
 
-type OrtModule = typeof import("onnxruntime-web");
-type Session = Awaited<ReturnType<OrtModule["InferenceSession"]["create"]>>;
+type OrtTensor = { data: ArrayLike<number> };
+type Session = {
+  inputNames: string[];
+  outputNames: string[];
+  run: (feeds: Record<string, unknown>) => Promise<Record<string, OrtTensor>>;
+};
+type OrtApi = {
+  env: { wasm: { numThreads: number; proxy: boolean; simd: boolean; wasmPaths: string } };
+  InferenceSession: {
+    create: (url: string, options: { executionProviders: string[] }) => Promise<Session>;
+  };
+  Tensor: new (type: "float32", data: Float32Array, dims: number[]) => unknown;
+};
 
 let sessionPromise: Promise<Session> | null = null;
+let runtimePromise: Promise<OrtApi> | null = null;
 
 function wasmBase() {
   return new URL("/onnx/", window.location.origin).href;
 }
 
-async function loadOrt(): Promise<OrtModule> {
-  const loaded = await import("onnxruntime-web");
-  if (typeof loaded.InferenceSession?.create === "function") return loaded;
-  const fallback = (loaded as { default?: OrtModule }).default;
-  if (fallback && typeof fallback.InferenceSession?.create === "function") {
-    return fallback;
+function loadOrt(): Promise<OrtApi> {
+  const existing = (window as Window & { ort?: OrtApi }).ort;
+  if (existing && typeof existing.InferenceSession?.create === "function") {
+    return Promise.resolve(existing);
   }
-  throw new Error("Este navegador no pudo cargar el motor de la imagen.");
+  if (!runtimePromise) {
+    runtimePromise = new Promise<OrtApi>((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = RUNTIME_URL;
+      script.async = true;
+      script.onload = () => {
+        const ort = (window as Window & { ort?: OrtApi }).ort;
+        if (ort && typeof ort.InferenceSession?.create === "function") resolve(ort);
+        else reject(new Error("Este navegador no pudo cargar el motor de la imagen."));
+      };
+      script.onerror = () => reject(new Error("Este navegador no pudo cargar el motor de la imagen."));
+      document.head.appendChild(script);
+    }).catch((error) => {
+      runtimePromise = null;
+      throw error;
+    });
+  }
+  return runtimePromise;
 }
 
 async function openSession() {
@@ -142,7 +170,7 @@ export async function removeBackground(
     onStatus?.("Cargando el modelo. La primera vez tarda un momento…");
     const session = await openSession();
     const ort = await loadOrt();
-    const feeds: Record<string, InstanceType<OrtModule["Tensor"]>> = {};
+    const feeds: Record<string, unknown> = {};
     feeds[session.inputNames[0]] = new ort.Tensor("float32", modelInput(fitted.canvas), [
       1,
       3,
