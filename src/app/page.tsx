@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FaqJsonLd, FaqList } from "@/components/faq-list";
+import { FeaturedRemoveBg } from "@/components/featured-remove-bg";
 import { HomeToolGrid } from "@/components/home-tool-grid";
 import { InkHero } from "@/components/ink-hero";
 import { ToolCard } from "@/components/tool-card";
@@ -33,6 +34,7 @@ export default function HomePage() {
     <div>
       <FaqJsonLd items={siteFaqs} />
       <InkHero />
+      <FeaturedRemoveBg />
       <HomeToolGrid />
 
       <section className="luna-wrap pb-16 pt-4">

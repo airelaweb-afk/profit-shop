@@ -85,6 +85,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto hidden items-center gap-4 xl:flex">
+          <Link
+            href="/quitar-fondo/"
+            className="new-glow rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground transition hover:bg-primary hover:text-primary-foreground"
+          >
+            Quitar fondo
+          </Link>
           <MoreMenu />
           <AccountActions />
         </div>

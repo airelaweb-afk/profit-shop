@@ -106,17 +106,12 @@
   .luna-wrap {
     margin-inline: auto;
     width: 100%;
-    max-width: 92rem;
-    padding-inline: 1.25rem;
+    max-width: 72rem;
+    padding-inline: 1rem;
   }
   @media (min-width: 640px) {
     .luna-wrap {
-      padding-inline: 1.75rem;
-    }
-  }
-  @media (min-width: 1024px) {
-    .luna-wrap {
-      padding-inline: 2.5rem;
+      padding-inline: 1.5rem;
     }
   }
   body:has([data-luna-studio]) .luna-cookie-banner {
@@ -774,18 +769,21 @@ button.punch-card:hover {
   color: #ffe14a;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track,
-  .logo-moon,
-  .logo-spark,
-  .hero-orbit,
-  .hero-stripe,
-  .stamp-mark,
-  .spark-float,
-  .signal-bar > span:nth-child(3) {
-    animation: none !important;
+@keyframes new-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 225, 74, 0.7);
   }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 225, 74, 0);
+  }
+}
 
+.new-glow {
+  animation: new-glow 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
   a.punch-card:hover,
   button.punch-card:hover {
     transform: none;

@@ -111,7 +111,9 @@ const office = [
 
 type TileData = { href: string; name: string; pro?: boolean };
 
-const ALL_TILES: TileData[] = [
+const NEW_HREF = "/quitar-fondo";
+
+const CATALOG: TileData[] = [
   ...allPdfTools.map((tool) => ({
     href: tool.href,
     name: tool.name,
@@ -124,6 +126,11 @@ const ALL_TILES: TileData[] = [
   })),
   ...audioKit.map((tool) => ({ href: tool.href, name: tool.name })),
   ...office,
+];
+
+const ALL_TILES: TileData[] = [
+  ...CATALOG.filter((tile) => tile.href === NEW_HREF),
+  ...CATALOG.filter((tile) => tile.href !== NEW_HREF),
 ];
 
 const FILTERS = [
@@ -167,16 +174,30 @@ const FILTER_HREFS: Record<Exclude<FilterId, "all">, string[]> = {
 
 function Tile({ href, name, pro }: TileData) {
   const Icon = ICONS[href] ?? FileText;
+  const isNew = href === NEW_HREF;
   return (
     <Link
       href={href}
-      className="group flex h-full flex-col rounded-2xl border border-foreground/10 bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary hover:shadow-[6px_6px_0_0_#ff4b1a]"
+      className={`group flex h-full flex-col rounded-2xl border p-5 transition hover:-translate-y-0.5 ${
+        isNew
+          ? "border-2 border-foreground bg-accent shadow-[6px_6px_0_0_#ff4b1a] hover:shadow-[8px_8px_0_0_#ff4b1a]"
+          : "border-foreground/10 bg-card shadow-sm hover:border-primary hover:shadow-[6px_6px_0_0_#ff4b1a]"
+      }`}
     >
-      <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      <span
+        className={`flex size-12 items-center justify-center rounded-xl ${
+          isNew ? "bg-foreground text-accent" : "bg-primary/10 text-primary"
+        }`}
+      >
         <Icon className="size-6" strokeWidth={2} />
       </span>
       <span className="mt-4 flex items-baseline gap-2">
         <span className="font-heading text-xl leading-tight">{name}</span>
+        {isNew ? (
+          <span className="new-glow rounded-full bg-primary px-2 py-0.5 font-mono text-[0.6rem] font-semibold tracking-[0.14em] text-primary-foreground uppercase">
+            Nuevo
+          </span>
+        ) : null}
         {pro ? (
           <span className="font-mono text-[0.65rem] tracking-[0.14em] text-primary uppercase">
             Pro
