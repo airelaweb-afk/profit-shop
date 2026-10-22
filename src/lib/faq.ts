@@ -56,6 +56,11 @@ export const siteFaqs: FaqItem[] = [
     href: "/cookies",
   },
   {
+    q: "¿Puedo quitar el fondo de una foto sin subirla?",
+    a: "Sí. En Quitar fondo eliges una imagen y te bajas un PNG transparente. El modelo se descarga la primera vez en tu aparato; la foto no sale de ahí. El pelo fino o un fondo del mismo color que la ropa pueden quedar irregulares.",
+    href: "/quitar-fondo",
+  },
+  {
     q: "La foto del iPhone no se abre en Windows. ¿Qué hago?",
     a: "Es HEIC. Pásala a JPG en HEIC a JPG. La primera vez tarda un poco: carga el decodificador en este aparato.",
     href: "/heic-a-jpg",
@@ -146,6 +151,20 @@ export const toolFaqs: Record<string, FaqItem[]> = {
     {
       q: "¿Se pierde calidad al eliminar páginas?",
       a: "No. Las páginas que quedan se copian tal cual, con su texto y sus imágenes.",
+    },
+  ],
+  "/quitar-fondo": [
+    {
+      q: "¿La foto se sube a algún sitio?",
+      a: "No. Se procesa en este navegador. La primera vez se descarga el modelo (unos 4 MB más el motor) y se queda en el aparato.",
+    },
+    {
+      q: "¿Por qué el borde queda raro?",
+      a: "El modelo es pequeño, para que el móvil pueda con él. Un producto o un logo sobre un fondo distinto sale bien. El pelo suelto y la ropa del mismo color que la pared, no tanto.",
+    },
+    {
+      q: "¿Puedo quitar el fondo de varias fotos a la vez?",
+      a: "No. Es una foto cada vez, para no llenar la memoria del teléfono.",
     },
   ],
   "/webp-en-lote": [

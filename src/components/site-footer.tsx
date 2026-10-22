@@ -36,6 +36,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/quitar-fondo" className="hover:text-foreground">
+                Quitar fondo
+              </Link>
+            </li>
+            <li>
               <Link href="/rellenar-pdf" className="hover:text-foreground">
                 Rellenar PDF
               </Link>

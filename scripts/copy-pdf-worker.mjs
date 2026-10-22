@@ -22,6 +22,17 @@ const tessCores = [
   "tesseract-core-lstm.wasm.js",
   "tesseract-core-relaxedsimd-lstm.wasm.js",
 ];
+const onnxDir = join(root, "node_modules/onnxruntime-web/dist");
+const onnxFiles = ["ort-wasm-simd.wasm", "ort-wasm.wasm"];
+if (onnxFiles.every((name) => existsSync(join(onnxDir, name)))) {
+  const dest = join(publicDir, "onnx");
+  mkdirSync(dest, { recursive: true });
+  for (const name of onnxFiles) {
+    copyFileSync(join(onnxDir, name), join(dest, name));
+  }
+  console.log("Copied ONNX wasm runtimes to public/onnx/");
+}
+
 if (existsSync(tessWorker) && existsSync(join(tessCoreDir, tessCores[0]))) {
   mkdirSync(join(publicDir, "tesseract"), { recursive: true });
   mkdirSync(join(publicDir, "tesseract-core"), { recursive: true });

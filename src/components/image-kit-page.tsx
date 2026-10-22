@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AdSlot } from "@/components/ad-slot";
 import { FaqList } from "@/components/faq-list";
 import { ImageKitTool } from "@/components/image-kit-tool";
+import { RemoveBackgroundTool } from "@/components/remove-background-tool";
 import { RelatedGuides } from "@/components/related-guides";
 import { faqsForPath } from "@/lib/faq";
 import { audioKit, imageKit, type ImageKitSlug } from "@/lib/image-kit";
@@ -25,7 +26,7 @@ const copy: Record<
     keywords: ["comprimir imagen", "reducir peso foto", "jpg demasiado pesado"],
     kicker: "Comprimir imagen · gratis",
     title: "Que la foto entre en el formulario.",
-    lead: "Bajas la calidad JPG o WebP y te la descargas. Un PNG a veces no adelgaza hasta pasarlo a JPG. Quitar el fondo o ampliar con IA no está: eso pide servidor.",
+    lead: "Bajas la calidad JPG o WebP y te la descargas. Un PNG a veces no adelgaza hasta pasarlo a JPG. Ampliar con IA no está: eso pide servidor.",
   },
   "to-jpg": {
     metaTitle: "PNG a JPG",
@@ -83,6 +84,19 @@ const copy: Record<
     title: "Endereza la foto del móvil.",
     lead: "90, 180 o 270 grados. Varias a la vez si quieres.",
   },
+  cutout: {
+    metaTitle: "Quitar fondo de una imagen",
+    meta: "Quita el fondo de una foto en el navegador y descarga un PNG transparente. La imagen no se sube a un servidor.",
+    keywords: [
+      "quitar fondo imagen",
+      "fondo transparente",
+      "eliminar fondo foto",
+      "remove background",
+    ],
+    kicker: "Quitar fondo · gratis",
+    title: "El fondo, fuera. La foto, aquí.",
+    lead: "Una foto. Sale un PNG transparente. El modelo se descarga la primera vez en este aparato; la imagen no se envía a ningún servidor. El pelo fino puede quedar irregular.",
+  },
 };
 
 export function imageKitMetadata(kind: ImageKitSlug): Metadata {
@@ -107,9 +121,16 @@ export function ImageKitPage({ kind }: { kind: ImageKitSlug }) {
         {item.title}
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
-      <AdSlot label="Comprimir y convertir fotos es gratis." wrapClassName="mt-6" />
+      <AdSlot
+        label={
+          kind === "cutout"
+            ? "Quitar el fondo es gratis."
+            : "Comprimir y convertir fotos es gratis."
+        }
+        wrapClassName="mt-6"
+      />
       <div className="mt-10">
-          <ImageKitTool kind={kind} />
+        {kind === "cutout" ? <RemoveBackgroundTool /> : <ImageKitTool kind={kind} />}
       </div>
       <FaqList items={faqsForPath(href)} />
       <RelatedGuides href={href} />

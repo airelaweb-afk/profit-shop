@@ -55,6 +55,13 @@ export const imageKit = [
     problem: "El móvil la ha guardado de lado.",
     does: "Giro de 90° y descarga. Varias a la vez si quieres.",
   },
+  {
+    href: "/quitar-fondo",
+    slug: "cutout" as const,
+    name: "Quitar fondo",
+    problem: "El producto o el logo tienen que ir sobre otro fondo.",
+    does: "PNG transparente. El modelo corre aquí. La foto no se sube.",
+  },
 ] as const;
 
 export type ImageKitSlug = (typeof imageKit)[number]["slug"];

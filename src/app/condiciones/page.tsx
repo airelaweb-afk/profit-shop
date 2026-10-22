@@ -45,9 +45,9 @@ export default function CondicionesPage() {
       </p>
       <h2>Herramientas aparcadas</h2>
       <p>
-        PDF a Word, vídeo, MP3 de salida y quitar fondo con IA no están. No se
-        cobran. Si un día se montan con servidor, se avisará que el archivo
-        viaja.
+        PDF a Word, vídeo y MP3 de salida no están. No se cobran. Quitar el
+        fondo sí está, y se hace en el navegador: la foto no viaja. Si un día
+        se monta algo con servidor, se avisará que el archivo viaja.
       </p>
     </LegalShell>
   );

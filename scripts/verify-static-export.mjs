@@ -10,6 +10,8 @@ const required = [
   join(dir, "marca-de-agua-pdf", "index.html"),
   join(dir, "eliminar-paginas-pdf", "index.html"),
   join(dir, "webp-en-lote", "index.html"),
+  join(dir, "quitar-fondo", "index.html"),
+  join(dir, "models", "u2netp.onnx"),
   join(dir, "plugin-wordpress-webp", "index.html"),
   join(dir, "downloads", "luna-oficio-webp.zip"),
   join(dir, "blog", "index.html"),

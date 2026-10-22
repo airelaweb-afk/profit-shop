@@ -1,0 +1,10 @@
+u2netp.onnx
+
+Small U²-Net model (u2netp) by Xuebin Qin et al., University of Alberta.
+Upstream code license: Apache-2.0.
+https://github.com/xuebinqin/U-2-Net
+
+The file matches the build redistributed by rembg (MIT) at
+https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx
+
+The visitor's photo is not uploaded. This model runs in the browser.

@@ -70,8 +70,8 @@ export default function ComoFuncionaPage() {
         <section>
           <h2 className="font-heading text-2xl">Comprimir y convertir fotos</h2>
           <p className="mt-2 text-muted-foreground">
-            Comprimir, PNG a JPG, HEIC del iPhone, recortar y girar. También
-            audio a WAV. Quitar el fondo, ampliar con IA, vídeo y PDF a Word
+            Comprimir, PNG a JPG, HEIC del iPhone, recortar, girar y quitar
+            el fondo. También audio a WAV. Ampliar con IA, vídeo y PDF a Word
             no: piden servidor o un motor que aquí no hay.
           </p>
         </section>

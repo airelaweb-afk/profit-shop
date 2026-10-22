@@ -10,6 +10,7 @@ const ITEMS = [
   "sin subir el archivo",
   "en el navegador",
   "comprimir imagen",
+  "quitar fondo",
   "pdf a jpg",
   "rotar pdf",
   "jpg a webp",

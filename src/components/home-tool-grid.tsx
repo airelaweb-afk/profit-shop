@@ -29,6 +29,7 @@ import {
   Clock3,
   Wallet,
   AudioLines,
+  Eraser,
   Music,
 } from "lucide-react";
 import { allPdfTools } from "@/lib/pdf-kit";
@@ -55,6 +56,7 @@ const ICONS: Record<string, LucideIcon> = {
   "/redimensionar-imagen": Maximize2,
   "/recortar-imagen": Crop,
   "/girar-imagen": RotateCw,
+  "/quitar-fondo": Eraser,
   "/webp-en-lote": Layers,
   "/plugin-wordpress-webp": Puzzle,
   "/audio-a-wav": Music,
@@ -87,6 +89,7 @@ const BLURB: Record<string, string> = {
   "/redimensionar-imagen": "Al ancho o alto que te piden.",
   "/recortar-imagen": "Quédate con el trozo que vale.",
   "/girar-imagen": "Endereza la foto del móvil.",
+  "/quitar-fondo": "PNG transparente. La foto no se sube.",
   "/webp-en-lote": "Toda la carpeta a WebP, en un zip.",
   "/plugin-wordpress-webp": "Toda la biblioteca de medios a WebP.",
   "/audio-a-wav": "MP3, M4A u OGG a WAV, en el navegador.",

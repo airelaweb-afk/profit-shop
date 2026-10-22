@@ -408,7 +408,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         tapTitle={copy.tap}
         cta={copy.cta}
         cameraCta={wantsCamera ? "Hacer foto ahora" : undefined}
-        hint="No se envía a ningún servidor. Quitar fondo, ampliar con IA y PDF a Word siguen aparcados."
+        hint="No se envía a ningún servidor. Ampliar con IA y PDF a Word siguen aparcados."
         onFiles={(list) => void addFiles(list)}
       />
       <FreeCapNote

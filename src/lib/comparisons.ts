@@ -135,9 +135,9 @@ export const competitors: Competitor[] = [
         theirs: "Conversión en la nube.",
       },
       {
-        label: "Quitar fondo / IA",
-        ours: "No. Pide servidor y no lo fingimos.",
-        theirs: "Herramientas de edición en servidor.",
+        label: "Quitar fondo",
+        ours: "Sí, en tu navegador. Un modelo local. El pelo fino puede quedar irregular.",
+        theirs: "Edición en sus servidores.",
       },
     ],
   },

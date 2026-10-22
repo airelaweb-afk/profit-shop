@@ -6,9 +6,9 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Herramientas de imagen",
   description:
-    "Comprimir imagen, HEIC a JPG, PNG a JPG, JPG a WebP, recortar y girar. WebP en lote y plugin WordPress para Pro. En el navegador, sin subir el archivo.",
+    "Comprimir imagen, quitar fondo, HEIC a JPG, PNG a JPG, JPG a WebP, recortar y girar. WebP en lote y plugin WordPress para Pro. En el navegador, sin subir el archivo.",
   path: "/herramientas-imagen",
-  keywords: ["comprimir imagen", "heic a jpg", "png a jpg", "recortar imagen"],
+  keywords: ["comprimir imagen", "quitar fondo", "heic a jpg", "png a jpg", "recortar imagen"],
 });
 
 export default function HerramientasImagenPage() {
@@ -21,8 +21,8 @@ export default function HerramientasImagenPage() {
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Lo que más se pide: que la foto pese menos, que el HEIC del iPhone se
         abra en Windows, que el PNG sea JPG o WebP. Para webs, la conversión a
-        WebP en lote y el plugin de WordPress son Pro. Quitar fondo, ampliar
-        con IA y vídeo no están: piden servidor.
+        WebP en lote y el plugin de WordPress son Pro. Quitar fondo también
+        se hace aquí. Ampliar con IA y vídeo no están: piden servidor.
       </p>
       <AdSlot label="Comprimir y HEIC a JPG son gratis." wrapClassName="mt-6" />
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

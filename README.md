@@ -24,7 +24,7 @@ En el **teléfono**: barra inferior (Inicio, PDF, Fotos, Documentos), botones gr
 - **JPG a PDF** y **PDF a JPG** (`/jpg-a-pdf`, `/pdf-a-jpg`): fotos ↔ hojas.
 - **Rotar, numerar y eliminar páginas PDF** (`/rotar-pdf`, `/numerar-pdf`, `/eliminar-paginas-pdf`).
 - **Marca de agua PDF** (`/marca-de-agua-pdf`): Pro.
-- **Imagen** (`/herramientas-imagen`): comprimir, PNG/JPG/WebP, HEIC a JPG, recortar, girar, redimensionar.
+- **Imagen** (`/herramientas-imagen`): comprimir, PNG/JPG/WebP, HEIC a JPG, recortar, girar, redimensionar, quitar fondo.
 - **WebP en lote** (`/webp-en-lote`): Pro. Hasta 300 imágenes o una carpeta entera a WebP, con calidad y ancho máximo, en un zip con los mismos nombres. Todo en el navegador (`src/components/webp-batch-tool.tsx`).
 - **Plugin WordPress WebP** (`/plugin-wordpress-webp`): Pro. Descarga de `luna-oficio-webp.zip`; ver [Plugin de WordPress](#plugin-de-wordpress-webp).
 - **Audio a WAV** y **recortar audio** (`/audio-a-wav`, `/recortar-audio`). No hay MP3 de salida ni vídeo.

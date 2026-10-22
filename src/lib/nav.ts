@@ -43,6 +43,7 @@ const imagePaths = new Set([
   "/redimensionar-imagen",
   "/recortar-imagen",
   "/girar-imagen",
+  "/quitar-fondo",
   "/webp-en-lote",
   "/plugin-wordpress-webp",
   "/audio-a-wav",
