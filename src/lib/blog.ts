@@ -6,6 +6,118 @@ export type { BlogBlock, BlogPost } from "@/lib/blog-types";
 
 const corePosts: BlogPost[] = [
   {
+    slug: "quitar-fondo-de-una-foto-sin-subirla",
+    title: "Cómo quitar el fondo de una foto gratis y sin subirla a internet",
+    meta: "Quita el fondo de una imagen en el navegador y descarga un PNG transparente. Sin cuenta, sin marca de agua y sin mandar la foto a un servidor.",
+    kicker: "Quitar fondo",
+    date: "2026-10-22",
+    keywords: [
+      "quitar fondo foto",
+      "quitar fondo imagen gratis",
+      "eliminar fondo sin subir",
+      "png transparente",
+    ],
+    toolHref: "/quitar-fondo",
+    blocks: [
+      {
+        type: "p",
+        text: "Casi todas las webs que quitan el fondo te piden que subas la foto. La foto viaja a su servidor, la procesan allí y te devuelven el recorte, a veces con marca de agua o en baja resolución. En Luna Oficio el recorte se hace en tu propio navegador: la imagen no sale de tu aparato.",
+      },
+      {
+        type: "h2",
+        text: "Paso a paso",
+      },
+      {
+        type: "ul",
+        items: [
+          "Abre Quitar fondo y pulsa Elegir foto. En el móvil también puedes hacerla en el momento.",
+          "Espera unos segundos. La primera vez se descarga el modelo (unos 4 MB); después va más rápido.",
+          "Revisa el resultado sobre los cuadros: lo que se ve a cuadros es transparente.",
+          "Pulsa Guardar PNG. Sale con fondo transparente, lista para ponerla sobre otro fondo.",
+        ],
+      },
+      {
+        type: "cta",
+        href: "/quitar-fondo",
+        label: "Quitar fondo ahora",
+        text: "Gratis, sin cuenta y sin marca de agua. Una foto cada vez.",
+      },
+      {
+        type: "h2",
+        text: "Qué sale bien y qué no",
+      },
+      {
+        type: "p",
+        text: "Un producto sobre una mesa, un logo, una taza o una persona sobre una pared lisa salen bien. El pelo suelto, el humo, el cristal o una camisa del mismo color que la pared pueden quedar con el borde irregular. Si te pasa, prueba con una foto con más contraste entre el objeto y el fondo.",
+      },
+      {
+        type: "h2",
+        text: "¿Y si lo quiero con fondo blanco?",
+      },
+      {
+        type: "p",
+        text: "Descarga el PNG transparente y pásalo por PNG a JPG: el transparente se rellena de blanco. Es lo que piden muchas tiendas online y marketplaces para la foto principal.",
+      },
+      {
+        type: "cta",
+        href: "/png-a-jpg",
+        label: "PNG a JPG con fondo blanco",
+        text: "También en el navegador y sin subir la imagen.",
+      },
+    ],
+  },
+  {
+    slug: "fotos-de-producto-sin-fondo-para-vender",
+    title: "Fotos de producto sin fondo para Wallapop, Vinted o tu tienda online",
+    meta: "Cómo hacer una foto de producto con fondo transparente o blanco desde el móvil, gratis y sin instalar nada.",
+    kicker: "Quitar fondo",
+    date: "2026-10-22",
+    keywords: [
+      "foto producto fondo blanco",
+      "quitar fondo foto producto",
+      "fotos wallapop fondo blanco",
+      "fotos vinted sin fondo",
+    ],
+    toolHref: "/quitar-fondo",
+    blocks: [
+      {
+        type: "p",
+        text: "Un anuncio con el producto limpio, sin la cocina ni el sofá detrás, se ve más serio y se vende antes. No hace falta un estudio ni Photoshop: basta el móvil y una herramienta que quite el fondo.",
+      },
+      {
+        type: "h2",
+        text: "Cómo hacer la foto para que el recorte salga limpio",
+      },
+      {
+        type: "ul",
+        items: [
+          "Pon el producto sobre una superficie lisa y de un color distinto al del objeto.",
+          "Busca luz de ventana, sin flash, para que no haya sombras duras.",
+          "Encuadra el producto entero, con un poco de margen alrededor.",
+          "Evita reflejos fuertes: el brillo se confunde con el fondo.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Quitar el fondo y ponerlo blanco",
+      },
+      {
+        type: "ul",
+        items: [
+          "Abre Quitar fondo, elige la foto y guarda el PNG transparente.",
+          "Si la tienda pide fondo blanco, pasa el PNG por PNG a JPG.",
+          "Si pesa demasiado para subirla, Comprimir imagen la deja ligera.",
+        ],
+      },
+      {
+        type: "cta",
+        href: "/quitar-fondo",
+        label: "Quitar el fondo de la foto",
+        text: "Desde el móvil o el ordenador. La foto no se sube a ningún servidor.",
+      },
+    ],
+  },
+  {
     slug: "unir-varios-pdf-en-uno",
     title: "Cómo unir varios PDF en uno solo sin subirlos a internet",
     meta: "Une PDF en el navegador: DNI, presupuesto y contrato en un archivo. Sin iLovePDF ni servidor. Guía paso a paso.",

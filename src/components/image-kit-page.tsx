@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/ad-slot";
-import { FaqList } from "@/components/faq-list";
+import { FaqJsonLd, FaqList } from "@/components/faq-list";
 import { ImageKitTool } from "@/components/image-kit-tool";
+import { ToolJsonLd } from "@/components/json-ld";
 import { RemoveBackgroundTool } from "@/components/remove-background-tool";
 import { RelatedGuides } from "@/components/related-guides";
 import { faqsForPath } from "@/lib/faq";
 import { audioKit, imageKit, type ImageKitSlug } from "@/lib/image-kit";
-import { pageMeta } from "@/lib/seo";
+import { pageMeta, toolTitle } from "@/lib/seo";
 
 const copy: Record<
   ImageKitSlug,
@@ -18,6 +19,8 @@ const copy: Record<
     metaTitle: string;
     meta: string;
     keywords: string[];
+    steps?: string[];
+    uses?: string[];
   }
 > = {
   compress: {
@@ -41,7 +44,7 @@ const copy: Record<
     meta: "Convierte JPG o WebP a PNG en el navegador, sin subir el archivo.",
     keywords: ["jpg a png", "convertir jpg a png"],
     kicker: "JPG a PNG · gratis",
-    title: "De JPG a PNG.",
+    title: "Para el logo o el sello.",
     lead: "Para un sello, un logo o un documento que pide PNG. Aquí mismo.",
   },
   "to-webp": {
@@ -49,7 +52,7 @@ const copy: Record<
     meta: "Convierte JPG o PNG a WebP en el navegador, más ligero para la web. Sin subir el archivo.",
     keywords: ["jpg a webp", "convertir a webp"],
     kicker: "JPG a WebP · gratis",
-    title: "JPG o PNG, a WebP.",
+    title: "Más ligera para tu web.",
     lead: "Suele pesar menos que el JPG. Si el programa del cliente no abre WebP, usa JPG.",
   },
   heic: {
@@ -86,16 +89,30 @@ const copy: Record<
   },
   cutout: {
     metaTitle: "Quitar fondo de una imagen",
-    meta: "Quita el fondo de una foto en el navegador y descarga un PNG transparente. La imagen no se sube a un servidor.",
+    meta: "Quita el fondo de una foto online y gratis: descargas un PNG transparente en segundos. Se hace en tu navegador; la imagen no se sube a ningún servidor.",
     keywords: [
       "quitar fondo imagen",
-      "fondo transparente",
-      "eliminar fondo foto",
+      "quitar fondo foto gratis",
+      "eliminar fondo imagen online",
+      "fondo transparente png",
+      "borrar fondo foto",
       "remove background",
     ],
     kicker: "Quitar fondo · gratis",
     title: "El fondo, fuera. La foto, aquí.",
     lead: "Una foto. Sale un PNG transparente. El modelo se descarga la primera vez en este aparato; la imagen no se envía a ningún servidor. El pelo fino puede quedar irregular.",
+    steps: [
+      "Pulsa Elegir foto (o Hacer foto ahora en el móvil): JPG, PNG, WebP o HEIC del iPhone.",
+      "Espera unos segundos. La primera vez se descarga el modelo (unos 4 MB) y se queda en tu aparato.",
+      "Mira el resultado sobre el fondo de cuadros: lo transparente es lo que se ha quitado.",
+      "Pulsa Guardar PNG. Sale con fondo transparente, listo para ponerlo sobre otro color o en tu web.",
+    ],
+    uses: [
+      "Fotos de producto para tu tienda online, Wallapop, Vinted o Etsy.",
+      "Un logo o un sello escaneado que tiene que ir sobre otro fondo.",
+      "Recortar a una persona para un cartel, una presentación o una tarjeta.",
+      "Montajes rápidos sin abrir Photoshop ni instalar nada.",
+    ],
   },
 };
 
@@ -103,7 +120,7 @@ export function imageKitMetadata(kind: ImageKitSlug): Metadata {
   const item = copy[kind];
   const href = imageKit.find((tool) => tool.slug === kind)?.href ?? "/";
   return pageMeta({
-    title: item.metaTitle,
+    title: toolTitle(item.metaTitle),
     description: item.meta,
     path: href,
     keywords: item.keywords,
@@ -114,11 +131,20 @@ export function ImageKitPage({ kind }: { kind: ImageKitSlug }) {
   const item = copy[kind];
   const href = imageKit.find((tool) => tool.slug === kind)?.href ?? "/";
   const others = [...imageKit.filter((tool) => tool.slug !== kind), ...audioKit];
+  const faqs = faqsForPath(href);
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <ToolJsonLd
+        name={item.metaTitle}
+        description={item.meta}
+        path={href}
+        section={{ name: "Herramientas de imagen", path: "/herramientas-imagen" }}
+      />
+      <FaqJsonLd items={faqs} />
       <p className="text-sm tracking-wide text-primary uppercase">{item.kicker}</p>
       <h1 className="mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        {item.title}
+        {item.metaTitle}.{" "}
+        <span className="text-primary">{item.title}</span>
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
       <AdSlot
@@ -132,7 +158,33 @@ export function ImageKitPage({ kind }: { kind: ImageKitSlug }) {
       <div className="mt-10">
         {kind === "cutout" ? <RemoveBackgroundTool /> : <ImageKitTool kind={kind} />}
       </div>
-      <FaqList items={faqsForPath(href)} />
+      {item.steps || item.uses ? (
+        <section className="mt-14 grid gap-8 md:grid-cols-2">
+          {item.steps ? (
+            <div>
+              <h2 className="font-heading text-2xl">
+                Cómo {item.metaTitle.charAt(0).toLowerCase() + item.metaTitle.slice(1)}
+              </h2>
+              <ol className="mt-4 grid list-decimal gap-2 pl-5 text-muted-foreground">
+                {item.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
+          {item.uses ? (
+            <div>
+              <h2 className="font-heading text-2xl">Para qué se usa</h2>
+              <ul className="mt-4 grid list-disc gap-2 pl-5 text-muted-foreground">
+                {item.uses.map((use) => (
+                  <li key={use}>{use}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+      <FaqList items={faqs} />
       <RelatedGuides href={href} />
       <aside className="mt-14">
         <h2 className="font-heading text-2xl">Otras del mismo estilo</h2>

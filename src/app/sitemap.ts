@@ -13,7 +13,6 @@ const staticPaths = [
   "/faq/",
   "/precios/",
   "/como-funciona/",
-  "/entrar/",
   "/aviso-legal/",
   "/privacidad/",
   "/cookies/",
@@ -33,7 +32,7 @@ const staticPaths = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date("2026-09-30");
+  const now = new Date("2026-10-22");
   const pages = [
     ...staticPaths.map((path) => ({
       url: `${SITE_URL}${path === "/" ? "/" : path}`,

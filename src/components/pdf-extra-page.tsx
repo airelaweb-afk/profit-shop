@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AdSlot } from "@/components/ad-slot";
-import { FaqList } from "@/components/faq-list";
+import { FaqJsonLd, FaqList } from "@/components/faq-list";
+import { ToolJsonLd } from "@/components/json-ld";
 import { PdfExtraTool } from "@/components/pdf-extra-tool";
 import { ProGate } from "@/components/pro-gate";
 import { RelatedGuides } from "@/components/related-guides";
 import { faqsForPath } from "@/lib/faq";
 import { allPdfTools, pdfExtraKit, type PdfExtraSlug } from "@/lib/pdf-kit";
-import { pageMeta } from "@/lib/seo";
+import { pageMeta, toolTitle } from "@/lib/seo";
 
 const copy: Record<
   PdfExtraSlug,
@@ -59,7 +60,7 @@ export function pdfExtraMetadata(kind: PdfExtraSlug): Metadata {
   const item = copy[kind];
   const href = pdfExtraKit.find((tool) => tool.slug === kind)?.href ?? "/";
   return pageMeta({
-    title: item.metaTitle,
+    title: toolTitle(item.metaTitle, kind !== "watermark"),
     description: item.meta,
     path: href,
     keywords: item.keywords,
@@ -81,9 +82,18 @@ export function PdfExtraPage({ kind }: { kind: PdfExtraSlug }) {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <ToolJsonLd
+        name={item.metaTitle}
+        description={item.meta}
+        path={href}
+        section={{ name: "Herramientas PDF", path: "/herramientas-pdf" }}
+        free={kind !== "watermark"}
+      />
+      <FaqJsonLd items={faqsForPath(href)} />
       <p className="text-sm tracking-wide text-primary uppercase">{item.kicker}</p>
       <h1 className="mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        {item.title}
+        {item.metaTitle}.{" "}
+        <span className="text-primary">{item.title}</span>
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
       <AdSlot label="Unir y comprimir PDF siguen gratis, con o sin Pro." wrapClassName="mt-6" />

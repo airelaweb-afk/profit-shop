@@ -166,6 +166,19 @@ export const toolFaqs: Record<string, FaqItem[]> = {
       q: "¿Puedo quitar el fondo de varias fotos a la vez?",
       a: "No. Es una foto cada vez, para no llenar la memoria del teléfono.",
     },
+    {
+      q: "¿Es gratis quitar el fondo?",
+      a: "Sí. Sin cuenta y sin marca de agua, con un tope de tamaño y de tareas al día. Con Pro no hay tope.",
+    },
+    {
+      q: "¿En qué formato se descarga?",
+      a: "En PNG con fondo transparente. Si lo necesitas con fondo blanco, ponlo sobre un fondo blanco en tu editor o pásalo a JPG en PNG a JPG: el transparente se rellena de blanco.",
+      href: "/png-a-jpg",
+    },
+    {
+      q: "¿Funciona en el móvil?",
+      a: "Sí, en Android y en iPhone, desde el navegador. Puedes hacer la foto en el momento o elegir una de la galería, también en HEIC.",
+    },
   ],
   "/webp-en-lote": [
     {

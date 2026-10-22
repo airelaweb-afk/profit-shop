@@ -4,13 +4,16 @@ import { hasCloud } from "@/lib/supabase";
 
 const cloud = hasCloud();
 
-export const metadata = pageMeta({
-  title: "Entrar",
-  description: cloud
-    ? "Inicia sesión o crea tu cuenta de Luna Oficio. Vale en cualquier aparato; los archivos siguen sin salir de tu navegador."
-    : "Inicia sesión o crea una cuenta en este navegador para usar las herramientas de Luna Oficio. Los datos se quedan aquí.",
-  path: "/entrar",
-});
+export const metadata = {
+  ...pageMeta({
+    title: "Entrar",
+    description: cloud
+      ? "Inicia sesión o crea tu cuenta de Luna Oficio. Vale en cualquier aparato; los archivos siguen sin salir de tu navegador."
+      : "Inicia sesión o crea una cuenta en este navegador para usar las herramientas de Luna Oficio. Los datos se quedan aquí.",
+    path: "/entrar",
+  }),
+  robots: { index: false, follow: true },
+};
 
 export default function EntrarPage() {
   return (

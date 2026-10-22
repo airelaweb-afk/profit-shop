@@ -16,7 +16,8 @@ export default function HerramientasImagenPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="text-sm tracking-wide text-primary uppercase">Imagen</p>
       <h1 className="mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        Comprimir, convertir, recortar. En este aparato.
+        Herramientas de imagen online.{" "}
+        <span className="text-primary">Comprimir, convertir, quitar fondo.</span>
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Lo que más se pide: que la foto pese menos, que el HEIC del iPhone se

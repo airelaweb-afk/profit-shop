@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/ad-slot";
-import { FaqList } from "@/components/faq-list";
+import { FaqJsonLd, FaqList } from "@/components/faq-list";
+import { ToolJsonLd } from "@/components/json-ld";
 import { PdfKitTool } from "@/components/pdf-kit-tool";
 import { RelatedGuides } from "@/components/related-guides";
 import { faqsForPath } from "@/lib/faq";
 import { allPdfTools, pdfKit, type PdfKitSlug } from "@/lib/pdf-kit";
-import { pageMeta } from "@/lib/seo";
+import { pageMeta, toolTitle } from "@/lib/seo";
 
 const copy: Record<
   Exclude<PdfKitSlug, "sign" | "fill" | "edit">,
@@ -24,7 +25,7 @@ const copy: Record<
     meta: "Une varios PDF en uno solo, en el navegador. Sin cuenta y sin subir el archivo.",
     keywords: ["unir pdf", "juntar pdf", "combinar pdf online"],
     kicker: "Unir PDF · gratis",
-    title: "Unir PDF. En este aparato.",
+    title: "En este aparato.",
     lead: "Elige dos o más PDF, ordénalos y te bajas uno. En el teléfono, pulsa Elegir PDF. No pasa por nuestros servidores. No convertimos a Word: eso, en el navegador, queda mal.",
   },
   split: {
@@ -65,7 +66,7 @@ export function pdfKitMetadata(kind: Exclude<PdfKitSlug, "sign" | "fill" | "edit
   const item = copy[kind];
   const href = pdfKit.find((tool) => tool.slug === kind)?.href ?? "/";
   return pageMeta({
-    title: item.metaTitle,
+    title: toolTitle(item.metaTitle),
     description: item.meta,
     path: href,
     keywords: item.keywords,
@@ -78,9 +79,17 @@ export function PdfKitPage({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
   const others = allPdfTools.filter((tool) => tool.slug !== kind);
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <ToolJsonLd
+        name={item.metaTitle}
+        description={item.meta}
+        path={href}
+        section={{ name: "Herramientas PDF", path: "/herramientas-pdf" }}
+      />
+      <FaqJsonLd items={faqsForPath(href)} />
       <p className="text-sm tracking-wide text-primary uppercase">{item.kicker}</p>
       <h1 className="mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        {item.title}
+        {item.metaTitle}.{" "}
+        <span className="text-primary">{item.title}</span>
       </h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{item.lead}</p>
       <AdSlot label="Esta herramienta es gratis." wrapClassName="mt-6" />

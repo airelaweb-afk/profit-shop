@@ -12,12 +12,13 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Herramientas PDF e imagen online gratis, sin subir archivos",
   description:
-    "Unir PDF, comprimir, HEIC a JPG, JPG a WebP, audio a WAV y firmar, en el navegador. Sin cuenta y sin subir el archivo.",
+    "Unir PDF, comprimir, quitar fondo de imágenes, HEIC a JPG, JPG a WebP y firmar, en el navegador. Gratis, sin cuenta y sin subir el archivo.",
   path: "/",
   keywords: [
     "unir pdf",
     "comprimir pdf",
     "comprimir imagen",
+    "quitar fondo imagen",
     "heic a jpg",
     "firmar pdf",
     "jpg a webp",
