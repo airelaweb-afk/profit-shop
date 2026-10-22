@@ -121,8 +121,8 @@ export function PricingBox() {
       <div className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15">
         <p className="font-heading text-2xl">Pagar Pro</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Tarjeta (Stripe) o Revolut. El archivo sigue en tu navegador: el pago
-          es en su web, no aquí.
+          {revolut ? "Tarjeta (Stripe) o Revolut." : "Con tarjeta, en Stripe."} El
+          archivo sigue en tu navegador: el pago es en su web, no aquí.
           {cloud
             ? session
               ? ` Pagas con ${session.email} y Pro se activa solo en tu cuenta.`
@@ -199,7 +199,7 @@ export function PricingBox() {
             </Button>
           ) : null}
         </div>
-        {!stripe || !revolut ? (
+        {!stripe ? (
           <p className="mt-3 text-xs text-muted-foreground">
             Para los botones, pega los Payment Link (anual y mensual) y tu
             revolut.me en <code>src/lib/payments.ts</code> o en Hostinger:{" "}

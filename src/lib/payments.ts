@@ -1,8 +1,8 @@
 /** Payment Link anual (Dashboard → Payment links). 40 € / 12 meses. */
-export const STRIPE_PAYMENT_LINK_MANUAL = "";
+export const STRIPE_PAYMENT_LINK_MANUAL = "https://buy.stripe.com/3cI5kCgzg1S275841200000";
 
 /** Payment Link mensual. 7 € / 1 mes. */
-export const STRIPE_PAYMENT_LINK_MONTHLY_MANUAL = "";
+export const STRIPE_PAYMENT_LINK_MONTHLY_MANUAL = "https://buy.stripe.com/6oUdR882KcwGdtwbtu00001";
 
 /** Revolut (revolut.me/usuario o pago solicitado). */
 export const REVOLUT_PAYMENT_LINK_MANUAL = "";
