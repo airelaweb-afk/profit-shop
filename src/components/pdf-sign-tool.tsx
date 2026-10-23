@@ -106,8 +106,10 @@ function CrossGlyph() {
   );
 }
 
-export function PdfSignTool() {
-  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
+export function PdfSignTool({ locale = "es" }: { locale?: "es" | "en" }) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard(locale);
   const fileInput = useRef<HTMLInputElement>(null);
   const signCanvas = useRef<HTMLCanvasElement>(null);
   const typingInput = useRef<HTMLInputElement>(null);
@@ -305,8 +307,14 @@ export function PdfSignTool() {
       if (data.byteLength > limit.pdfBytes) {
         throw new Error(
           pro
-            ? `El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`
-            : `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+            ? t(
+                `El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`,
+                `The PDF is over ${bytesLabel(limit.pdfBytes)}.`,
+              )
+            : t(
+                `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+                `Free allows ${bytesLabel(limit.pdfBytes)}. Pro allows larger files.`,
+              ),
         );
       }
       pdfBytes.current = data.slice(0);
@@ -322,13 +330,20 @@ export function PdfSignTool() {
       const pages = await renderPages(data.slice(0));
       const extra =
         pages > 40
-          ? " Solo se muestran las primeras 40 páginas; el PDF descargado lleva todas."
+          ? t(
+              " Solo se muestran las primeras 40 páginas; el PDF descargado lleva todas.",
+              " Only the first 40 pages are shown; the downloaded PDF keeps them all.",
+            )
           : "";
       setNotice(
         (found.length
-          ? `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} reales del formulario. Rellénalos a la izquierda (no es texto pintado encima). Si quieres solo eso, usa Rellenar PDF.`
-          : "Este PDF no trae campos. Un escaneo o un PDF ‘impreso’ no se puede convertir en formulario de verdad. Aquí marcas encima; para campos originales usa un PDF hecho con casillas (Word, Acrobat, Hacienda).") +
-          extra,
+          ? en
+            ? `PDF with ${found.length} real form field${found.length === 1 ? "" : "s"}. Fill them on the left (this is not text painted on top). If that is all you need, use Fill PDF.`
+            : `PDF con ${found.length} campo${found.length === 1 ? "" : "s"} reales del formulario. Rellénalos a la izquierda (no es texto pintado encima). Si quieres solo eso, usa Rellenar PDF.`
+          : t(
+              "Este PDF no trae campos. Un escaneo o un PDF ‘impreso’ no se puede convertir en formulario de verdad. Aquí marcas encima; para campos originales usa un PDF hecho con casillas (Word, Acrobat, Hacienda).",
+              "This PDF has no fields. A scan or a flat PDF cannot become a real form. Mark it on top here. For original fields, use a PDF that was made with boxes.",
+            )) + extra,
       );
     } catch (caught) {
       setError(
@@ -348,7 +363,7 @@ export function PdfSignTool() {
   async function takeFile(file: File | undefined) {
     if (!file) return;
     if (!isPdfFile(file)) {
-      setError("Sube un archivo PDF.");
+      setError(t("Sube un archivo PDF.", "Upload a PDF file."));
       return;
     }
     const data = await file.arrayBuffer();
@@ -382,7 +397,7 @@ export function PdfSignTool() {
     setDragging(false);
     const file = [...event.dataTransfer.files].find(isPdfFile);
     if (!file) {
-      setError("Suelta un archivo PDF.");
+      setError(t("Suelta un archivo PDF.", "Drop a PDF file."));
       return;
     }
     await takeFile(file);
@@ -476,7 +491,7 @@ export function PdfSignTool() {
     }
     if (mode === "sign") {
       if (!signature) {
-        setError("Dibuja la firma en el recuadro y luego pulsa en el PDF.");
+        setError(t("Dibuja la firma en el recuadro y luego pulsa en el PDF.", "Draw the signature in the box, then tap the PDF."));
         return;
       }
       setError("");
@@ -663,7 +678,7 @@ export function PdfSignTool() {
 
   async function download() {
     if (!pdfBytes.current) {
-      setError("Sube un PDF o crea una hoja en blanco.");
+      setError(t("Sube un PDF o crea una hoja en blanco.", "Upload a PDF or start with a blank page."));
       return;
     }
     if (!beforeRun()) return;
@@ -680,11 +695,11 @@ export function PdfSignTool() {
       const blob = new Blob([copy], { type: "application/pdf" });
       const result = await saveBlob(blob, suggestedFileName(fileName));
       setNotice(
-        noticeForSave(result, "Listo. El PDF firmado está guardado."),
+        noticeForSave(result, t("Listo. El PDF firmado está guardado.", "Done. The signed PDF is saved."), locale),
       );
       afterRun();
     } catch {
-      setError("No se pudo guardar. Prueba con otro PDF (sin contraseña).");
+      setError(t("No se pudo guardar. Prueba con otro PDF (sin contraseña).", "Could not save. Try another PDF (without a password)."));
     } finally {
       setBusy(false);
     }
@@ -692,16 +707,16 @@ export function PdfSignTool() {
 
   const modeHint =
     mode === "check"
-      ? "Pulsa en cada recuadro para marcar ✓. Amplía con + o Ctrl + rueda."
+      ? t("Pulsa en cada recuadro para marcar ✓. Amplía con + o Ctrl + rueda.", "Tap each box to mark a tick. Zoom with + or Ctrl + scroll.")
       : mode === "cross"
-        ? "Pulsa para poner una X."
+        ? t("Pulsa para poner una X.", "Tap to place an X.")
         : mode === "sign"
-          ? "Dibuja la firma a la izquierda y pulsa en el PDF."
+          ? t("Dibuja la firma a la izquierda y pulsa en el PDF.", "Draw the signature on the left and tap the PDF.")
           : mode === "date"
-            ? "Pulsa en el PDF para poner la fecha de hoy."
+            ? t("Pulsa en el PDF para poner la fecha de hoy.", "Tap the PDF to place today's date.")
             : textValue.trim()
-              ? "Pulsa en el PDF para pegar ese texto."
-              : "Pulsa en el PDF y escribe ahí mismo.";
+              ? t("Pulsa en el PDF para pegar ese texto.", "Tap the PDF to paste that text.")
+              : t("Pulsa en el PDF y escribe ahí mismo.", "Tap the PDF and type right there.");
 
   const filePicker = (
     <input
@@ -720,26 +735,35 @@ export function PdfSignTool() {
         <FileDrop
           accept="application/pdf,.pdf"
           busy={busy}
-          dropTitle="Sube tu PDF"
-          tapTitle="Elige el PDF del teléfono"
-          cta="Elegir PDF"
-          hint="El que te han mandado. Lo rellenas, lo firmas y te lo guardas. No se envía a ningún servidor."
-          busyHint="Abriendo el PDF. Un archivo grande tarda un momento."
+          dropTitle={t("Sube tu PDF", "Drop your PDF")}
+          tapTitle={t("Elige el PDF del teléfono", "Choose the PDF from your phone")}
+          cta={t("Elegir PDF", "Choose PDF")}
+          hint={t(
+            "El que te han mandado. Lo rellenas, lo firmas y te lo guardas. No se envía a ningún servidor.",
+            "The one they sent you. Fill it, sign it and save it. Nothing is uploaded.",
+          )}
+          busyHint={t("Abriendo el PDF. Un archivo grande tarda un momento.", "Opening the PDF. A large file takes a moment.")}
+          busyTitle={en ? "Opening…" : undefined}
           onFiles={(list) => void takeFile(list[0])}
         />
         <FreeCapNote
-          text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
+          locale={locale}
+          text={
+            en
+              ? `Free: one PDF of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
+              : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+          }
         />
-        {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+        {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          ¿No tienes archivo?{" "}
+          {t("¿No tienes archivo?", "No file handy?")}{" "}
           <button
             type="button"
             className="min-h-11 text-primary underline-offset-4 hover:underline"
             onClick={() => void openBlank()}
             disabled={busy}
           >
-            Empezar con una hoja en blanco
+            {t("Empezar con una hoja en blanco", "Start with a blank page")}
           </button>
         </p>
         {error ? (
@@ -754,9 +778,9 @@ export function PdfSignTool() {
   const modeButtons: { id: Mode; label: string; icon: ReactNode }[] = [
     { id: "check", label: "✓", icon: <Check className="size-4" /> },
     { id: "cross", label: "X", icon: <X className="size-4" /> },
-    { id: "text", label: "Texto", icon: <Type className="size-4" /> },
-    { id: "date", label: "Fecha", icon: null },
-    { id: "sign", label: "Firma", icon: <PenLine className="size-4" /> },
+    { id: "text", label: t("Texto", "Text"), icon: <Type className="size-4" /> },
+    { id: "date", label: t("Fecha", "Date"), icon: null },
+    { id: "sign", label: t("Firma", "Sign"), icon: <PenLine className="size-4" /> },
   ];
 
   return (
@@ -794,7 +818,7 @@ export function PdfSignTool() {
             type="button"
             variant="outline"
             className="size-11 sm:size-8"
-            aria-label="Alejar"
+            aria-label={t("Alejar", "Zoom out")}
             onClick={() => setZoom((current) => clampZoom(current - 0.15))}
           >
             <Minus />
@@ -806,7 +830,7 @@ export function PdfSignTool() {
             type="button"
             variant="outline"
             className="size-11 sm:size-8"
-            aria-label="Acercar"
+            aria-label={t("Acercar", "Zoom in")}
             onClick={() => setZoom((current) => clampZoom(current + 0.15))}
           >
             <Plus />
@@ -817,14 +841,14 @@ export function PdfSignTool() {
             className="h-11 sm:h-8"
             onClick={() => setZoom(1)}
           >
-            Caber
+            {t("Caber", "Fit")}
           </Button>
           <span className="ml-auto hidden flex-wrap gap-1.5 xl:flex">
             {stamps.length > 0 ? (
               <>
                 <Button type="button" size="sm" variant="ghost" onClick={undoStamp}>
                   <Undo2 />
-                  Deshacer
+                  {t("Deshacer", "Undo")}
                 </Button>
                 <Button
                   type="button"
@@ -838,7 +862,7 @@ export function PdfSignTool() {
                   }}
                 >
                   <Trash2 />
-                  Quitar
+                  {t("Quitar", "Clear")}
                 </Button>
               </>
             ) : null}
@@ -848,8 +872,8 @@ export function PdfSignTool() {
               onClick={() => void download()}
               disabled={busy}
             >
-              {busy ? "Preparando…" : <Download />}
-              {busy ? "" : "Guardar PDF"}
+              {busy ? t("Preparando…", "Preparing…") : <Download />}
+              {busy ? "" : t("Guardar PDF", "Save PDF")}
             </Button>
           </span>
         </div>
@@ -869,7 +893,7 @@ export function PdfSignTool() {
                     ?.scrollIntoView({ behavior: "smooth", block: "start" })
                 }
               >
-                Pág. {index + 1}
+                {t("Pág.", "P.")} {index + 1}
               </button>
             ))}
           </div>
@@ -886,11 +910,13 @@ export function PdfSignTool() {
             onDragLeave={onDragLeave}
             onDrop={(event) => void onDrop(event)}
           >
-            <h2 className="font-heading text-xl">Tu PDF</h2>
+            <h2 className="font-heading text-xl">{t("Tu PDF", "Your PDF")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {fileName}
               {pageCount
-                ? ` · ${pageCount} página${pageCount === 1 ? "" : "s"}`
+                ? en
+                  ? ` · ${pageCount} page${pageCount === 1 ? "" : "s"}`
+                  : ` · ${pageCount} página${pageCount === 1 ? "" : "s"}`
                 : ""}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
@@ -901,7 +927,7 @@ export function PdfSignTool() {
                 disabled={busy}
               >
                 <FileUp />
-                Cambiar
+                {t("Cambiar", "Change")}
               </Button>
               <Button
                 type="button"
@@ -910,26 +936,26 @@ export function PdfSignTool() {
                 onClick={() => void openBlank()}
                 disabled={busy}
               >
-                Hoja en blanco
+                {t("Hoja en blanco", "Blank page")}
               </Button>
             </div>
           </section>
 
           {mode === "text" ? (
             <section className="rounded-2xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5">
-              <Label htmlFor="pdf-text">Texto para repetir (opcional)</Label>
+              <Label htmlFor="pdf-text">{t("Texto para repetir (opcional)", "Text to repeat (optional)")}</Label>
               <Input
                 id="pdf-text"
                 className="mt-2 h-12"
                 value={textValue}
                 onChange={(event) => setTextValue(event.target.value)}
-                placeholder="NIF, población… cada clic lo pega"
+                placeholder={t("NIF, población… cada clic lo pega", "A name, a city… each tap pastes it")}
               />
             </section>
           ) : null}
 
           <section className="rounded-2xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5">
-            <Label htmlFor="pdf-sign">Firma (dedo o ratón)</Label>
+            <Label htmlFor="pdf-sign">{t("Firma (dedo o ratón)", "Signature (finger or mouse)")}</Label>
             <canvas
               id="pdf-sign"
               ref={signCanvas}
@@ -944,16 +970,18 @@ export function PdfSignTool() {
               onClick={resetPad}
             >
               <Eraser />
-              Borrar firma
+              {t("Borrar firma", "Clear signature")}
             </Button>
           </section>
 
           {fields.length > 0 ? (
             <section className="rounded-2xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5">
-              <h2 className="font-heading text-xl">Campos del PDF</h2>
+              <h2 className="font-heading text-xl">{t("Campos del PDF", "PDF fields")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Este archivo ya traía cajas. Rellénalas aquí; salen en el PDF
-                descargado.
+                {t(
+                  "Este archivo ya traía cajas. Rellénalas aquí; salen en el PDF descargado.",
+                  "This file already had boxes. Fill them here; they go into the downloaded PDF.",
+                )}
               </p>
               <ul className="mt-4 flex flex-col gap-3">
                 {fields.map((field, index) => (
@@ -1059,13 +1087,13 @@ export function PdfSignTool() {
                   return (
                     <li key={pageIndex} id={`pdf-page-${pageIndex}`}>
                       <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
-                        Página {pageIndex + 1}
+                        {t("Página", "Page")} {pageIndex + 1}
                       </p>
                       <div className="relative overflow-hidden rounded-sm bg-white shadow-[0_24px_50px_-18px_rgba(40,24,10,0.45)] ring-1 ring-foreground/10">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={src}
-                          alt={`Página ${pageIndex + 1} del PDF`}
+                          alt={en ? `Page ${pageIndex + 1} of the PDF` : `Página ${pageIndex + 1} del PDF`}
                           className="block w-full cursor-crosshair touch-manipulation select-none"
                           draggable={false}
                           onClick={(event) => {
@@ -1182,7 +1210,7 @@ export function PdfSignTool() {
                             <button
                               type="button"
                               className="absolute -right-3 -top-3 flex size-8 items-center justify-center rounded-full bg-foreground text-base leading-none text-background"
-                              aria-label="Quitar marca"
+                              aria-label={t("Quitar marca", "Remove mark")}
                               onPointerDown={(event) => event.stopPropagation()}
                               onClick={(event) => {
                                 event.stopPropagation();
@@ -1259,7 +1287,7 @@ export function PdfSignTool() {
               onClick={undoStamp}
             >
               <Undo2 />
-              Deshacer
+              {t("Deshacer", "Undo")}
             </Button>
           ) : null}
           <Button
@@ -1268,8 +1296,8 @@ export function PdfSignTool() {
             onClick={() => void download()}
             disabled={busy}
           >
-            {busy ? "Preparando…" : <Download />}
-            {busy ? "" : "Guardar PDF"}
+            {busy ? t("Preparando…", "Preparing…") : <Download />}
+            {busy ? "" : t("Guardar PDF", "Save PDF")}
           </Button>
         </div>
       </div>

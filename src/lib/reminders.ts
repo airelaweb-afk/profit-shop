@@ -135,7 +135,18 @@ export function parseDebtors(raw: string): Debtor[] {
     .slice(0, 40);
 }
 
-export function reminderSubject(debtor: Debtor, round: ReminderRound) {
+export function reminderSubject(
+  debtor: Debtor,
+  round: ReminderRound,
+  locale: "es" | "en" = "es",
+) {
+  if (locale === "en") {
+    const what = debtor.concept || "outstanding work";
+    if (round === "primera") return `Payment due: ${what}`;
+    if (round === "segunda")
+      return `Reminder: ${what} (${formatEuro(debtor.amount)})`;
+    return `Payment closing: ${what}`;
+  }
   const what = debtor.concept || "trabajo pendiente";
   if (round === "primera") return `Pendiente de cobro: ${what}`;
   if (round === "segunda")
@@ -148,9 +159,23 @@ export function reminderBody(
   round: ReminderRound,
   sender: string,
   channel: ReminderChannel,
+  locale: "es" | "en" = "es",
 ) {
-  const name = sender.trim() || "Un saludo";
   const money = formatEuro(debtor.amount);
+  if (locale === "en") {
+    const name = sender.trim() || "Regards";
+    const job = debtor.concept || "the work";
+    const since = debtor.dateLabel ? ` since ${debtor.dateLabel}` : "";
+    const hi = channel === "email" ? "Hello,\n\n" : "Hello:\n\n";
+    if (round === "primera") {
+      return `${hi}I am writing about ${job} for ${debtor.company} (${money}${since}). When you can, please confirm whether it is queued for payment.\n\nThank you,\n${name}`;
+    }
+    if (round === "segunda") {
+      return `${hi}A reminder of ${money} (${job} · ${debtor.company})${since}. If there is a problem with the invoice or the item, tell me and we can sort it. If it is already being processed, ignore this message.\n\nThank you,\n${name}`;
+    }
+    return `${hi}${job} for ${debtor.company} (${money}) is still unpaid${since}. I need the payment or a specific date this week so I can close it. If you have already sent it, tell me and I will stop.\n\n${name}`;
+  }
+  const name = sender.trim() || "Un saludo";
   const job = debtor.concept || "el trabajo";
   const since = debtor.dateLabel ? ` desde el ${debtor.dateLabel}` : "";
   const hi = channel === "email" ? `Hola,\n\n` : `Hola:\n\n`;

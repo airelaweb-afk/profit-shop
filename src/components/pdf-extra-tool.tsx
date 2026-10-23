@@ -56,8 +56,43 @@ const copy: Record<
   },
 };
 
-export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
-  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
+const copyEn: typeof copy = {
+  rotate: {
+    drop: "Drop the PDF you want to turn",
+    tap: "Choose the PDF you want to turn",
+    cta: "Choose PDF",
+    action: "Rotate and save",
+  },
+  numbers: {
+    drop: "Drop the PDF to number the pages",
+    tap: "Choose the PDF to number the pages",
+    cta: "Choose PDF",
+    action: "Number and save",
+  },
+  watermark: {
+    drop: "Drop the PDF for the watermark",
+    tap: "Choose the PDF for the watermark",
+    cta: "Choose PDF",
+    action: "Stamp and save",
+  },
+  remove: {
+    drop: "Drop the PDF you want to remove pages from",
+    tap: "Choose the PDF you want to remove pages from",
+    cta: "Choose PDF",
+    action: "Delete pages and save",
+  },
+};
+
+export function PdfExtraTool({
+  kind,
+  locale = "es",
+}: {
+  kind: PdfExtraSlug;
+  locale?: "es" | "en";
+}) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard(locale);
   const [item, setItem] = useState<Item | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -66,21 +101,27 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
   const [start, setStart] = useState("1");
   const [mark, setMark] = useState("BORRADOR");
   const [pages, setPages] = useState("");
-  const labels = copy[kind];
+  const labels = (en ? copyEn : copy)[kind];
 
   async function addFiles(list: File[]) {
     setError("");
     setNotice("");
     const file = list.find((entry) => isPdfFile(entry));
     if (!file) {
-      setError("Sube un archivo PDF.");
+      setError(t("Sube un archivo PDF.", "Upload a PDF file."));
       return;
     }
     if (file.size > limit.pdfBytes) {
       setUpgrade(
         pro
-          ? `${file.name} pesa más de ${bytesLabel(limit.pdfBytes)}.`
-          : `${file.name} pesa más de ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+          ? t(
+              `${file.name} pesa más de ${bytesLabel(limit.pdfBytes)}.`,
+              `${file.name} is over ${bytesLabel(limit.pdfBytes)}.`,
+            )
+          : t(
+              `${file.name} pesa más de ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+              `${file.name} is over ${bytesLabel(limit.pdfBytes)}. Pro allows larger files.`,
+            ),
       );
       return;
     }
@@ -88,7 +129,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
       const pages = await countPdfPages(await file.arrayBuffer());
       setItem({ id: newId(), file, pages });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo leer el PDF.");
+      setError(caught instanceof Error ? caught.message : t("No se pudo leer el PDF.", "Could not read the PDF."));
     }
   }
 
@@ -107,14 +148,16 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         const removed = await removePdfPages(data, pages);
         bytes = removed.bytes;
         suffix = "sin-paginas";
-        ready = `Listo: ${removed.removed} página${removed.removed === 1 ? "" : "s"} fuera, quedan ${removed.kept}. ${formatBytes(bytes.byteLength)}.`;
+        ready = en
+          ? `Done: ${removed.removed} page${removed.removed === 1 ? "" : "s"} removed, ${removed.kept} left. ${formatBytes(bytes.byteLength)}.`
+          : `Listo: ${removed.removed} página${removed.removed === 1 ? "" : "s"} fuera, quedan ${removed.kept}. ${formatBytes(bytes.byteLength)}.`;
       } else if (kind === "rotate") {
         bytes = await rotatePdf(data, angle);
         suffix = `rotado-${angle}`;
       } else if (kind === "numbers") {
         const from = Number(start);
         if (!Number.isFinite(from) || from < 1) {
-          throw new Error("El número de arranque tiene que ser 1 o más.");
+          throw new Error(t("El número de arranque tiene que ser 1 o más.", "The starting number has to be 1 or more."));
         }
         bytes = await numberPdfPages(data, from);
         suffix = "numerado";
@@ -127,10 +170,10 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         suggestedOutName(item.file.name, suffix, "pdf"),
         "application/pdf",
       );
-      setNotice(noticeForSave(result, ready || `Listo: ${formatBytes(bytes.byteLength)}.`));
+      setNotice(noticeForSave(result, ready || (en ? `Done: ${formatBytes(bytes.byteLength)}.` : `Listo: ${formatBytes(bytes.byteLength)}.`), locale));
       afterRun();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo terminar.");
+      setError(caught instanceof Error ? caught.message : t("No se pudo terminar.", "Could not finish."));
     } finally {
       setBusy(false);
     }
@@ -145,14 +188,20 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
         dropTitle={labels.drop}
         tapTitle={labels.tap}
         cta={labels.cta}
-        hint="No se envía a ningún servidor."
-        busyHint="Un archivo grande tarda un momento."
+        hint={t("No se envía a ningún servidor.", "Nothing is uploaded.")}
+        busyHint={t("Un archivo grande tarda un momento.", "A large file takes a moment.")}
+        busyTitle={en ? "Opening…" : undefined}
         onFiles={(list) => void addFiles(list)}
       />
       <FreeCapNote
-        text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
+        locale={locale}
+        text={
+          en
+            ? `Free: one PDF of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
+            : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+        }
       />
-      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+      {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
 
       {item ? (
         <div className="mt-6 flex items-center gap-2 rounded-xl bg-card px-3 py-2 ring-1 ring-foreground/10">
@@ -161,7 +210,9 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
             <p className="text-xs text-muted-foreground">
               {formatBytes(item.file.size)}
               {item.pages
-                ? ` · ${item.pages} página${item.pages === 1 ? "" : "s"}`
+                ? en
+                  ? ` · ${item.pages} page${item.pages === 1 ? "" : "s"}`
+                  : ` · ${item.pages} página${item.pages === 1 ? "" : "s"}`
                 : ""}
             </p>
           </div>
@@ -170,7 +221,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
             size="icon"
             variant="ghost"
             className="size-11"
-            aria-label="Quitar"
+            aria-label={t("Quitar", "Remove")}
             onClick={() => setItem(null)}
           >
             <Trash2 />
@@ -196,7 +247,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
 
       {kind === "numbers" ? (
         <div className="mt-6 grid gap-1.5">
-          <Label htmlFor="pdf-start">Empezar a numerar en</Label>
+          <Label htmlFor="pdf-start">{t("Empezar a numerar en", "Start numbering at")}</Label>
           <Input
             id="pdf-start"
             className="h-12"
@@ -209,24 +260,33 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
 
       {kind === "remove" ? (
         <div className="mt-6 grid gap-1.5">
-          <Label htmlFor="pdf-remove">Páginas a quitar</Label>
+          <Label htmlFor="pdf-remove">{t("Páginas a quitar", "Pages to delete")}</Label>
           <Input
             id="pdf-remove"
             className="h-12"
             inputMode="numeric"
             value={pages}
             onChange={(event) => setPages(event.target.value)}
-            placeholder={item?.pages ? `Por ejemplo: 1, 4-6 (hay ${item.pages})` : "Por ejemplo: 1, 4-6"}
+            placeholder={
+              item?.pages
+                ? en
+                  ? `For example: 1, 4-6 (${item.pages} pages)`
+                  : `Por ejemplo: 1, 4-6 (hay ${item.pages})`
+                : t("Por ejemplo: 1, 4-6", "For example: 1, 4-6")
+            }
           />
           <p className="text-xs text-muted-foreground">
-            Números y rangos separados por comas. Las demás páginas se quedan en su orden.
+            {t(
+              "Números y rangos separados por comas. Las demás páginas se quedan en su orden.",
+              "Numbers and ranges, separated by commas. The other pages stay in order.",
+            )}
           </p>
         </div>
       ) : null}
 
       {kind === "watermark" ? (
         <div className="mt-6 grid gap-1.5">
-          <Label htmlFor="pdf-mark">Texto de la marca</Label>
+          <Label htmlFor="pdf-mark">{t("Texto de la marca", "Watermark text")}</Label>
           <Input
             id="pdf-mark"
             className="h-12"
@@ -246,7 +306,7 @@ export function PdfExtraTool({ kind }: { kind: PdfExtraSlug }) {
           disabled={busy || !item || (kind === "remove" && !pages.trim())}
           onClick={() => void run()}
         >
-          {busy ? "Preparando…" : <Download />}
+          {busy ? t("Preparando…", "Preparing…") : <Download />}
           {busy ? "" : labels.action}
         </Button>
       </div>

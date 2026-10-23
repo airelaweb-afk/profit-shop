@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ad-slot";
 import { Button } from "@/components/ui/button";
 import { getPost, posts } from "@/lib/blog";
+import { pairForPath } from "@/lib/locale";
+import { absUrl } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -18,11 +20,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) return { title: "Artículo" };
+  const path = `/blog/${post.slug}`;
+  const pair = pairForPath(path);
+  const languages = pair
+    ? {
+        es: absUrl(pair.es),
+        en: absUrl(pair.en),
+        "x-default": absUrl(pair.es),
+      }
+    : undefined;
   return {
     title: post.title,
     description: post.meta,
     keywords: post.keywords,
-    alternates: { canonical: `${SITE_URL}/blog/${post.slug}/` },
+    alternates: languages
+      ? { canonical: absUrl(path), languages }
+      : { canonical: `${SITE_URL}/blog/${post.slug}/` },
     openGraph: {
       title: post.title,
       description: post.meta,

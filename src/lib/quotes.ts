@@ -13,6 +13,29 @@ const MONTHS_ES = [
   "diciembre",
 ];
 
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+export type DocLocale = "es" | "en";
+
+export const englishQuoteIntro =
+  "Thank you for your interest. Below is the detail of the services, timing and amounts.";
+
+export const englishQuoteConditions =
+  "Payment: 50% on acceptance and 50% on delivery.\nRevisions: two rounds included. Scope changes are quoted separately.\nAcceptance: reply to this document by email with \"accepted\" or sign below.";
+
 export function formatEuro(cents: number) {
   const euros = (Math.round(cents) / 100).toFixed(2).replace(".", ",");
   return `${euros} €`;
@@ -147,7 +170,10 @@ export function quoteTotals(lines: ServiceLine[], taxPercent: number) {
   return { subtotal, tax, total: subtotal + tax };
 }
 
-export function formatLongDate(when = new Date()) {
+export function formatLongDate(when = new Date(), locale: DocLocale = "es") {
+  if (locale === "en") {
+    return `${when.getUTCDate()} ${MONTHS_EN[when.getUTCMonth()]} ${when.getUTCFullYear()}`;
+  }
   return `${when.getUTCDate()} de ${MONTHS_ES[when.getUTCMonth()]} de ${when.getUTCFullYear()}`;
 }
 
@@ -165,7 +191,7 @@ export function quoteNumber(
   return `${prefix}-${year}-${n}`;
 }
 
-export function validUntil(days: number, when = new Date()) {
+export function validUntil(days: number, when = new Date(), locale: DocLocale = "es") {
   const date = new Date(
     Date.UTC(
       when.getUTCFullYear(),
@@ -173,7 +199,7 @@ export function validUntil(days: number, when = new Date()) {
       when.getUTCDate() + Math.max(1, days),
     ),
   );
-  return formatLongDate(date);
+  return formatLongDate(date, locale);
 }
 
 export function quoteSendMessage({
@@ -182,18 +208,33 @@ export function quoteSendMessage({
   number,
   total,
   valid,
+  locale = "es",
 }: {
   issuer: Issuer;
   client: ClientRow;
   number: string;
   total: number;
   valid: string;
+  locale?: DocLocale;
 }) {
   const first = client.contact.trim().split(/\s+/)[0];
-  const hello = first ? `Hola ${first}` : `Hola`;
   const sign = [issuer.name, issuer.phone, issuer.email]
     .filter(Boolean)
     .join("\n");
+  if (locale === "en") {
+    const hello = first ? `Hello ${first}` : "Hello";
+    return `${hello},
+
+Here is quote ${number} from ${issuer.name || "my studio"} for ${client.company}.
+Total: ${formatEuro(total)} (VAT ${issuer.taxPercent}% included).
+Valid until ${valid}.
+
+The PDF is attached. If it works for you, reply to this message with "accepted".
+
+Regards,
+${sign}`;
+  }
+  const hello = first ? `Hola ${first}` : `Hola`;
   return `${hello},
 
 Te envío el presupuesto ${number} de ${issuer.name || "mi estudio"} para ${client.company}.

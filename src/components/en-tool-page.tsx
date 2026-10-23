@@ -60,8 +60,16 @@ export function EnToolPage({ copy, children }: { copy: EnToolCopy; children: Rea
           ))}
         </ul>
         <p className="mt-4 text-sm text-muted-foreground">
-          <Link href="/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
-            More tools, in Spanish
+          <Link href="/en/pdf-tools/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
+            PDF tools
+          </Link>
+          {" · "}
+          <Link href="/en/image-tools/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
+            Image tools
+          </Link>
+          {" · "}
+          <Link href="/en/blog/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
+            Blog
           </Link>
         </p>
       </aside>

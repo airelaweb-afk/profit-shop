@@ -6,21 +6,32 @@ import { competitors } from "@/lib/comparisons";
 import { COMPARISON_DISCLAIMER, COMPARISON_LAW } from "@/lib/legal-ads";
 import { SITE_NAME } from "@/lib/site";
 
-export function CompareShell({ item }: { item: Competitor }) {
-  const others = competitors.filter((entry) => entry.slug !== item.slug);
+export function CompareShell({
+  item,
+  locale = "es",
+  pool,
+}: {
+  item: Competitor;
+  locale?: "es" | "en";
+  pool?: readonly Competitor[];
+}) {
+  const en = locale === "en";
+  const others = (pool ?? competitors).filter((entry) => entry.slug !== item.slug);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: item.title,
     description: item.meta,
-    inLanguage: "es-ES",
+    inLanguage: en ? "en" : "es-ES",
     isPartOf: { "@type": "WebSite", name: SITE_NAME },
     about: [
       { "@type": "SoftwareApplication", name: SITE_NAME },
       {
         "@type": "Brand",
         name: item.name,
-        description: "Marca de terceros, citada para identificar al competidor.",
+        description: en
+          ? "Third-party brand, named to identify the competitor."
+          : "Marca de terceros, citada para identificar al competidor.",
       },
     ],
   };
@@ -31,21 +42,23 @@ export function CompareShell({ item }: { item: Competitor }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <p className="text-sm tracking-wide text-primary uppercase">
-        {SITE_NAME} · comparativa objetiva
+        {en ? `${SITE_NAME} · objective comparison` : `${SITE_NAME} · comparativa objetiva`}
       </p>
       <h1 className="mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        Unir PDF sin subirlo. No somos {item.name}.
+        {en
+          ? `Merge a PDF without uploading it. We are not ${item.name}.`
+          : `Unir PDF sin subirlo. No somos ${item.name}.`}
       </h1>
       <p className="mt-4 rounded-[2px] bg-accent px-4 py-3 text-sm text-foreground">
-        {item.holder} Esta página es de {SITE_NAME}. No usamos su logotipo ni
-        su nombre como si fuéramos ellos. {COMPARISON_DISCLAIMER} Norma:{" "}
-        {COMPARISON_LAW}
+        {item.holder}{" "}
+        {en
+          ? `This page belongs to ${SITE_NAME}. We do not use their logo or their name as if we were them. Third-party brands are named only to identify the competitor. We compare one verifiable fact: where the file is processed. The binding legal text is the Spanish legal notice.`
+          : `Esta página es de ${SITE_NAME}. No usamos su logotipo ni su nombre como si fuéramos ellos. ${COMPARISON_DISCLAIMER} Norma: ${COMPARISON_LAW}`}
       </p>
       <p className="mt-4 text-muted-foreground">
-        Si has llegado buscando “{item.search}”, el atasco es el mismo. La
-        diferencia objetiva: aquí el archivo se procesa en tu navegador. No
-        viaja a un servidor nuestro. {item.name} trabaja en la nube o con
-        software de escritorio: el archivo se sube o se instala.
+        {en
+          ? `If you arrived while searching for “${item.search}”, the problem is the same. The objective difference: here the file is processed in your browser. It does not travel to a server of ours. ${item.name} works in the cloud or with desktop software: the file is uploaded or installed.`
+          : `Si has llegado buscando “${item.search}”, el atasco es el mismo. La diferencia objetiva: aquí el archivo se procesa en tu navegador. No viaja a un servidor nuestro. ${item.name} trabaja en la nube o con software de escritorio: el archivo se sube o se instala.`}
       </p>
       <AdSlot label="Unir y comprimir son gratis." wrapClassName="mt-6" />
       <div className="mt-10 overflow-x-auto">
@@ -53,7 +66,7 @@ export function CompareShell({ item }: { item: Competitor }) {
           <thead className="bg-foreground text-background">
             <tr>
               <th className="px-3 py-3 text-left font-mono text-[0.65rem] tracking-widest uppercase">
-                Hecho
+                {en ? "Fact" : "Hecho"}
               </th>
               <th className="px-3 py-3 text-left font-mono text-[0.65rem] tracking-widest uppercase">
                 {SITE_NAME}
@@ -75,26 +88,26 @@ export function CompareShell({ item }: { item: Competitor }) {
         </table>
       </div>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button className="h-12" render={<Link href="/unir-pdf" />} nativeButton={false}>
-          Unir PDF ahora
+        <Button className="h-12" render={<Link href={en ? "/en/merge-pdf/" : "/unir-pdf"} />} nativeButton={false}>
+          {en ? "Merge PDF now" : "Unir PDF ahora"}
         </Button>
         <Button
           variant="outline"
           className="h-12"
-          render={<Link href="/comprimir-pdf" />}
+          render={<Link href={en ? "/en/compress-pdf/" : "/comprimir-pdf"} />}
           nativeButton={false}
         >
-          Comprimir PDF
+          {en ? "Compress PDF" : "Comprimir PDF"}
         </Button>
       </div>
       {others.length > 0 ? (
         <aside className="mt-14">
-          <h2 className="font-heading text-2xl">Otras comparativas</h2>
+          <h2 className="font-heading text-2xl">{en ? "Other comparisons" : "Otras comparativas"}</h2>
           <ul className="mt-4 grid gap-2">
             {others.map((entry) => (
               <li key={entry.slug}>
                 <Link href={entry.href} className="punch-card block p-4">
-                  {SITE_NAME} frente a {entry.name}
+                  {en ? `${SITE_NAME} compared with ${entry.name}` : `${SITE_NAME} frente a ${entry.name}`}
                 </Link>
               </li>
             ))}

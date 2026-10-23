@@ -23,7 +23,9 @@ import { formatIsoEs } from "@/lib/use-admin";
 import { usePro, useProfile } from "@/lib/use-consent";
 import { useSession } from "@/lib/use-session";
 
-export function PricingBox() {
+export function PricingBox({ locale = "es" }: { locale?: "es" | "en" }) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
   const pro = usePro();
   const profile = useProfile();
   const session = useSession();
@@ -59,11 +61,11 @@ export function PricingBox() {
     setError("");
     setNotice("");
     try {
-      await activatePro(code);
-      setNotice("Pro activo en este navegador. Sin límites.");
+      await activatePro(code, locale);
+      setNotice(t("Pro activo en este navegador. Sin límites.", "Pro is active in this browser. No limits."));
       setCode("");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo activar.");
+      setError(caught instanceof Error ? caught.message : t("No se pudo activar.", "Could not activate."));
     }
   }
 
@@ -71,12 +73,19 @@ export function PricingBox() {
     return (
       <div className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15">
         <p className="font-heading text-2xl">
-          {cloudPro ? "Pro está activo en tu cuenta." : "Pro está activo aquí."}
+          {cloudPro
+            ? t("Pro está activo en tu cuenta.", "Pro is active on your account.")
+            : t("Pro está activo aquí.", "Pro is active here.")}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
           {cloudPro && profile?.pro_until
-            ? `Hasta el ${formatIsoEs(profile.pro_until)}, en cualquier aparato donde entres con ${profile.email}.`
-            : "Solo en este aparato. Si borras los datos del sitio, hay que introducir la clave otra vez."}
+            ? en
+              ? `Until ${new Date(profile.pro_until).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}, on any device where you sign in as ${profile.email}.`
+              : `Hasta el ${formatIsoEs(profile.pro_until)}, en cualquier aparato donde entres con ${profile.email}.`
+            : t(
+                "Solo en este aparato. Si borras los datos del sitio, hay que introducir la clave otra vez.",
+                "Only on this device. If you clear the site data, you have to enter the key again.",
+              )}
         </p>
         {cloudPro ? (
           <Button
@@ -85,7 +94,7 @@ export function PricingBox() {
             render={<Link href="/cuenta/" />}
             nativeButton={false}
           >
-            Ver mi cuenta
+            {t("Ver mi cuenta", "My account")}
           </Button>
         ) : (
           <Button
@@ -94,7 +103,7 @@ export function PricingBox() {
             className="mt-4 h-11"
             onClick={() => deactivatePro()}
           >
-            Quitar Pro de este navegador
+            {t("Quitar Pro de este navegador", "Remove Pro from this browser")}
           </Button>
         )}
       </div>
@@ -112,40 +121,59 @@ export function PricingBox() {
         <p className="rounded-[2px] bg-accent px-4 py-3 text-sm text-accent-foreground">
           {cloud && session
             ? checking
-              ? "Pago recibido. Activando Pro en tu cuenta… (unos segundos)."
-              : "Si el pago ha salido bien, Pro se activa solo en tu cuenta. Si en unos minutos no aparece, escríbenos."
-            : "Si el pago ha salido bien, te llega la clave al correo. Pégala abajo para activar Pro en este navegador."}
+              ? t(
+                  "Pago recibido. Activando Pro en tu cuenta… (unos segundos).",
+                  "Payment received. Turning Pro on for your account… (a few seconds).",
+                )
+              : t(
+                  "Si el pago ha salido bien, Pro se activa solo en tu cuenta. Si en unos minutos no aparece, escríbenos.",
+                  "If the payment went through, Pro turns on by itself on your account. If it is still missing after a few minutes, email us.",
+                )
+            : t(
+                "Si el pago ha salido bien, te llega la clave al correo. Pégala abajo para activar Pro en este navegador.",
+                "If the payment went through, the key arrives by email. Paste it below to activate Pro in this browser.",
+              )}
         </p>
       ) : null}
 
       <div className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15">
-        <p className="font-heading text-2xl">Pagar Pro</p>
+        <p className="font-heading text-2xl">{t("Pagar Pro", "Pay for Pro")}</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          {revolut ? "Tarjeta (Stripe) o Revolut." : "Con tarjeta, en Stripe."} El
-          archivo sigue en tu navegador: el pago es en su web, no aquí.
+          {revolut
+            ? t("Tarjeta (Stripe) o Revolut.", "Card (Stripe) or Revolut.")
+            : t("Con tarjeta, en Stripe.", "By card, on Stripe.")}{" "}
+          {t(
+            "El archivo sigue en tu navegador: el pago es en su web, no aquí.",
+            "The file stays in your browser: payment happens on their site, not here.",
+          )}
           {cloud
             ? session
-              ? ` Pagas con ${session.email} y Pro se activa solo en tu cuenta.`
-              : " Entra antes de pagar para que Pro se active solo en tu cuenta."
-            : " Luego activas la clave abajo."}
+              ? en
+                ? ` You pay as ${session.email} and Pro turns on by itself on your account.`
+                : ` Pagas con ${session.email} y Pro se activa solo en tu cuenta.`
+              : t(
+                  " Entra antes de pagar para que Pro se active solo en tu cuenta.",
+                  " Sign in before you pay so Pro turns on by itself on your account.",
+                )
+            : t(" Luego activas la clave abajo.", " Then activate the key below.")}
         </p>
         {cloud && !session ? (
           <div className="mt-4 grid gap-2 sm:flex">
             <Button
               variant="outline"
               className="h-11"
-              render={<Link href="/entrar/?next=%2Fprecios%2F" />}
+              render={<Link href={en ? "/entrar/?next=%2Fen%2Fpricing%2F" : "/entrar/?next=%2Fprecios%2F"} />}
               nativeButton={false}
             >
-              Entrar
+              {t("Entrar", "Sign in")}
             </Button>
             <Button
               variant="outline"
               className="h-11"
-              render={<Link href="/entrar/?tab=crear&next=%2Fprecios%2F" />}
+              render={<Link href={en ? "/entrar/?tab=crear&next=%2Fen%2Fpricing%2F" : "/entrar/?tab=crear&next=%2Fprecios%2F"} />}
               nativeButton={false}
             >
-              Crear cuenta
+              {t("Crear cuenta", "Create account")}
             </Button>
           </div>
         ) : null}
@@ -156,7 +184,7 @@ export function PricingBox() {
               render={<a href={stripeYear} target="_blank" rel="noreferrer" />}
               nativeButton={false}
             >
-              Anual · {PRO_YEARLY}
+              {t("Anual", "Yearly")} · {PRO_YEARLY}
             </Button>
           ) : null}
           {monthly ? (
@@ -166,7 +194,7 @@ export function PricingBox() {
               render={<a href={stripeMonth} target="_blank" rel="noreferrer" />}
               nativeButton={false}
             >
-              Mensual · {PRO_MONTHLY}
+              {t("Mensual", "Monthly")} · {PRO_MONTHLY}
             </Button>
           ) : null}
           {revolut ? (
@@ -182,7 +210,7 @@ export function PricingBox() {
               }
               nativeButton={false}
             >
-              Pagar con Revolut
+              {t("Pagar con Revolut", "Pay with Revolut")}
             </Button>
           ) : null}
           {!stripe && !revolut ? (
@@ -190,19 +218,22 @@ export function PricingBox() {
               className="h-12"
               render={
                 <a
-                  href={`mailto:${LEGAL.email}?subject=${encodeURIComponent("Luna Oficio Pro")}&body=${encodeURIComponent("Quiero Pro (7 €/mes o 40 €/año). Pago por Stripe o Revolut.")}`}
+                  href={`mailto:${LEGAL.email}?subject=${encodeURIComponent("Luna Oficio Pro")}&body=${encodeURIComponent(en ? "I want Pro (7 €/month or 40 €/year). Payment by Stripe or Revolut." : "Quiero Pro (7 €/mes o 40 €/año). Pago por Stripe o Revolut.")}`}
                 />
               }
               nativeButton={false}
             >
-              Escribir a {LEGAL.email}
+              {t("Escribir a", "Email")} {LEGAL.email}
             </Button>
           ) : null}
         </div>
         {!stripe ? (
           <p className="mt-3 text-xs text-muted-foreground">
-            Para los botones, pega los Payment Link (anual y mensual) y tu
-            revolut.me en <code>src/lib/payments.ts</code> o en Hostinger:{" "}
+            {en
+              ? "For the buttons, paste the Payment Links (yearly and monthly) and your revolut.me into "
+              : "Para los botones, pega los Payment Link (anual y mensual) y tu revolut.me en "}
+            <code>src/lib/payments.ts</code>
+            {en ? " or in Hostinger: " : " o en Hostinger: "}
             <code>NEXT_PUBLIC_STRIPE_PAYMENT_LINK</code>,{" "}
             <code>NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY</code>,{" "}
             <code>NEXT_PUBLIC_REVOLUT_PAYMENT_LINK</code>. En Stripe, metadata{" "}
@@ -211,8 +242,10 @@ export function PricingBox() {
         ) : null}
         {cloud && revolut ? (
           <p className="mt-3 text-xs text-muted-foreground">
-            Con Revolut el alta la hacemos a mano en cuanto vemos el pago: pon tu correo en el
-            concepto.
+            {t(
+              "Con Revolut el alta la hacemos a mano en cuanto vemos el pago: pon tu correo en el concepto.",
+              "With Revolut we switch Pro on by hand when we see the payment: put your email in the reference.",
+            )}
           </p>
         ) : null}
       </div>
@@ -222,15 +255,21 @@ export function PricingBox() {
         className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15"
       >
         <p className="font-heading text-2xl">
-          {cloud ? "¿Tienes una clave?" : "Activar clave"}
+          {cloud ? t("¿Tienes una clave?", "Have a key?") : t("Activar clave", "Activate a key")}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
           {cloud
-            ? "Si te dimos una clave Pro (regalo, pago por Revolut o transferencia), pégala aquí. Vale en este navegador."
-            : "Cuando hayas pagado, te enviamos la clave. Vive en este navegador, como la cuenta."}
+            ? t(
+                "Si te dimos una clave Pro (regalo, pago por Revolut o transferencia), pégala aquí. Vale en este navegador.",
+                "If we gave you a Pro key (a gift, a Revolut payment or a transfer), paste it here. It works in this browser.",
+              )
+            : t(
+                "Cuando hayas pagado, te enviamos la clave. Vive en este navegador, como la cuenta.",
+                "After you pay, we email the key. It lives in this browser, like the account.",
+              )}
         </p>
         <div className="mt-4 grid gap-1.5">
-          <Label htmlFor="pro-code">Clave</Label>
+          <Label htmlFor="pro-code">{t("Clave", "Key")}</Label>
           <Input
             id="pro-code"
             className="h-12"
@@ -248,10 +287,11 @@ export function PricingBox() {
           <p className="mt-3 text-sm text-muted-foreground">{notice}</p>
         ) : null}
         <Button type="submit" className="mt-4 h-12 w-full sm:w-auto">
-          Activar en este navegador
+          {t("Activar en este navegador", "Activate in this browser")}
         </Button>
         <p className="mt-3 text-xs text-muted-foreground">
-          ¿Dudas? <Link href="/contacto/">Contacto</Link>.
+          {t("¿Dudas?", "Questions?")}{" "}
+          <Link href={en ? "/en/contact/" : "/contacto/"}>{t("Contacto", "Contact")}</Link>.
         </p>
       </form>
     </div>

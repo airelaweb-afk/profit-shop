@@ -26,19 +26,71 @@ export function QuoteDocument({
   services,
   index,
   optionLabel,
+  locale = "es",
 }: {
   issuer: Issuer;
   client: ClientRow;
   services: ServiceLine[];
   index: number;
   optionLabel?: string;
+  locale?: "es" | "en";
 }) {
+  const en = locale === "en";
   const totals = quoteTotals(services, issuer.taxPercent);
   const number = quoteNumber(index, {
     prefix: issuer.quotePrefix,
     start: issuer.quoteStart,
   });
   const addressLine = [issuer.address, issuer.city].filter(Boolean).join(" · ");
+  const copy = en
+    ? {
+        logo: `Logo of ${issuer.name || "your business"}`,
+        studio: issuer.name || "Your business",
+        tax: issuer.taxId ? `Tax ID ${issuer.taxId}` : "",
+        stamp: optionLabel ? "Option" : "Quote",
+        prepared: "Prepared for",
+        client: client.company || "Client",
+        contact: "Add a contact or email if you want it shown.",
+        date: "Date",
+        until: "Valid until",
+        vat: "VAT",
+        description: "Description",
+        qty: "Qty",
+        price: "Price",
+        amount: "Amount",
+        empty: "Add services to complete the quote.",
+        terms: "Terms",
+        accept: "Client acceptance",
+        signDate: "Date",
+        signId: "Signature and tax ID",
+        net: "Net amount",
+        total: "Total",
+        foot: "Information only. This is not an invoice and not proof of payment.",
+      }
+    : {
+        logo: `Logo de ${issuer.name || "tu negocio"}`,
+        studio: issuer.name || "Tu negocio",
+        tax: issuer.taxId ? `NIF ${issuer.taxId}` : "",
+        stamp: optionLabel ? "Opción" : "Presupuesto",
+        prepared: "Preparado para",
+        client: client.company || "Cliente",
+        contact: "Añada contacto o correo si quiere que figure.",
+        date: "Fecha",
+        until: "Válido hasta",
+        vat: "IVA",
+        description: "Descripción",
+        qty: "Cant.",
+        price: "Precio",
+        amount: "Importe",
+        empty: "Añada servicios para completar el presupuesto.",
+        terms: "Condiciones",
+        accept: "Aceptación del cliente",
+        signDate: "Fecha",
+        signId: "Firma y NIF",
+        net: "Base imponible",
+        total: "Total",
+        foot: "Documento informativo. No es una factura ni un justificante de pago.",
+      };
 
   return (
     <article className="quote-doc">
@@ -47,7 +99,7 @@ export function QuoteDocument({
           {issuer.logoDataUrl ? (
             <img
               src={issuer.logoDataUrl}
-              alt={`Logo de ${issuer.name || "tu negocio"}`}
+              alt={copy.logo}
               className="quote-doc-logo"
             />
           ) : (
@@ -56,11 +108,9 @@ export function QuoteDocument({
             </div>
           )}
           <div>
-            <p className="quote-doc-studio">{issuer.name || "Tu negocio"}</p>
+            <p className="quote-doc-studio">{copy.studio}</p>
             <p className="quote-doc-meta">
-              {[issuer.taxId && `NIF ${issuer.taxId}`, addressLine]
-                .filter(Boolean)
-                .join(" · ")}
+              {[copy.tax, addressLine].filter(Boolean).join(" · ")}
             </p>
             <p className="quote-doc-meta">
               {[issuer.email, issuer.phone, issuer.website]
@@ -70,7 +120,7 @@ export function QuoteDocument({
           </div>
         </div>
         <div className="quote-doc-stamp">
-          <p>{optionLabel ? "Opción" : "Presupuesto"}</p>
+          <p>{copy.stamp}</p>
           <strong>{optionLabel || number}</strong>
           {optionLabel ? (
             <p className="quote-doc-kicker" style={{ marginTop: 8 }}>
@@ -82,24 +132,24 @@ export function QuoteDocument({
 
       <div className="quote-doc-title-row">
         <div>
-          <p className="quote-doc-kicker">Preparado para</p>
-          <h1 className="quote-doc-client">{client.company || "Cliente"}</h1>
+          <p className="quote-doc-kicker">{copy.prepared}</p>
+          <h1 className="quote-doc-client">{copy.client}</h1>
           <p className="quote-doc-meta">
             {[client.contact, client.email].filter(Boolean).join(" · ") ||
-              "Añada contacto o correo si quiere que figure."}
+              copy.contact}
           </p>
         </div>
         <dl className="quote-doc-facts">
           <div>
-            <dt>Fecha</dt>
-            <dd>{formatLongDate()}</dd>
+            <dt>{copy.date}</dt>
+            <dd>{formatLongDate(new Date(), locale)}</dd>
           </div>
           <div>
-            <dt>Válido hasta</dt>
-            <dd>{validUntil(issuer.validDays)}</dd>
+            <dt>{copy.until}</dt>
+            <dd>{validUntil(issuer.validDays, new Date(), locale)}</dd>
           </div>
           <div>
-            <dt>IVA</dt>
+            <dt>{copy.vat}</dt>
             <dd>{issuer.taxPercent} %</dd>
           </div>
         </dl>
@@ -111,17 +161,17 @@ export function QuoteDocument({
         <thead>
           <tr>
             <th className="quote-doc-num">#</th>
-            <th>Descripción</th>
-            <th>Cant.</th>
-            <th>Precio</th>
-            <th>Importe</th>
+            <th>{copy.description}</th>
+            <th>{copy.qty}</th>
+            <th>{copy.price}</th>
+            <th>{copy.amount}</th>
           </tr>
         </thead>
         <tbody>
           {services.length === 0 ? (
             <tr>
               <td colSpan={5} className="quote-doc-empty">
-                Añada servicios para completar el presupuesto.
+                {copy.empty}
               </td>
             </tr>
           ) : (
@@ -147,36 +197,36 @@ export function QuoteDocument({
 
       <div className="quote-doc-bottom">
         <section className="quote-doc-notes">
-          <p className="quote-doc-kicker">Condiciones</p>
+          <p className="quote-doc-kicker">{copy.terms}</p>
           <p>{issuer.conditions || "—"}</p>
           <div className="quote-doc-sign">
-            <p>Aceptación del cliente</p>
+            <p>{copy.accept}</p>
             <div className="quote-doc-sign-lines">
-              <span>Fecha</span>
-              <span>Firma y NIF</span>
+              <span>{copy.signDate}</span>
+              <span>{copy.signId}</span>
             </div>
           </div>
         </section>
         <aside className="quote-doc-totals">
           <div>
-            <span>Base imponible</span>
+            <span>{copy.net}</span>
             <strong>{formatEuro(totals.subtotal)}</strong>
           </div>
           <div>
-            <span>IVA {issuer.taxPercent} %</span>
+            <span>
+              {copy.vat} {issuer.taxPercent} %
+            </span>
             <strong>{formatEuro(totals.tax)}</strong>
           </div>
           <div className="quote-doc-grand">
-            <span>Total</span>
+            <span>{copy.total}</span>
             <strong>{formatEuro(totals.total)}</strong>
           </div>
         </aside>
       </div>
 
       <footer className="quote-doc-foot">
-        <span>
-          Documento informativo. No es una factura ni un justificante de pago.
-        </span>
+        <span>{copy.foot}</span>
         <span>{issuer.website || issuer.email || issuer.name}</span>
       </footer>
     </article>

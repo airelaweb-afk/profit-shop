@@ -46,12 +46,14 @@ export function PdfFormViewer({
   scale,
   fields,
   onMeta,
+  locale = "es",
 }: {
   data: ArrayBuffer;
   pageIndex: number;
   scale: number;
   fields: PdfFormField[];
   onMeta: (meta: PdfFormHandle) => void;
+  locale?: "es" | "en";
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -117,7 +119,9 @@ export function PdfFormViewer({
         setError(
           caught instanceof Error
             ? caught.message
-            : "No se pudo abrir el formulario del PDF.",
+            : locale === "en"
+              ? "Could not open the PDF form."
+              : "No se pudo abrir el formulario del PDF.",
         );
       }
     });
@@ -225,7 +229,7 @@ export function PdfFormViewer({
         setError(
           caught instanceof Error
             ? caught.message
-            : "No se pudieron pintar los campos.",
+            : locale === "en" ? "Could not draw the fields." : "No se pudieron pintar los campos.",
         );
       }
     });
@@ -247,7 +251,9 @@ export function PdfFormViewer({
         </p>
       ) : null}
       {!ready && !error ? (
-        <p className="mb-3 text-sm text-muted-foreground">Abriendo las casillas del PDF…</p>
+        <p className="mb-3 text-sm text-muted-foreground">
+          {locale === "en" ? "Opening the PDF fields…" : "Abriendo las casillas del PDF…"}
+        </p>
       ) : null}
       <div
         ref={wrapRef}

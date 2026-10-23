@@ -86,8 +86,10 @@ function patchLine(
   return lines.map((item) => (item.id === id ? { ...item, ...patch } : item));
 }
 
-export function PdfEditTextTool() {
-  const { pro, limit, upgrade, beforeRun, afterRun } = useJobGuard();
+export function PdfEditTextTool({ locale = "es" }: { locale?: "es" | "en" }) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, beforeRun, afterRun } = useJobGuard(locale);
   const search = useSearchParams();
   const demo = search.get("demo") === "1";
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -141,7 +143,9 @@ export function PdfEditTextTool() {
           ? ` Fuente: ${found.fontNames.slice(0, 3).join(", ")}.`
           : "";
       setNotice(
-        `${found.lines.length} líneas.${fonts} Pulsa una frase para escribir. A la derecha, tamaño y color.`,
+        en
+          ? `${found.lines.length} lines.${fonts} Tap a sentence to type. Size and colour are on the right.`
+          : `${found.lines.length} líneas.${fonts} Pulsa una frase para escribir. A la derecha, tamaño y color.`,
       );
     }
   }
@@ -149,7 +153,7 @@ export function PdfEditTextTool() {
   async function takeFile(file: File | undefined) {
     if (!file) return;
     if (!isPdfFile(file)) {
-      setError("Sube un archivo PDF.");
+      setError(t("Sube un archivo PDF.", "Upload a PDF file."));
       return;
     }
     setBusy(true);
@@ -227,7 +231,9 @@ export function PdfEditTextTool() {
         ...found,
       ]);
       setNotice(
-        `OCR: ${found.length} líneas. Revísalas. Al guardar se escribe texto de verdad (Tinos).`,
+        en
+          ? `OCR: ${found.length} lines. Check them. On save, real text is written (Tinos).`
+          : `OCR: ${found.length} líneas. Revísalas. Al guardar se escribe texto de verdad (Tinos).`,
       );
     } catch (caught) {
       setError(
@@ -359,8 +365,14 @@ export function PdfEditTextTool() {
         noticeForSave(
           saved,
           result.usedEmbedded
-            ? "Guardado con la fuente que venía en el PDF (TTF/OTF embebida)."
-            : "Guardado. Este PDF no traía una TTF reutilizable; el texto nuevo va en Helvetica.",
+            ? t(
+                "Guardado con la fuente que venía en el PDF (TTF/OTF embebida).",
+                "Saved with the font that was in the PDF (embedded TTF/OTF).",
+              )
+            : t(
+                "Guardado. Este PDF no traía una TTF reutilizable; el texto nuevo va en Helvetica.",
+                "Saved. This PDF had no reusable TTF; the new text is Helvetica.",
+              ),
         ),
       );
       afterRun();
@@ -391,15 +403,19 @@ export function PdfEditTextTool() {
         <FileDrop
           accept=".pdf,application/pdf,application/octet-stream"
           busy={busy}
-          dropTitle="PDF con texto"
-          tapTitle="Elige el PDF del teléfono"
-          cta="Elegir PDF"
-          hint="Si tiene texto seleccionable, se edita al momento. Si es un escaneo, luego pulsa «Leer con OCR»."
-          busyHint="Leyendo el texto del PDF."
+          dropTitle={t("PDF con texto", "A PDF with text")}
+          tapTitle={t("Elige el PDF del teléfono", "Choose the PDF from your phone")}
+          cta={t("Elegir PDF", "Choose PDF")}
+          hint={t(
+            "Si tiene texto seleccionable, se edita al momento. Si es un escaneo, luego pulsa «Leer con OCR».",
+            "If the text can be selected, you can edit it now. If it is a scan, tap Read with OCR.",
+          )}
+          busyHint={t("Leyendo el texto del PDF.", "Reading the PDF text.")}
+          busyTitle={en ? "Opening…" : undefined}
           onFiles={(list) => void takeFile(list[0])}
         />
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          ¿No tienes un PDF a mano?
+          {t("¿No tienes un PDF a mano?", "No PDF handy?")}
         </p>
         <div className="mt-2 flex flex-wrap justify-center gap-2">
           <Button
@@ -408,7 +424,7 @@ export function PdfEditTextTool() {
             onClick={() => void openSample()}
             disabled={busy}
           >
-            Probar ahora con un cartel
+            {t("Probar ahora con un cartel", "Try a sample poster")}
           </Button>
           <Button
             type="button"
@@ -417,13 +433,18 @@ export function PdfEditTextTool() {
             onClick={() => void openScan()}
             disabled={busy}
           >
-            Probar un escaneo (OCR)
+            {t("Probar un escaneo (OCR)", "Try a scan (OCR)")}
           </Button>
         </div>
         <FreeCapNote
-          text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
+          locale={locale}
+          text={
+            en
+              ? `Free: one PDF of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
+              : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+          }
         />
-        {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+        {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
         {error ? (
           <p className="mt-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
@@ -435,6 +456,7 @@ export function PdfEditTextTool() {
 
   const stylesPanel = (
     <TextStylePanel
+      locale={locale}
       line={selected}
       onChange={(patch) => {
         if (!selected) return;
@@ -463,7 +485,7 @@ export function PdfEditTextTool() {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={thumbs[index]}
-              alt={`Página ${index + 1}`}
+              alt={en ? `Page ${index + 1}` : `Página ${index + 1}`}
               className="block w-full"
             />
           ) : (
@@ -492,32 +514,32 @@ export function PdfEditTextTool() {
           size="icon"
           className="size-10"
           onClick={closeStudio}
-          aria-label="Cerrar editor"
+          aria-label={t("Cerrar editor", "Close editor")}
         >
           <X />
         </Button>
         <div className="mr-1 hidden items-center rounded-full bg-muted p-0.5 sm:flex">
           <span className="rounded-full bg-card px-3 py-1 text-xs font-semibold ring-1 ring-foreground/10">
-            Editar texto
+            {t("Editar texto", "Edit text")}
           </span>
         </div>
-        <ToolTab icon={Type} label="Texto" active />
+        <ToolTab icon={Type} label={t("Texto", "Text")} active />
         <ToolTab
           icon={Highlighter}
-          label="Anotar"
-          href="/pdf/"
-          hint="La rúbrica está en Firmar PDF"
+          label={t("Anotar", "Annotate")}
+          href={en ? "/en/sign-pdf/" : "/pdf/"}
+          hint={t("La rúbrica está en Firmar PDF", "The signature is in Sign PDF")}
         />
         <ToolTab
           icon={Shapes}
-          label="Formas"
-          hint="Aún no. El texto sí se cambia aquí."
+          label={t("Formas", "Shapes")}
+          hint={t("Aún no. El texto sí se cambia aquí.", "Not yet. Text can be changed here.")}
         />
         <ToolTab
           icon={LayoutList}
-          label="Campos"
-          href="/rellenar-pdf/"
-          hint="Casillas de formulario: Rellenar PDF"
+          label={t("Campos", "Fields")}
+          href={en ? "/en/fill-pdf/" : "/rellenar-pdf/"}
+          hint={t("Casillas de formulario: Rellenar PDF", "Form boxes: Fill PDF")}
         />
         <Separator orientation="vertical" className="mx-1 hidden h-8 sm:block" />
         <Button
@@ -528,7 +550,7 @@ export function PdfEditTextTool() {
           disabled={busy}
         >
           <ScanText />
-          <span className="hidden sm:inline">{ocrStatus || "Leer con OCR"}</span>
+          <span className="hidden sm:inline">{ocrStatus || t("Leer con OCR", "Read with OCR")}</span>
         </Button>
         <Button
           type="button"
@@ -544,7 +566,7 @@ export function PdfEditTextTool() {
           disabled={busy}
         >
           <FileUp />
-          <span className="hidden sm:inline">Cambiar</span>
+          <span className="hidden sm:inline">{t("Cambiar", "Change")}</span>
         </Button>
         <Button
           type="button"
@@ -552,7 +574,7 @@ export function PdfEditTextTool() {
           className="h-10 lg:hidden"
           onClick={() => setPagesOpen(true)}
         >
-          Páginas
+          {t("Páginas", "Pages")}
         </Button>
         </div>
         <div className="flex shrink-0 items-center gap-1 pr-2 sm:pr-3">
@@ -562,7 +584,7 @@ export function PdfEditTextTool() {
             className="h-10 xl:hidden"
             onClick={() => setStylesOpen(true)}
           >
-            Estilos
+            {t("Estilos", "Styles")}
           </Button>
           <Button
             type="button"
@@ -571,7 +593,7 @@ export function PdfEditTextTool() {
             disabled={busy || !dirty || lines.length === 0}
           >
             <Download />
-            {busy ? "Preparando…" : "Guardar cambios"}
+            {busy ? t("Preparando…", "Preparing…") : t("Guardar cambios", "Save changes")}
           </Button>
         </div>
       </div>
@@ -584,7 +606,7 @@ export function PdfEditTextTool() {
         <section className="relative min-w-0 flex-1 overflow-auto">
           <p className="pointer-events-none absolute top-3 left-4 z-10 max-w-lg truncate text-xs text-foreground/50">
             {fileName}
-            {lines.length ? ` · ${lines.length} líneas` : ""}
+            {lines.length ? (en ? ` · ${lines.length} lines` : ` · ${lines.length} líneas`) : ""}
           </p>
           <div className="flex min-h-full items-start justify-center px-4 py-10 sm:px-10 sm:py-12">
             <div
@@ -620,7 +642,7 @@ export function PdfEditTextTool() {
                       textDecoration: line.underline ? "underline" : "none",
                     }}
                   >
-                    <span className="sr-only">Editar texto</span>
+                    <span className="sr-only">{t("Editar texto", "Edit text")}</span>
                     <textarea
                       value={line.text}
                       rows={1}
@@ -659,7 +681,7 @@ export function PdfEditTextTool() {
           className="size-9"
           disabled={pageIndex <= 0}
           onClick={() => setPageIndex((current) => Math.max(0, current - 1))}
-          aria-label="Página anterior"
+          aria-label={t("Página anterior", "Previous page")}
         >
           <ChevronLeft />
         </Button>
@@ -675,7 +697,7 @@ export function PdfEditTextTool() {
           onClick={() =>
             setPageIndex((current) => Math.min(pageCount - 1, current + 1))
           }
-          aria-label="Página siguiente"
+          aria-label={t("Página siguiente", "Next page")}
         >
           <ChevronRight />
         </Button>
@@ -732,14 +754,14 @@ export function PdfEditTextTool() {
               ) : null}
             </p>
           ) : null}
-          {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+          {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
         </div>
       ) : null}
 
       <Sheet open={pagesOpen} onOpenChange={setPagesOpen}>
         <SheetContent side="left" className="w-[min(16rem,90vw)] p-0">
           <SheetHeader className="p-3">
-            <SheetTitle>Páginas</SheetTitle>
+            <SheetTitle>{t("Páginas", "Pages")}</SheetTitle>
           </SheetHeader>
           <div className="overflow-y-auto">{thumbsList}</div>
         </SheetContent>
@@ -747,7 +769,7 @@ export function PdfEditTextTool() {
       <Sheet open={stylesOpen} onOpenChange={setStylesOpen}>
         <SheetContent side="right" className="w-[min(20rem,92vw)] p-0">
           <SheetHeader className="p-3">
-            <SheetTitle>Estilos de texto</SheetTitle>
+            <SheetTitle>{t("Estilos de texto", "Text styles")}</SheetTitle>
           </SheetHeader>
           {stylesPanel}
         </SheetContent>
@@ -803,18 +825,21 @@ function ToolTab({
 function TextStylePanel({
   line,
   onChange,
+  locale = "es",
 }: {
   line: PdfTextLine | null;
   onChange: (patch: Partial<PdfTextLine>) => void;
+  locale?: "es" | "en";
 }) {
+  const en = locale === "en";
   if (!line) {
     return (
       <div className="p-4">
-        <h2 className="font-heading text-lg">Estilos de texto</h2>
+        <h2 className="font-heading text-lg">{en ? "Text styles" : "Estilos de texto"}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pulsa una frase azulada en la página. Aquí cambias tamaño, negrita y
-          color. La cursiva solo se guarda si pasas a Helvetica: la TTF del PDF
-          suele venir en un solo corte.
+          {en
+            ? "Tap a blue line on the page. Here you change size, bold and colour. Italic is only saved if you switch to Helvetica: the PDF font usually has one cut."
+            : "Pulsa una frase azulada en la página. Aquí cambias tamaño, negrita y color. La cursiva solo se guarda si pasas a Helvetica: la TTF del PDF suele venir en un solo corte."}
         </p>
       </div>
     );
@@ -827,9 +852,9 @@ function TextStylePanel({
       : "embedded";
   return (
     <div className="p-4">
-      <h2 className="font-heading text-lg">Estilos de texto</h2>
+      <h2 className="font-heading text-lg">{en ? "Text styles" : "Estilos de texto"}</h2>
       <label className="mt-4 block text-xs font-medium text-muted-foreground">
-        Fuente
+        {en ? "Font" : "Fuente"}
       </label>
       <select
         className="mt-1 h-10 w-full rounded-[2px] border border-input bg-background px-2 text-sm"
@@ -848,7 +873,7 @@ function TextStylePanel({
         }}
       >
         <option value="embedded">
-          Del PDF ({fontLabel(line.originalFontHint)})
+          {en ? "From the PDF" : "Del PDF"} ({fontLabel(line.originalFontHint)})
         </option>
         <option value="tinos">Tinos</option>
         <option value="helvetica">Helvetica</option>
@@ -879,7 +904,7 @@ function TextStylePanel({
           className="size-10"
           onClick={() => onChange({ bold: !line.bold })}
           aria-pressed={line.bold}
-          title="Negrita"
+          title={en ? "Bold" : "Negrita"}
         >
           <Bold />
         </Button>
@@ -891,8 +916,12 @@ function TextStylePanel({
           disabled={embedded}
           title={
             embedded
-              ? "Cursiva: elige Helvetica. La fuente embebida no trae itálica."
-              : "Cursiva"
+              ? en
+                ? "Italic: choose Helvetica. The embedded font has no italic."
+                : "Cursiva: elige Helvetica. La fuente embebida no trae itálica."
+              : en
+                ? "Italic"
+                : "Cursiva"
           }
           onClick={() => onChange({ italic: !line.italic })}
           aria-pressed={!!line.italic}
@@ -912,7 +941,7 @@ function TextStylePanel({
         </Button>
       </div>
       <p className="mt-4 text-xs font-medium text-muted-foreground">
-        Color actual
+        {en ? "Current colour" : "Color actual"}
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {PRESET_COLORS.map((color) => (
@@ -923,7 +952,7 @@ function TextStylePanel({
               line.color.toLowerCase() === color ? "ring-2 ring-primary" : ""
             }`}
             style={{ background: color }}
-            aria-label={`Color ${color}`}
+            aria-label={en ? `Colour ${color}` : `Color ${color}`}
             onClick={() => onChange({ color })}
           />
         ))}
@@ -932,7 +961,7 @@ function TextStylePanel({
           value={line.color}
           onChange={(event) => onChange({ color: event.target.value })}
           className="size-8 cursor-pointer rounded-[2px] border border-input bg-card p-0"
-          aria-label="Color personalizado"
+          aria-label={en ? "Custom colour" : "Color personalizado"}
         />
       </div>
     </div>

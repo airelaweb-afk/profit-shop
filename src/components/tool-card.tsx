@@ -8,6 +8,7 @@ export function ToolCard({
   does,
   pro,
   kicker,
+  openLabel = "Abrir",
 }: {
   href: string;
   name: string;
@@ -15,6 +16,7 @@ export function ToolCard({
   does?: string;
   pro?: boolean;
   kicker?: string;
+  openLabel?: string;
 }) {
   return (
     <Link href={href} prefetch={false} className="punch-card flex h-full flex-col p-5">
@@ -34,7 +36,7 @@ export function ToolCard({
       ) : null}
       {does ? <p className="mt-2 text-sm">{does}</p> : null}
       <span className="mt-4 inline-flex items-center gap-1 text-sm text-primary">
-        Abrir
+        {openLabel}
         <ArrowRight className="size-3.5" />
       </span>
     </Link>

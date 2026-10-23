@@ -9,14 +9,8 @@ import { allNavLinks } from "@/lib/nav";
 import { useSession } from "@/lib/use-session";
 import { LanguageSwitch } from "@/components/language-switch";
 import { MoreMenu } from "@/components/more-menu";
+import { enHeaderLinks, enMoreLinks } from "@/lib/en-nav";
 import { useLocale } from "@/lib/locale-context";
-
-const englishNav = [
-  { href: "/en/merge-pdf/", label: "Merge PDF" },
-  { href: "/en/compress-pdf/", label: "Compress PDF" },
-  { href: "/en/heic-to-jpg/", label: "HEIC to JPG" },
-  { href: "/en/compress-image/", label: "Compress image" },
-];
 
 function AccountActions() {
   const session = useSession();
@@ -72,7 +66,7 @@ function EnglishHeader() {
       <div className="luna-wrap flex h-14 items-center justify-between gap-3 sm:h-16">
         <SiteBrand compact tone="ink" href="/en/" />
         <nav className="hidden items-center gap-4 text-sm xl:flex">
-          {englishNav.map((link) => (
+          {enHeaderLinks.map((link) => (
             <Link key={link.href} href={link.href} prefetch={false} className="ink-link">
               {link.label}
             </Link>
@@ -86,6 +80,7 @@ function EnglishHeader() {
           >
             Remove background
           </Link>
+          <MoreMenu label="More" links={[...enMoreLinks]} />
           <LanguageSwitch className="ink-link text-sm" />
           <AccountActions />
         </div>

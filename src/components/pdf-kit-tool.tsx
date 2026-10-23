@@ -103,20 +103,35 @@ export function PdfKitTool({
   const multiple = kind === "merge" || kind === "images";
   const wantsPdf = kind !== "images";
   const spanishCopy = copyFor(kind);
-  const copy =
-    en && kind === "merge"
-      ? {
-          drop: "Drop the PDFs, in the order you want",
-          tap: "Choose the PDFs, in the order you want",
-          cta: "Choose PDFs",
-        }
-      : en && kind === "compress"
-        ? {
-            drop: "Drop the PDF that's too large",
-            tap: "Choose the PDF that's too large",
-            cta: "Choose PDF",
-          }
-        : spanishCopy;
+  const englishCopy = {
+    merge: {
+      drop: "Drop the PDFs, in the order you want",
+      tap: "Choose the PDFs, in the order you want",
+      cta: "Choose PDFs",
+    },
+    split: {
+      drop: "Drop the PDF you want to split",
+      tap: "Choose the PDF you want to split",
+      cta: "Choose PDF",
+    },
+    compress: {
+      drop: "Drop the PDF that is too large",
+      tap: "Choose the PDF that is too large",
+      cta: "Choose PDF",
+    },
+    images: {
+      drop: "Drop photos or screenshots (JPG or PNG)",
+      tap: "Choose photos or screenshots",
+      cta: "Choose photos",
+      camera: "Take a photo",
+    },
+    "to-images": {
+      drop: "Drop the PDF to save each page as a JPG",
+      tap: "Choose the PDF to save each page as a JPG",
+      cta: "Choose PDF",
+    },
+  } as const;
+  const copy = en ? englishCopy[kind] : spanishCopy;
 
   async function addFiles(list: File[]) {
     setError("");
@@ -224,33 +239,41 @@ export function PdfKitTool({
           : `Listo: ${items.length} archivos, ${formatBytes(bytes.byteLength)}.`;
       } else if (kind === "split") {
         const file = items[0]?.file;
-        if (!file) throw new Error("Sube un PDF.");
+        if (!file) throw new Error(tr("Sube un PDF.", "Upload a PDF."));
         const data = await file.arrayBuffer();
         const pageCount = items[0].pages ?? (await countPdfPages(data));
         if (pageCount > limit.pdfPages) {
           throw new Error(
             pro
-              ? `Este PDF tiene ${pageCount} páginas (máximo ${limit.pdfPages}).`
-              : `Gratis son ${limit.pdfPages} páginas. Este tiene ${pageCount}. Pro es ilimitado.`,
+              ? en
+                ? `This PDF has ${pageCount} pages (maximum ${limit.pdfPages}).`
+                : `Este PDF tiene ${pageCount} páginas (máximo ${limit.pdfPages}).`
+              : en
+                ? `Free covers ${limit.pdfPages} pages. This one has ${pageCount}. Pro has no page cap.`
+                : `Gratis son ${limit.pdfPages} páginas. Este tiene ${pageCount}. Pro es ilimitado.`,
           );
         }
         if (perPage) {
           const files = await splitPdfPerPage(data);
           result = await downloadBytes(
             zipFiles(files),
-            suggestedOutName(file.name, "paginas", "zip"),
+            suggestedOutName(file.name, en ? "pages" : "paginas", "zip"),
             "application/zip",
           );
-          ready = `Listo: ${files.length} PDF en un zip.`;
+          ready = en
+            ? `Done: ${files.length} PDFs in a zip.`
+            : `Listo: ${files.length} PDF en un zip.`;
         } else {
           const indices = parsePageRanges(range, pageCount);
           const bytes = await extractPdfPages(data, indices);
           result = await downloadBytes(
             bytes,
-            suggestedOutName(file.name, "extracto", "pdf"),
+            suggestedOutName(file.name, en ? "extract" : "extracto", "pdf"),
             "application/pdf",
           );
-          ready = `Listo: ${indices.length} página${indices.length === 1 ? "" : "s"}, ${formatBytes(bytes.byteLength)}.`;
+          ready = en
+            ? `Done: ${indices.length} page${indices.length === 1 ? "" : "s"}, ${formatBytes(bytes.byteLength)}.`
+            : `Listo: ${indices.length} página${indices.length === 1 ? "" : "s"}, ${formatBytes(bytes.byteLength)}.`;
         }
       } else if (kind === "compress") {
         const file = items[0]?.file;
@@ -277,7 +300,7 @@ export function PdfKitTool({
               ? `The PDF was rewritten (${formatBytes(after)}). If it barely shrank, try Strong.`
               : `Se ha reescrito el PDF (${formatBytes(after)}). Si casi no baja, prueba la compresión fuerte.`;
       } else if (kind === "images") {
-        if (items.length === 0) throw new Error("Elige al menos una imagen.");
+        if (items.length === 0) throw new Error(tr("Elige al menos una imagen.", "Choose at least one image."));
         const images = await Promise.all(
           items.map(async (item) => {
             const name = item.file.name.toLowerCase();
@@ -292,20 +315,24 @@ export function PdfKitTool({
         const bytes = await imagesToPdf(images);
         result = await downloadBytes(
           bytes,
-          suggestedOutName(items[0].file.name, "fotos", "pdf"),
+          suggestedOutName(items[0].file.name, en ? "photos" : "fotos", "pdf"),
           "application/pdf",
         );
-        ready = `Listo: ${items.length} imagen${items.length === 1 ? "" : "es"} en un PDF A4.`;
+        ready = en
+          ? `Done: ${items.length} image${items.length === 1 ? "" : "s"} in an A4 PDF.`
+          : `Listo: ${items.length} imagen${items.length === 1 ? "" : "es"} en un PDF A4.`;
       } else {
         const file = items[0]?.file;
-        if (!file) throw new Error("Sube un PDF.");
+        if (!file) throw new Error(tr("Sube un PDF.", "Upload a PDF."));
         const bytes = await pdfToJpegZip(await file.arrayBuffer());
         result = await downloadBytes(
           bytes,
           suggestedOutName(file.name, "jpg", "zip"),
           "application/zip",
         );
-        ready = "Listo: un JPG por página, en un zip.";
+        ready = en
+          ? "Done: one JPG per page, in a zip."
+          : "Listo: un JPG por página, en un zip.";
       }
       setNotice(noticeForSave(result, ready, locale));
       afterRun();
@@ -325,13 +352,13 @@ export function PdfKitTool({
       ? tr("Unir y guardar", "Merge and save")
       : kind === "split"
         ? perPage
-          ? "Dividir y guardar zip"
-          : "Extraer y guardar"
+          ? tr("Dividir y guardar zip", "Split and save zip")
+          : tr("Extraer y guardar", "Extract and save")
         : kind === "compress"
           ? tr("Comprimir y guardar", "Compress and save")
           : kind === "images"
-            ? "Crear PDF"
-            : "Sacar JPG";
+            ? tr("Crear PDF", "Create PDF")
+            : tr("Sacar JPG", "Save JPGs");
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -356,7 +383,9 @@ export function PdfKitTool({
               ? `Free: up to ${limit.pdfFiles} PDFs of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
               : `Gratis: hasta ${limit.pdfFiles} PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
             : kind === "images"
-              ? `Gratis: hasta ${limit.imagesToPdf} fotos de ${bytesLabel(limit.pdfBytes)}`
+              ? en
+                ? `Free: up to ${limit.imagesToPdf} photos of ${bytesLabel(limit.pdfBytes)}`
+                : `Gratis: hasta ${limit.imagesToPdf} fotos de ${bytesLabel(limit.pdfBytes)}`
               : en
                 ? `Free: one PDF of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
                 : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
@@ -434,12 +463,12 @@ export function PdfKitTool({
               checked={perPage}
               onChange={(event) => setPerPage(event.target.checked)}
             />
-            Un PDF por cada página (zip)
+            {tr("Un PDF por cada página (zip)", "One PDF per page (zip)")}
           </label>
           {perPage ? null : (
             <div className="grid gap-1.5">
               <Label htmlFor="pdf-range">
-                Páginas a extraer (en blanco = todas)
+                {tr("Páginas a extraer (en blanco = todas)", "Pages to extract (blank = all)")}
               </Label>
               <Input
                 id="pdf-range"
@@ -447,7 +476,11 @@ export function PdfKitTool({
                 value={range}
                 onChange={(event) => setRange(event.target.value)}
                 placeholder={
-                  items[0].pages ? `1-${items[0].pages} o 1-3, 5` : "1-3, 5"
+                  items[0].pages
+                    ? en
+                      ? `1-${items[0].pages} or 1-3, 5`
+                      : `1-${items[0].pages} o 1-3, 5`
+                    : "1-3, 5"
                 }
               />
             </div>

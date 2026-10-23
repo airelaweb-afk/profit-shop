@@ -77,7 +77,7 @@ export function parseHourToken(raw: string): number | null {
   return null;
 }
 
-export function parseEntries(raw: string): TimeEntry[] {
+export function parseEntries(raw: string, locale: "es" | "en" = "es"): TimeEntry[] {
   return raw
     .split(/\n+/)
     .map((line) => line.trim())
@@ -118,7 +118,9 @@ export function parseEntries(raw: string): TimeEntry[] {
       return {
         dateLabel: dateLabel || "—",
         minutes,
-        task: taskParts.join(", ") || "Trabajo administrativo",
+        task:
+          taskParts.join(", ") ||
+          (locale === "en" ? "Office work" : "Trabajo administrativo"),
       };
     })
     .filter((row): row is TimeEntry => Boolean(row))
@@ -141,8 +143,28 @@ export function timesheetTotals(entries: TimeEntry[], hourlyCents: number) {
   return { minutes, amount };
 }
 
-export function timesheetMessage(header: TimesheetHeader, entries: TimeEntry[]) {
+export function timesheetMessage(
+  header: TimesheetHeader,
+  entries: TimeEntry[],
+  locale: "es" | "en" = "es",
+) {
   const totals = timesheetTotals(entries, header.hourlyCents);
+  if (locale === "en") {
+    const who = header.worker.trim() || "Office";
+    const client = header.client.trim() || "the client";
+    const period = header.period.trim() || formatLongDate(new Date(), "en");
+    const money =
+      totals.amount > 0 ? ` Amount: ${formatEuro(totals.amount)}.` : "";
+    return `Hello,
+
+Here is the timesheet from ${who} for ${client} (${period}).
+Total: ${formatHours(totals.minutes)}.${money}
+
+The PDF is attached. If a line needs a correction, tell me.
+
+Regards,
+${who}`;
+  }
   const who = header.worker.trim() || "Administración";
   const client = header.client.trim() || "el cliente";
   const period = header.period.trim() || formatLongDate();

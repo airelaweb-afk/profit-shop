@@ -1,16 +1,9 @@
 import Link from "next/link";
 import { SearchTicker } from "@/components/search-ticker";
 import { SiteBrand } from "@/components/site-brand";
+import { enFooterLegal, enFooterTools } from "@/lib/en-nav";
 import type { Locale } from "@/lib/locale";
 import { hasCloud } from "@/lib/supabase";
-
-const englishTools = [
-  { href: "/en/remove-background/", label: "Remove background" },
-  { href: "/en/merge-pdf/", label: "Merge PDF" },
-  { href: "/en/compress-pdf/", label: "Compress PDF" },
-  { href: "/en/heic-to-jpg/", label: "HEIC to JPG" },
-  { href: "/en/compress-image/", label: "Compress image" },
-];
 
 function EnglishFooter() {
   return (
@@ -26,44 +19,25 @@ function EnglishFooter() {
         <div>
           <p className="text-sm font-medium">Tools</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            {englishTools.map((tool) => (
+            {enFooterTools.map((tool) => (
               <li key={tool.href}>
                 <Link prefetch={false} href={tool.href} className="hover:text-foreground">
                   {tool.label}
                 </Link>
               </li>
             ))}
-            <li>
-              <Link prefetch={false} href="/" className="hover:text-foreground">
-                More tools, in Spanish
-              </Link>
-            </li>
           </ul>
         </div>
         <div>
           <p className="text-sm font-medium">Legal</p>
-          <p className="mt-3 text-sm text-muted-foreground">These pages are in Spanish.</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>
-              <Link prefetch={false} href="/aviso-legal" className="hover:text-foreground">
-                Legal notice
-              </Link>
-            </li>
-            <li>
-              <Link prefetch={false} href="/privacidad" className="hover:text-foreground">
-                Privacy
-              </Link>
-            </li>
-            <li>
-              <Link prefetch={false} href="/cookies" className="hover:text-foreground">
-                Cookies
-              </Link>
-            </li>
-            <li>
-              <Link prefetch={false} href="/condiciones" className="hover:text-foreground">
-                Terms
-              </Link>
-            </li>
+            {enFooterLegal.map((item) => (
+              <li key={item.href}>
+                <Link prefetch={false} href={item.href} className="hover:text-foreground">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -71,7 +45,7 @@ function EnglishFooter() {
         <p className="luna-wrap py-4 text-xs text-background/70">
           Luna Oficio, by Airela Web. Tools for working with files without uploading
           them. Other companies&apos; trademarks are identified in the{" "}
-          <Link prefetch={false} href="/aviso-legal" className="text-accent underline underline-offset-2 hover:text-background">
+          <Link prefetch={false} href="/en/legal-notice/" className="text-accent underline underline-offset-2 hover:text-background">
             legal notice
           </Link>
           .{" "}
@@ -79,11 +53,11 @@ function EnglishFooter() {
             Panel
           </Link>
           {" · "}
-          <Link prefetch={false} href="/precios" className="text-background/70 underline underline-offset-2 hover:text-accent">
+          <Link prefetch={false} href="/en/pricing/" className="text-background/70 underline underline-offset-2 hover:text-accent">
             Pro
           </Link>
           {" · "}
-          <Link prefetch={false} href="/comparar" className="text-background/70 underline underline-offset-2 hover:text-accent">
+          <Link prefetch={false} href="/en/compare/" className="text-background/70 underline underline-offset-2 hover:text-accent">
             Comparisons
           </Link>
         </p>

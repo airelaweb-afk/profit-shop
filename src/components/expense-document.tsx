@@ -15,12 +15,15 @@ function initials(name: string) {
 export function ExpenseDocument({
   header,
   rows,
+  locale = "es",
 }: {
   header: ExpenseHeader;
   rows: ExpenseRow[];
+  locale?: "es" | "en";
 }) {
+  const en = locale === "en";
   const totals = expenseTotals(rows);
-  const when = formatLongDate();
+  const when = formatLongDate(new Date(), locale);
 
   return (
     <article className="quote-doc">
@@ -31,7 +34,7 @@ export function ExpenseDocument({
           </div>
           <div>
             <p className="quote-doc-studio">
-              {header.company || header.owner || "Gastos"}
+              {header.company || header.owner || (en ? "Expenses" : "Gastos")}
             </p>
             <p className="quote-doc-meta">
               {[header.owner, header.period].filter(Boolean).join(" · ")}
@@ -39,30 +42,36 @@ export function ExpenseDocument({
           </div>
         </div>
         <div className="quote-doc-stamp">
-          <p>Relación de gastos</p>
+          <p>{en ? "Expense list" : "Relación de gastos"}</p>
           <strong>{formatEuro(totals.total)}</strong>
         </div>
       </header>
 
       <div className="quote-doc-title-row">
         <div>
-          <p className="quote-doc-kicker">Para el gestor</p>
-          <h1 className="quote-doc-client">{header.company || "Empresa"}</h1>
+          <p className="quote-doc-kicker">{en ? "For the bookkeeper" : "Para el gestor"}</p>
+          <h1 className="quote-doc-client">{header.company || (en ? "Company" : "Empresa")}</h1>
           <p className="quote-doc-meta">
-            {header.period ? `Periodo: ${header.period}` : `Emitido el ${when}`}
+            {header.period
+              ? en
+                ? `Period: ${header.period}`
+                : `Periodo: ${header.period}`
+              : en
+                ? `Issued ${when}`
+                : `Emitido el ${when}`}
           </p>
         </div>
         <dl className="quote-doc-facts">
           <div>
-            <dt>Tickets</dt>
+            <dt>{en ? "Receipts" : "Tickets"}</dt>
             <dd>{rows.length || "—"}</dd>
           </div>
           <div>
-            <dt>Base</dt>
+            <dt>{en ? "Net" : "Base"}</dt>
             <dd>{formatEuro(totals.base)}</dd>
           </div>
           <div>
-            <dt>IVA</dt>
+            <dt>{en ? "VAT" : "IVA"}</dt>
             <dd>{formatEuro(totals.tax)}</dd>
           </div>
         </dl>
@@ -72,9 +81,9 @@ export function ExpenseDocument({
         <thead>
           <tr>
             <th>#</th>
-            <th>Fecha y proveedor</th>
-            <th>IVA</th>
-            <th>Base</th>
+            <th>{en ? "Date and supplier" : "Fecha y proveedor"}</th>
+            <th>{en ? "VAT" : "IVA"}</th>
+            <th>{en ? "Net" : "Base"}</th>
             <th>Total</th>
           </tr>
         </thead>
@@ -82,7 +91,9 @@ export function ExpenseDocument({
           {rows.length === 0 ? (
             <tr>
               <td colSpan={5} className="quote-doc-empty">
-                Pega los tickets a la izquierda para rellenar la tabla.
+                {en
+                  ? "Paste the receipts on the left to fill the table."
+                  : "Pega los tickets a la izquierda para rellenar la tabla."}
               </td>
             </tr>
           ) : (
@@ -113,16 +124,18 @@ export function ExpenseDocument({
         <div className="quote-doc-notes">
           <p>
             {header.notes ||
-              "Relación interna de tickets. No es una factura. Los datos se quedan en este navegador."}
+              (en
+                ? "Internal receipt list. This is not an invoice. The data stays in this browser."
+                : "Relación interna de tickets. No es una factura. Los datos se quedan en este navegador.")}
           </p>
         </div>
         <div className="quote-doc-totals">
           <div>
-            <span>Base</span>
+            <span>{en ? "Net" : "Base"}</span>
             <strong>{formatEuro(totals.base)}</strong>
           </div>
           <div>
-            <span>IVA</span>
+            <span>{en ? "VAT" : "IVA"}</span>
             <strong>{formatEuro(totals.tax)}</strong>
           </div>
           <div className="quote-doc-grand">
@@ -133,8 +146,8 @@ export function ExpenseDocument({
       </div>
 
       <p className="quote-doc-foot">
-        <span>{header.owner || "Administración"}</span>
-        <span>Gastos · {when}</span>
+        <span>{header.owner || (en ? "Office" : "Administración")}</span>
+        <span>{en ? "Expenses" : "Gastos"} · {when}</span>
       </p>
     </article>
   );

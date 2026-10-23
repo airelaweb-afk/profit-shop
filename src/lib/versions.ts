@@ -152,7 +152,11 @@ export function activeLines(pkg: JobPackage) {
   );
 }
 
-export function applyRush(lines: ServiceLine[], percent: number): ServiceLine[] {
+export function applyRush(
+  lines: ServiceLine[],
+  percent: number,
+  locale: "es" | "en" = "es",
+): ServiceLine[] {
   const subtotal = lines.reduce((sum, line) => sum + lineTotal(line), 0);
   const extra = Math.round((subtotal * Math.max(0, percent)) / 100);
   if (extra <= 0) return lines;
@@ -160,14 +164,17 @@ export function applyRush(lines: ServiceLine[], percent: number): ServiceLine[] 
     ...lines,
     {
       id: "rush-line",
-      name: `Recargo de urgencia (${percent}%)`,
+      name:
+        locale === "en"
+          ? `Rush fee (${percent}%)`
+          : `Recargo de urgencia (${percent}%)`,
       quantity: 1,
       price: extra,
     },
   ];
 }
 
-export function buildVersions(job: VersionJob): BuiltVersion[] {
+export function buildVersions(job: VersionJob, locale: "es" | "en" = "es"): BuiltVersion[] {
   const built: BuiltVersion[] = [];
   for (const pkg of job.packages) {
     if (!pkg.enabled || !pkg.name.trim()) continue;
@@ -183,11 +190,11 @@ export function buildVersions(job: VersionJob): BuiltVersion[] {
       ...normal,
     });
     if (job.rush) {
-      const rushed = applyRush(base, job.rushPercent);
+      const rushed = applyRush(base, job.rushPercent, locale);
       const totals = quoteTotals(rushed, job.issuer.taxPercent);
       built.push({
         key: `${pkg.id}-rush`,
-        label: `${pkg.name} · urgente`,
+        label: locale === "en" ? `${pkg.name} · rush` : `${pkg.name} · urgente`,
         rush: true,
         includes: pkg.includes,
         lines: rushed,

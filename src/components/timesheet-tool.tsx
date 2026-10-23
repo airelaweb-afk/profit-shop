@@ -97,14 +97,16 @@ function Field({
   );
 }
 
-export function TimesheetTool() {
+export function TimesheetTool({ locale = "es" }: { locale?: "es" | "en" } = {}) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const stored = useMemo(() => parseStored(json), [json]);
-  const entries = useMemo(() => parseEntries(stored.list), [stored.list]);
+  const entries = useMemo(() => parseEntries(stored.list, locale), [stored.list, locale]);
   const totals = timesheetTotals(entries, stored.header.hourlyCents);
   const [copied, setCopied] = useState("");
   const [error, setError] = useState("");
-  const message = timesheetMessage(stored.header, entries);
+  const message = timesheetMessage(stored.header, entries, locale);
   const hourlyEuros =
     stored.header.hourlyCents > 0
       ? String(stored.header.hourlyCents / 100).replace(".", ",")
@@ -121,7 +123,7 @@ export function TimesheetTool() {
       setCopied("msg");
       window.setTimeout(() => setCopied(""), 1600);
     } catch {
-      setError("No se pudo copiar. Selecciona el texto a mano.");
+      setError(t("No se pudo copiar. Selecciona el texto a mano.", "Could not copy. Select the text yourself."));
     }
   }
 
@@ -142,10 +144,12 @@ export function TimesheetTool() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="font-heading text-2xl">Quién y para quién</h2>
+              <h2 className="font-heading text-2xl">{t("Quién y para quién", "Who, and for whom")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                El parte es un papel para el cliente o el jefe. No es una
-                factura. Se queda en este navegador.
+                {t(
+                  "El parte es un papel para el cliente o el jefe. No es una factura. Se queda en este navegador.",
+                  "The timesheet is a paper for the client or the manager. It is not an invoice. It stays in this browser.",
+                )}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -154,20 +158,20 @@ export function TimesheetTool() {
                 variant="outline"
                 onClick={() => write(structuredClone(sampleStored))}
               >
-                Cargar ejemplo
+                {t("Cargar ejemplo", "Load example")}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => write(structuredClone(emptyStored))}
               >
-                Empezar de cero
+                {t("Empezar de cero", "Start over")}
               </Button>
             </div>
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Field label="Tu nombre" htmlFor="ts-worker">
+            <Field label={t("Tu nombre", "Your name")} htmlFor="ts-worker">
               <Input
                 id="ts-worker"
                 className="h-10"
@@ -176,16 +180,16 @@ export function TimesheetTool() {
                 placeholder="Marina Ruiz"
               />
             </Field>
-            <Field label="Puesto" htmlFor="ts-role">
+            <Field label={t("Puesto", "Role")} htmlFor="ts-role">
               <Input
                 id="ts-role"
                 className="h-10"
                 value={stored.header.role}
                 onChange={(event) => patchHeader({ role: event.target.value })}
-                placeholder="Administración"
+                placeholder={t("Administración", "Office")}
               />
             </Field>
-            <Field label="Cliente o empresa" htmlFor="ts-client">
+            <Field label={t("Cliente o empresa", "Client or company")} htmlFor="ts-client">
               <Input
                 id="ts-client"
                 className="h-10"
@@ -194,16 +198,16 @@ export function TimesheetTool() {
                 placeholder="Clínica Alma"
               />
             </Field>
-            <Field label="Periodo" htmlFor="ts-period">
+            <Field label={t("Periodo", "Period")} htmlFor="ts-period">
               <Input
                 id="ts-period"
                 className="h-10"
                 value={stored.header.period}
                 onChange={(event) => patchHeader({ period: event.target.value })}
-                placeholder="8–12 septiembre 2026"
+                placeholder={t("8–12 septiembre 2026", "8–12 September 2026")}
               />
             </Field>
-            <Field label="Precio hora (opcional)" htmlFor="ts-rate">
+            <Field label={t("Precio hora (opcional)", "Hourly rate (optional)")} htmlFor="ts-rate">
               <Input
                 id="ts-rate"
                 className="h-10"
@@ -223,41 +227,50 @@ export function TimesheetTool() {
               />
             </Field>
             <p className="self-end text-sm text-muted-foreground sm:col-span-1">
-              Si lo dejas vacío, el PDF solo suma horas.
+              {t(
+                "Si lo dejas vacío, el PDF solo suma horas.",
+                "If you leave it empty, the PDF only totals the hours.",
+              )}
             </p>
           </div>
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Las horas</h2>
+          <h2 className="font-heading text-2xl">{t("Las horas", "The hours")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Una línea por día. Formato:{" "}
-            <span className="text-foreground">fecha, horas, qué hiciste</span>.
-            Horas: 3.5, 3h, 2:30 o 2h30.
+            {t("Una línea por día. Formato:", "One line per day. Format:")}{" "}
+            <span className="text-foreground">
+              {t("fecha, horas, qué hiciste", "date, hours, what you did")}
+            </span>
+            . {t("Horas: 3.5, 3h, 2:30 o 2h30.", "Hours: 3.5, 3h, 2:30 or 2h30.")}
           </p>
           <Textarea
             className="mt-4 min-h-48 font-mono text-sm"
             value={stored.list}
             onChange={(event) => write({ ...stored, list: event.target.value })}
-            aria-label="Lista de horas"
+            aria-label={t("Lista de horas", "Hours list")}
             placeholder={"08/09/2026, 3.5, citas y llamadas"}
           />
           <p className="mt-2 text-sm text-muted-foreground">
             {entries.length === 0
-              ? "No hay líneas con horas todavía."
-              : `${entries.length} línea${entries.length === 1 ? "" : "s"} · ${formatHours(totals.minutes)}${
-                  totals.amount > 0 ? ` · ${formatEuro(totals.amount)}` : ""
-                }`}
+              ? t("No hay líneas con horas todavía.", "No lines with hours yet.")
+              : en
+                ? `${entries.length} line${entries.length === 1 ? "" : "s"} · ${formatHours(totals.minutes)}${
+                    totals.amount > 0 ? ` · ${formatEuro(totals.amount)}` : ""
+                  }`
+                : `${entries.length} línea${entries.length === 1 ? "" : "s"} · ${formatHours(totals.minutes)}${
+                    totals.amount > 0 ? ` · ${formatEuro(totals.amount)}` : ""
+                  }`}
           </p>
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Nota al pie</h2>
+          <h2 className="font-heading text-2xl">{t("Nota al pie", "Footnote")}</h2>
           <Textarea
             className="mt-3 min-h-24"
             value={stored.header.notes}
             onChange={(event) => patchHeader({ notes: event.target.value })}
-            aria-label="Notas del parte"
+            aria-label={t("Notas del parte", "Timesheet notes")}
           />
         </section>
 
@@ -268,18 +281,21 @@ export function TimesheetTool() {
         ) : null}
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Cómo se manda</h2>
+          <h2 className="font-heading text-2xl">{t("Cómo se manda", "How you send it")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Guardas el PDF y lo adjuntas tú. La web no tiene tu correo.
+            {t(
+              "Guardas el PDF y lo adjuntas tú. La web no tiene tu correo.",
+              "You save the PDF and attach it yourself. The site does not have your email.",
+            )}
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button type="submit" size="lg" className="h-12 w-full px-5 sm:w-auto">
               <Printer />
-              Guardar PDF
+              {t("Guardar PDF", "Save PDF")}
             </Button>
             <Button type="button" variant="outline" onClick={() => void copyMessage()}>
               {copied === "msg" ? <Check /> : <Copy />}
-              {copied === "msg" ? "Copiado" : "Mensaje"}
+              {copied === "msg" ? t("Copiado", "Copied") : t("Mensaje", "Message")}
             </Button>
             <Button
               type="button"
@@ -287,7 +303,7 @@ export function TimesheetTool() {
               nativeButton={false}
               render={
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`${message}\n\n(Adjunta el PDF.)`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`${message}\n\n${en ? "(Attach the PDF.)" : "(Adjunta el PDF.)"}`)}`}
                   target="_blank"
                   rel="noreferrer"
                 />
@@ -302,12 +318,12 @@ export function TimesheetTool() {
               nativeButton={false}
               render={
                 <a
-                  href={`mailto:?subject=${encodeURIComponent(`Parte de horas · ${stored.header.client || "semana"}`)}&body=${encodeURIComponent(`${message}\n\n(Adjunta el PDF.)`)}`}
+                  href={`mailto:?subject=${encodeURIComponent(`${en ? "Timesheet" : "Parte de horas"} · ${stored.header.client || (en ? "week" : "semana")}`)}&body=${encodeURIComponent(`${message}\n\n${en ? "(Attach the PDF.)" : "(Adjunta el PDF.)"}`)}`}
                 />
               }
             >
               <Mail />
-              Correo
+              {t("Correo", "Email")}
             </Button>
           </div>
         </section>
@@ -315,11 +331,11 @@ export function TimesheetTool() {
 
       <div className="quote-preview-screen min-w-0">
         <p className="no-print mb-3 text-sm text-muted-foreground">
-          Vista previa · lo que sale en el PDF
+          {t("Vista previa · lo que sale en el PDF", "Preview · what goes in the PDF")}
         </p>
         <div className="quote-print">
           <div className="quote-sheet">
-            <TimesheetDocument header={stored.header} entries={entries} />
+            <TimesheetDocument header={stored.header} entries={entries} locale={locale} />
           </div>
         </div>
       </div>

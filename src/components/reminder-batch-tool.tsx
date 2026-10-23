@@ -91,7 +91,9 @@ async function copyText(value: string) {
   }
 }
 
-export function ReminderBatchTool() {
+export function ReminderBatchTool({ locale = "es" }: { locale?: "es" | "en" } = {}) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const stored = useMemo(() => parseStored(json), [json]);
   const debtors = useMemo(() => parseDebtors(stored.list), [stored.list]);
@@ -104,14 +106,14 @@ export function ReminderBatchTool() {
 
   const messages = debtors.map((debtor) => ({
     debtor,
-    subject: reminderSubject(debtor, stored.round),
-    body: reminderBody(debtor, stored.round, stored.sender, stored.channel),
+    subject: reminderSubject(debtor, stored.round, locale),
+    body: reminderBody(debtor, stored.round, stored.sender, stored.channel, locale),
   }));
 
   async function copyOne(id: string, value: string) {
     const ok = await copyText(value);
     if (!ok) {
-      setError("No se pudo copiar. Selecciona el texto a mano.");
+      setError(t("No se pudo copiar. Selecciona el texto a mano.", "Could not copy. Select the text yourself."));
       return;
     }
     setError("");
@@ -121,14 +123,14 @@ export function ReminderBatchTool() {
 
   async function copyAll() {
     if (messages.length === 0) {
-      setError("Pega al menos una línea con nombre e importe.");
+      setError(t("Pega al menos una línea con nombre e importe.", "Paste at least one line with a name and an amount."));
       return;
     }
     const blob = messages
       .map(({ debtor, subject, body }, index) => {
         const head =
-          stored.channel === "email"
-            ? `${index + 1}. ${debtor.company}\nAsunto: ${subject}\n`
+            stored.channel === "email"
+            ? `${index + 1}. ${debtor.company}\n${en ? "Subject" : "Asunto"}: ${subject}\n`
             : `${index + 1}. ${debtor.company}\n`;
         return `${head}${body}`;
       })
@@ -150,10 +152,12 @@ export function ReminderBatchTool() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="font-heading text-2xl">Tu firma</h2>
+              <h2 className="font-heading text-2xl">{t("Tu firma", "Your signature")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Nada se envía solo. Copias, WhatsApp o correo: tú pegas el
-                mensaje.
+                {t(
+                  "Nada se envía solo. Copias, WhatsApp o correo: tú pegas el mensaje.",
+                  "Nothing is sent by itself. Copy, WhatsApp or email: you paste the message.",
+                )}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -162,20 +166,20 @@ export function ReminderBatchTool() {
                 variant="outline"
                 onClick={() => write(structuredClone(sampleStored))}
               >
-                Cargar ejemplo
+                {t("Cargar ejemplo", "Load example")}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => write(structuredClone(emptyStored))}
               >
-                Empezar de cero
+                {t("Empezar de cero", "Start over")}
               </Button>
             </div>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5 sm:col-span-2">
-              <Label htmlFor="sender">Nombre con el que firmas</Label>
+              <Label htmlFor="sender">{t("Nombre con el que firmas", "Name you sign with")}</Label>
               <Input
                 id="sender"
                 className="h-10"
@@ -185,7 +189,7 @@ export function ReminderBatchTool() {
               />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="round">Qué ronda es</Label>
+              <Label htmlFor="round">{t("Qué ronda es", "Which round")}</Label>
               <select
                 id="round"
                 className="h-10 rounded-lg border border-input bg-transparent px-2.5 text-sm"
@@ -194,13 +198,13 @@ export function ReminderBatchTool() {
                   patch({ round: event.target.value as ReminderRound })
                 }
               >
-                <option value="primera">Primera (amable)</option>
-                <option value="segunda">Segunda (recordatorio)</option>
-                <option value="ultima">Última (pedir fecha)</option>
+                <option value="primera">{t("Primera (amable)", "First (friendly)")}</option>
+                <option value="segunda">{t("Segunda (recordatorio)", "Second (reminder)")}</option>
+                <option value="ultima">{t("Última (pedir fecha)", "Last (ask for a date)")}</option>
               </select>
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="channel">Tono de canal</Label>
+              <Label htmlFor="channel">{t("Tono de canal", "Channel tone")}</Label>
               <select
                 id="channel"
                 className="h-10 rounded-lg border border-input bg-transparent px-2.5 text-sm"
@@ -210,33 +214,41 @@ export function ReminderBatchTool() {
                 }
               >
                 <option value="whatsapp">WhatsApp</option>
-                <option value="email">Correo</option>
+                <option value="email">{t("Correo", "Email")}</option>
               </select>
             </div>
           </div>
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Quién te debe</h2>
+          <h2 className="font-heading text-2xl">{t("Quién te debe", "Who owes you")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Una línea por persona:{" "}
+            {t("Una línea por persona:", "One line per person:")}{" "}
             <span className="text-foreground">
-              empresa, importe, fecha, concepto, teléfono o correo
+              {t(
+                "empresa, importe, fecha, concepto, teléfono o correo",
+                "company, amount, date, item, phone or email",
+              )}
             </span>
-            . Fecha, teléfono y correo son opcionales. Entiende 450, 1.200 y
-            280 €.
+            .{" "}
+            {t(
+              "Fecha, teléfono y correo son opcionales. Entiende 450, 1.200 y 280 €.",
+              "Date, phone and email are optional. It understands 450, 1.200 and 280 €.",
+            )}
           </p>
           <Textarea
             className="mt-4 min-h-48 font-mono text-sm"
             value={stored.list}
             onChange={(event) => patch({ list: event.target.value })}
-            aria-label="Lista de impagos"
+            aria-label={t("Lista de impagos", "Unpaid list")}
             placeholder={"Taller Sur, 450, 01/08/2026, web, 600111222"}
           />
           <p className="mt-2 text-sm text-muted-foreground">
             {debtors.length === 0
-              ? "No hay líneas con nombre e importe."
-              : `${debtors.length} recordatorio${debtors.length === 1 ? "" : "s"} · ${formatEuro(totalCents)} · máximo 40.`}
+              ? t("No hay líneas con nombre e importe.", "No lines with a name and an amount.")
+              : en
+                ? `${debtors.length} reminder${debtors.length === 1 ? "" : "s"} · ${formatEuro(totalCents)} · maximum 40.`
+                : `${debtors.length} recordatorio${debtors.length === 1 ? "" : "s"} · ${formatEuro(totalCents)} · máximo 40.`}
           </p>
         </section>
 
@@ -248,17 +260,19 @@ export function ReminderBatchTool() {
 
         <Button type="submit" size="lg" className="h-12 w-full px-5 self-start sm:w-auto">
           {copied === "all" ? <Check /> : <Copy />}
-          {copied === "all" ? "Tanda copiada" : "Copiar todos los mensajes"}
+          {copied === "all" ? t("Tanda copiada", "Batch copied") : t("Copiar todos los mensajes", "Copy every message")}
         </Button>
       </form>
 
       <div className="flex flex-col gap-4">
         {messages.length === 0 ? (
           <div className="rounded-2xl bg-card p-6 ring-1 ring-foreground/10">
-            <p className="font-heading text-2xl">No hay mensajes todavía</p>
+            <p className="font-heading text-2xl">{t("No hay mensajes todavía", "No messages yet")}</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pega una línea con nombre e importe, o pulsa “Cargar ejemplo”.
-              Ejemplo: Taller Sur, 450, 01/08/2026, web, 600111222.
+              {t(
+                "Pega una línea con nombre e importe, o pulsa “Cargar ejemplo”. Ejemplo: Taller Sur, 450, 01/08/2026, web, 600111222.",
+                "Paste a line with a name and an amount, or press Load example. Example: Taller Sur, 450, 01/08/2026, web, 600111222.",
+              )}
             </p>
           </div>
         ) : (
@@ -270,11 +284,12 @@ export function ReminderBatchTool() {
               body={body}
               channel={stored.channel}
               copied={copied === String(index)}
+              locale={locale}
               onCopy={() =>
                 void copyOne(
                   String(index),
                   stored.channel === "email"
-                    ? `Asunto: ${subject}\n\n${body}`
+                    ? `${en ? "Subject" : "Asunto"}: ${subject}\n\n${body}`
                     : body,
                 )
               }
@@ -292,6 +307,7 @@ function ReminderCard({
   body,
   channel,
   copied,
+  locale = "es",
   onCopy,
 }: {
   debtor: Debtor;
@@ -299,8 +315,10 @@ function ReminderCard({
   body: string;
   channel: ReminderChannel;
   copied: boolean;
+  locale?: "es" | "en";
   onCopy: () => void;
 }) {
+  const en = locale === "en";
   const wa = waLink(debtor.phone, body);
   const mail = mailLink(debtor.email, subject, body);
 
@@ -320,7 +338,7 @@ function ReminderCard({
         <div className="flex flex-wrap gap-1">
           <Button type="button" variant="outline" size="sm" onClick={onCopy}>
             {copied ? <Check /> : <Copy />}
-            {copied ? "Copiado" : "Copiar"}
+            {copied ? (en ? "Copied" : "Copiado") : en ? "Copy" : "Copiar"}
           </Button>
           <Button
             type="button"
@@ -340,13 +358,13 @@ function ReminderCard({
             render={<a href={mail} />}
           >
             <Mail />
-            Correo
+            {en ? "Email" : "Correo"}
           </Button>
         </div>
       </div>
       {channel === "email" ? (
         <p className="mt-3 text-sm">
-          <span className="text-muted-foreground">Asunto: </span>
+          <span className="text-muted-foreground">{en ? "Subject: " : "Asunto: "}</span>
           {subject}
         </p>
       ) : null}

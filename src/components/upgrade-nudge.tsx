@@ -30,7 +30,7 @@ export function UpgradeNudge({
       </p>
       <Button
         className={`mt-3 h-11 ${compact ? "" : "border-2 border-foreground bg-foreground text-background hover:bg-foreground/90"}`}
-        render={<Link href="/precios/" />}
+        render={<Link href={english ? "/en/pricing/" : "/precios/"} />}
         nativeButton={false}
       >
         {english ? "See Pro" : "Ver Pro"}
@@ -49,7 +49,7 @@ export function FreeCapNote({
   return (
     <p className="mt-3 text-xs text-muted-foreground">
       {text}{" "}
-      <Link href="/precios/" className="text-primary underline-offset-4 hover:underline">
+      <Link href={locale === "en" ? "/en/pricing/" : "/precios/"} className="text-primary underline-offset-4 hover:underline">
         {locale === "en" ? "Pro, no limit" : "Pro, sin límite"}
       </Link>
       .

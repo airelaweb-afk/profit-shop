@@ -15,12 +15,15 @@ function initials(name: string) {
 export function TimesheetDocument({
   header,
   entries,
+  locale = "es",
 }: {
   header: TimesheetHeader;
   entries: TimeEntry[];
+  locale?: "es" | "en";
 }) {
+  const en = locale === "en";
   const totals = timesheetTotals(entries, header.hourlyCents);
-  const when = formatLongDate();
+  const when = formatLongDate(new Date(), locale);
 
   return (
     <article className="quote-doc">
@@ -30,40 +33,46 @@ export function TimesheetDocument({
             {initials(header.worker)}
           </div>
           <div>
-            <p className="quote-doc-studio">{header.worker || "Tu nombre"}</p>
+            <p className="quote-doc-studio">{header.worker || (en ? "Your name" : "Tu nombre")}</p>
             <p className="quote-doc-meta">
-              {[header.role || "Administración", header.period]
+              {[header.role || (en ? "Office" : "Administración"), header.period]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
           </div>
         </div>
         <div className="quote-doc-stamp">
-          <p>Parte de horas</p>
+          <p>{en ? "Timesheet" : "Parte de horas"}</p>
           <strong>{formatHours(totals.minutes)}</strong>
         </div>
       </header>
 
       <div className="quote-doc-title-row">
         <div>
-          <p className="quote-doc-kicker">Para</p>
-          <h1 className="quote-doc-client">{header.client || "Cliente"}</h1>
+          <p className="quote-doc-kicker">{en ? "For" : "Para"}</p>
+          <h1 className="quote-doc-client">{header.client || (en ? "Client" : "Cliente")}</h1>
           <p className="quote-doc-meta">
-            {header.period ? `Periodo: ${header.period}` : `Emitido el ${when}`}
+            {header.period
+              ? en
+                ? `Period: ${header.period}`
+                : `Periodo: ${header.period}`
+              : en
+                ? `Issued ${when}`
+                : `Emitido el ${when}`}
           </p>
         </div>
         <dl className="quote-doc-facts">
           <div>
-            <dt>Líneas</dt>
+            <dt>{en ? "Lines" : "Líneas"}</dt>
             <dd>{entries.length || "—"}</dd>
           </div>
           <div>
-            <dt>Total horas</dt>
+            <dt>{en ? "Total hours" : "Total horas"}</dt>
             <dd>{formatHours(totals.minutes)}</dd>
           </div>
           {header.hourlyCents > 0 ? (
             <div>
-              <dt>Importe</dt>
+              <dt>{en ? "Amount" : "Importe"}</dt>
               <dd>{formatEuro(totals.amount)}</dd>
             </div>
           ) : null}
@@ -74,16 +83,18 @@ export function TimesheetDocument({
         <thead>
           <tr>
             <th>#</th>
-            <th>Fecha y trabajo</th>
-            <th>Horas</th>
-            {header.hourlyCents > 0 ? <th>Importe</th> : null}
+            <th>{en ? "Date and work" : "Fecha y trabajo"}</th>
+            <th>{en ? "Hours" : "Horas"}</th>
+            {header.hourlyCents > 0 ? <th>{en ? "Amount" : "Importe"}</th> : null}
           </tr>
         </thead>
         <tbody>
           {entries.length === 0 ? (
             <tr>
               <td colSpan={header.hourlyCents > 0 ? 4 : 3} className="quote-doc-empty">
-                Pega las líneas a la izquierda para rellenar la tabla.
+                {en
+                  ? "Paste the lines on the left to fill the table."
+                  : "Pega las líneas a la izquierda para rellenar la tabla."}
               </td>
             </tr>
           ) : (
@@ -112,17 +123,19 @@ export function TimesheetDocument({
         <div className="quote-doc-notes">
           <p>
             {header.notes ||
-              "Documento de control interno. No es una factura. Los datos se quedan en este navegador."}
+              (en
+                ? "Internal record. This is not an invoice. The data stays in this browser."
+                : "Documento de control interno. No es una factura. Los datos se quedan en este navegador.")}
           </p>
         </div>
         <div className="quote-doc-totals">
           <div>
-            <span>Horas</span>
+            <span>{en ? "Hours" : "Horas"}</span>
             <strong>{formatHours(totals.minutes)}</strong>
           </div>
           {header.hourlyCents > 0 ? (
             <div className="quote-doc-grand">
-              <span>Importe</span>
+              <span>{en ? "Amount" : "Importe"}</span>
               <strong>{formatEuro(totals.amount)}</strong>
             </div>
           ) : null}
@@ -130,8 +143,8 @@ export function TimesheetDocument({
       </div>
 
       <p className="quote-doc-foot">
-        <span>{header.worker || "Administración"}</span>
-        <span>Parte de horas · {when}</span>
+        <span>{header.worker || (en ? "Office" : "Administración")}</span>
+        <span>{en ? "Timesheet" : "Parte de horas"} · {when}</span>
       </p>
     </article>
   );

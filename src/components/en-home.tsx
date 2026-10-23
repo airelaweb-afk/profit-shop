@@ -3,6 +3,7 @@ import { ArrowRight, Combine, Eraser, Minimize2, Shrink, Smartphone } from "luci
 import { FaqJsonLd, FaqList } from "@/components/faq-list";
 import { LogoMark } from "@/components/site-brand";
 import { Button } from "@/components/ui/button";
+import { enMoreTools } from "@/lib/en-catalog";
 import { enHomeFaqs, enTools } from "@/lib/en-copy";
 
 export function EnHome() {
@@ -30,7 +31,8 @@ export function EnHome() {
           </h1>
           <p className="mt-4 max-w-xl text-lg text-background/75">
             Merge a PDF, compress a file, remove a background, turn an iPhone HEIC
-            photo into a JPG. The file is never uploaded.
+            photo into a JPG. Quotes, signing and the rest of the toolkit are here
+            too. The file is never uploaded.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button
@@ -153,9 +155,43 @@ export function EnHome() {
               );
             })}
           </ul>
+          <h2 className="mt-16 text-center font-heading text-3xl tracking-tight sm:text-4xl">
+            The rest of the toolkit
+          </h2>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {enMoreTools.map((tool) => (
+              <li key={tool.href}>
+                <Link
+                  href={tool.href}
+                  prefetch={false}
+                  className="flex h-full flex-col rounded-2xl border border-foreground/10 bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary hover:shadow-[6px_6px_0_0_#ff4b1a]"
+                >
+                  <span className="flex items-baseline gap-2">
+                    <span className="font-heading text-lg leading-tight">{tool.name}</span>
+                    {tool.pro ? (
+                      <span className="rounded-full bg-foreground px-2 py-0.5 font-mono text-[0.6rem] font-semibold tracking-[0.14em] text-accent uppercase">
+                        Pro
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {tool.does}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            <Link href="/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
-              The rest of the tools are in Spanish
+            <Link href="/en/blog/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
+              Blog
+            </Link>
+            {" · "}
+            <Link href="/en/pricing/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
+              Pricing
+            </Link>
+            {" · "}
+            <Link href="/en/faq/" prefetch={false} className="text-primary underline-offset-4 hover:underline">
+              Questions
             </Link>
           </p>
         </div>

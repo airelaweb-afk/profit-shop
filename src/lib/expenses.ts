@@ -139,8 +139,25 @@ export function expenseTotals(rows: ExpenseRow[]) {
   );
 }
 
-export function expenseMessage(header: ExpenseHeader, rows: ExpenseRow[]) {
+export function expenseMessage(
+  header: ExpenseHeader,
+  rows: ExpenseRow[],
+  locale: "es" | "en" = "es",
+) {
   const totals = expenseTotals(rows);
+  if (locale === "en") {
+    const who = header.owner.trim() || "Office";
+    const period = header.period.trim() || formatLongDate(new Date(), "en");
+    const company = header.company.trim() || "the company";
+    return `Hello,
+
+Here is the expense list for ${company} (${period}): ${rows.length} receipts, total ${formatEuro(totals.total)} (net ${formatEuro(totals.base)} + VAT ${formatEuro(totals.tax)}).
+
+The PDF is attached. I keep the original receipts.
+
+Regards,
+${who}`;
+  }
   const who = header.owner.trim() || "Administración";
   const period = header.period.trim() || formatLongDate();
   const company = header.company.trim() || "la empresa";

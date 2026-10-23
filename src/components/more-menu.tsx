@@ -10,7 +10,15 @@ const moreLinks = [
   { href: "/como-funciona", label: "Cómo funciona" },
 ] as const;
 
-export function MoreMenu({ tone = "ink" }: { tone?: "ink" | "paper" }) {
+export function MoreMenu({
+  tone = "ink",
+  label = "Más",
+  links = moreLinks,
+}: {
+  tone?: "ink" | "paper";
+  label?: string;
+  links?: readonly { href: string; label: string }[];
+}) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
 
@@ -41,7 +49,7 @@ export function MoreMenu({ tone = "ink" }: { tone?: "ink" | "paper" }) {
         aria-haspopup="menu"
         onClick={() => setOpen((current) => !current)}
       >
-        Más
+        {label}
         <ChevronDown className={`size-3.5 ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
@@ -49,7 +57,7 @@ export function MoreMenu({ tone = "ink" }: { tone?: "ink" | "paper" }) {
           role="menu"
           className="absolute right-0 top-full z-50 mt-2 min-w-44 rounded-[2px] border-2 border-foreground bg-card py-1 text-foreground shadow-[6px_6px_0_0_#ff4b1a]"
         >
-          {moreLinks.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}

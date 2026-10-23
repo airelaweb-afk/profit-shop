@@ -32,11 +32,26 @@ Luna Oficio es de Airela Web. Idioma: español. No hace falta cuenta para las he
 
 ## English
 
-The same tools, in English. Spanish URLs stay where they are.
+The same tools, in English. Spanish URLs stay where they are. The Spanish legal notice is the binding text.
 
 - [English home](https://lunaoficio.com/en/)
 - [Remove background](https://lunaoficio.com/en/remove-background/): transparent PNG, in the browser.
 - [Merge PDF](https://lunaoficio.com/en/merge-pdf/): join several PDFs into one.
+- [Split PDF](https://lunaoficio.com/en/split-pdf/): extract a page range or one PDF per page.
 - [Compress PDF](https://lunaoficio.com/en/compress-pdf/): shrink a PDF for email.
+- [JPG to PDF](https://lunaoficio.com/en/jpg-to-pdf/): photos into an A4 PDF.
+- [PDF to JPG](https://lunaoficio.com/en/pdf-to-jpg/): one JPG per page.
+- [Sign PDF](https://lunaoficio.com/en/sign-pdf/): a signature on top of the document.
+- [Fill PDF](https://lunaoficio.com/en/fill-pdf/): complete the form fields.
+- [Edit PDF](https://lunaoficio.com/en/edit-pdf/): change a line of text.
 - [HEIC to JPG](https://lunaoficio.com/en/heic-to-jpg/): iPhone photos Windows can open.
 - [Compress image](https://lunaoficio.com/en/compress-image/): shrink a JPG, PNG or WebP.
+- [PNG to JPG](https://lunaoficio.com/en/png-to-jpg/): transparent areas become white.
+- [Crop image](https://lunaoficio.com/en/crop-image/): keep the part you need.
+- [Audio to WAV](https://lunaoficio.com/en/audio-to-wav/): MP3, M4A or OGG to WAV.
+- [Quotes](https://lunaoficio.com/en/quotes/): one PDF per client, with a logo. Amounts in euros. Not an invoice.
+- [Pricing](https://lunaoficio.com/en/pricing/)
+- [Questions](https://lunaoficio.com/en/faq/)
+- [How it works](https://lunaoficio.com/en/how-it-works/)
+- [Blog](https://lunaoficio.com/en/blog/)
+- [Legal notice](https://lunaoficio.com/en/legal-notice/)

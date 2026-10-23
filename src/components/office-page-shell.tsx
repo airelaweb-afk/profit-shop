@@ -7,12 +7,14 @@ export function OfficePageShell({
   lead,
   href,
   children,
+  showGuides = true,
 }: {
   kicker: string;
   title: string;
   lead: string;
   href: string;
   children: React.ReactNode;
+  showGuides?: boolean;
 }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -25,9 +27,11 @@ export function OfficePageShell({
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">{lead}</p>
       <AdSlot label="La herramienta es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">{children}</div>
-      <div className="no-print">
-        <RelatedGuides href={href} />
-      </div>
+      {showGuides ? (
+        <div className="no-print">
+          <RelatedGuides href={href} />
+        </div>
+      ) : null}
     </div>
   );
 }

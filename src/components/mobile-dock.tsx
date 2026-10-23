@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Eraser, FileImage, FileText, House, Menu, NotebookPen } from "lucide-react";
+import { FileImage, FileText, House, Menu, NotebookPen } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -214,19 +214,28 @@ function SpanishDock() {
 
 const englishDock = [
   { href: "/en/", label: "Home", icon: House },
-  { href: "/en/remove-background/", label: "Background", icon: Eraser },
-  { href: "/en/merge-pdf/", label: "PDFs", icon: FileText },
-  { href: "/en/compress-image/", label: "Photos", icon: FileImage },
+  { href: "/en/pdf-tools/", label: "PDF", icon: FileText },
+  { href: "/en/image-tools/", label: "Photos", icon: FileImage },
+  { href: "/en/quotes/", label: "Docs", icon: NotebookPen },
 ];
 
 const englishSheet = [
   { href: "/en/remove-background/", label: "Remove background" },
   { href: "/en/merge-pdf/", label: "Merge PDF" },
   { href: "/en/compress-pdf/", label: "Compress PDF" },
+  { href: "/en/sign-pdf/", label: "Sign PDF" },
   { href: "/en/heic-to-jpg/", label: "HEIC to JPG" },
   { href: "/en/compress-image/", label: "Compress image" },
-  { href: "/", label: "Spanish site" },
-  { href: "/cookies/", label: "Cookie policy" },
+  { href: "/en/audio-to-wav/", label: "Audio to WAV" },
+  { href: "/en/quotes/", label: "Quotes" },
+  { href: "/en/pricing/", label: "Pricing" },
+  { href: "/en/faq/", label: "Questions" },
+  { href: "/en/blog/", label: "Blog" },
+  { href: "/en/compare/", label: "Comparisons" },
+  { href: "/en/legal-notice/", label: "Legal notice" },
+  { href: "/en/privacy/", label: "Privacy" },
+  { href: "/en/cookies/", label: "Cookies" },
+  { href: "/en/terms/", label: "Terms" },
 ];
 
 function EnglishDock() {
@@ -325,7 +334,7 @@ function EnglishDock() {
               </div>
             )}
             <p className="mt-6 px-3 text-xs text-muted-foreground">
-              <Link prefetch={false} href="/precios" onClick={() => setOpen(false)} className="hover:text-foreground">
+              <Link prefetch={false} href="/en/pricing/" onClick={() => setOpen(false)} className="hover:text-foreground">
                 Pro
               </Link>
             </p>

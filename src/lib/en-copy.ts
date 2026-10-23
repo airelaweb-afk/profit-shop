@@ -75,10 +75,10 @@ export const enHomeFaqs: FaqItem[] = [
     linkLabel: openTool,
   },
   {
-    q: "Is the rest of the site in Spanish?",
-    a: "Yes. These pages are the English version. The blog, the legal pages and the other tools are in Spanish.",
-    href: "/",
-    linkLabel: "Open the Spanish site",
+    q: "Where are the other tools?",
+    a: "PDF, images, audio, quotes, the blog and the legal pages are in English here. The Spanish pages stay at their original addresses.",
+    href: "/en/pdf-tools/",
+    linkLabel: "Open the PDF tools",
   },
 ];
 

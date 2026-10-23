@@ -77,6 +77,48 @@ function titles(kind: ImageKitSlug, locale: "es" | "en" = "es") {
       cta: "Choose photos",
     };
   }
+  if (locale === "en" && kind === "to-jpg") {
+    return {
+      drop: "Drop PNG, WebP or HEIC to turn them into JPG",
+      tap: "Choose PNG, WebP or HEIC to turn them into JPG",
+      cta: "Choose photos",
+    };
+  }
+  if (locale === "en" && kind === "to-png") {
+    return {
+      drop: "Drop JPG or WebP to turn them into PNG",
+      tap: "Choose JPG or WebP to turn them into PNG",
+      cta: "Choose photos",
+    };
+  }
+  if (locale === "en" && kind === "to-webp") {
+    return {
+      drop: "Drop JPG or PNG to turn them into WebP",
+      tap: "Choose JPG or PNG to turn them into WebP",
+      cta: "Choose photos",
+    };
+  }
+  if (locale === "en" && kind === "resize") {
+    return {
+      drop: "Drop the image to resize",
+      tap: "Choose the image to resize",
+      cta: "Choose photo",
+    };
+  }
+  if (locale === "en" && kind === "crop") {
+    return {
+      drop: "Drop the image to crop",
+      tap: "Choose the image to crop",
+      cta: "Choose photo",
+    };
+  }
+  if (locale === "en") {
+    return {
+      drop: "Drop the image that is sideways",
+      tap: "Choose the image that is sideways",
+      cta: "Choose photos",
+    };
+  }
   if (kind === "heic") {
     return {
       drop: "Suelta las fotos HEIC del iPhone",
@@ -426,7 +468,13 @@ export function ImageKitTool({
   const action = en
     ? kind === "compress"
       ? "Compress and save"
-      : "Convert and save"
+      : kind === "crop"
+        ? "Crop and save"
+        : kind === "resize"
+          ? "Resize and save"
+          : kind === "rotate"
+            ? "Rotate and save"
+            : "Convert and save"
     : kind === "compress"
       ? "Comprimir y guardar"
       : kind === "crop"
@@ -491,7 +539,7 @@ export function ImageKitTool({
       {kind === "resize" && first ? (
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <div className="grid gap-1.5">
-            <Label htmlFor="img-w">Ancho (px)</Label>
+            <Label htmlFor="img-w">{tr("Ancho (px)", "Width (px)")}</Label>
             <Input
               id="img-w"
               type="number"
@@ -509,7 +557,7 @@ export function ImageKitTool({
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="img-h">Alto (px)</Label>
+            <Label htmlFor="img-h">{tr("Alto (px)", "Height (px)")}</Label>
             <Input
               id="img-h"
               type="number"
@@ -532,7 +580,10 @@ export function ImageKitTool({
               checked={lock}
               onChange={(event) => setLock(event.target.checked)}
             />
-            Mantener proporción ({first.width}×{first.height})
+            {tr(
+              `Mantener proporción (${first.width}×${first.height})`,
+              `Keep the ratio (${first.width}×${first.height})`,
+            )}
           </label>
         </div>
       ) : null}
@@ -596,8 +647,10 @@ export function ImageKitTool({
       {kind === "crop" && first ? (
         <div className="mt-6">
           <p className="mb-2 text-sm text-muted-foreground">
-            Arrastra un recuadro nuevo. Si pulsas dentro, lo mueves. La página no
-            se desplaza.
+            {tr(
+              "Arrastra un recuadro nuevo. Si pulsas dentro, lo mueves. La página no se desplaza.",
+              "Drag a new box. Press inside it to move it. The page stays still.",
+            )}
           </p>
           <div className="mb-3 grid grid-cols-3 gap-2">
             <Button
@@ -606,7 +659,7 @@ export function ImageKitTool({
               className="h-11"
               onClick={() => applyCropPreset("full")}
             >
-              Toda
+              {tr("Toda", "All")}
             </Button>
             <Button
               type="button"
@@ -614,7 +667,7 @@ export function ImageKitTool({
               className="h-11"
               onClick={() => applyCropPreset("square")}
             >
-              Cuadrado
+              {tr("Cuadrado", "Square")}
             </Button>
             <Button
               type="button"
@@ -641,7 +694,7 @@ export function ImageKitTool({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={first.preview}
-              alt="Recortar"
+              alt={tr("Recortar", "Crop")}
               className="pointer-events-none block max-h-[70dvh] max-w-full select-none"
               draggable={false}
             />

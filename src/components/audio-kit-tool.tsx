@@ -11,8 +11,16 @@ import { decodeAudio, encodeWav, isAudioFile } from "@/lib/audio-ops";
 import { suggestedOutName } from "@/lib/image-ops";
 import { noticeForSave, saveBlob } from "@/lib/save-file";
 
-export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
-  const { beforeRun, afterRun } = useJobGuard();
+export function AudioKitTool({
+  kind,
+  locale = "es",
+}: {
+  kind: AudioKitSlug;
+  locale?: "es" | "en";
+}) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
+  const { beforeRun, afterRun } = useJobGuard(locale);
   const [file, setFile] = useState<File | null>(null);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [start, setStart] = useState(0);
@@ -26,7 +34,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
     setError("");
     setNotice("");
     if (!isAudioFile(next)) {
-      setError("Sube un MP3, M4A, OGG, WAV o WebM. No extraemos audio de un vídeo.");
+      setError(t("Sube un MP3, M4A, OGG, WAV o WebM. No extraemos audio de un vídeo.", "Upload an MP3, M4A, OGG, WAV or WebM. We do not extract audio from a video."));
       return;
     }
     setBusy(true);
@@ -39,7 +47,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
     } catch (caught) {
       setFile(null);
       setBuffer(null);
-      setError(caught instanceof Error ? caught.message : "No se pudo leer.");
+      setError(caught instanceof Error ? caught.message : t("No se pudo leer.", "Could not read it."));
     } finally {
       setBusy(false);
     }
@@ -47,7 +55,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
 
   async function run() {
     if (!file || !buffer) {
-      setError("Elige un audio.");
+      setError(t("Elige un audio.", "Choose an audio file."));
       return;
     }
     if (!beforeRun()) return;
@@ -60,16 +68,18 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
           : encodeWav(buffer);
       const result = await saveBlob(
         blob,
-        suggestedOutName(file.name, kind === "trim" ? "recorte" : "audio", "wav"),
+        suggestedOutName(file.name, kind === "trim" ? (en ? "trim" : "recorte") : "audio", "wav"),
       );
       const ready =
         kind === "trim"
-          ? `Listo: de ${start.toFixed(1)} s a ${end.toFixed(1)} s, en WAV.`
-          : "Listo: WAV. Codificar a MP3 queda aparcado.";
-      setNotice(noticeForSave(result, ready));
+          ? en
+            ? `Done: from ${start.toFixed(1)} s to ${end.toFixed(1)} s, as WAV.`
+            : `Listo: de ${start.toFixed(1)} s a ${end.toFixed(1)} s, en WAV.`
+          : t("Listo: WAV. Codificar a MP3 queda aparcado.", "Done: WAV. Encoding to MP3 is not available.");
+      setNotice(noticeForSave(result, ready, locale));
       afterRun();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar.");
+      setError(caught instanceof Error ? caught.message : t("No se pudo guardar.", "Could not save."));
     } finally {
       setBusy(false);
     }
@@ -82,10 +92,14 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
       <FileDrop
         accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav,.webm"
         busy={busy}
-        dropTitle={kind === "trim" ? "Suelta la nota de voz" : "Suelta el audio"}
-        tapTitle={kind === "trim" ? "Elige la nota de voz" : "Elige el audio"}
-        cta="Elegir audio"
-        hint="MP3, M4A, OGG o WAV. Sale un WAV. Extraer el audio de un MP4 o convertir a MP3 queda para más adelante."
+        dropTitle={kind === "trim" ? t("Suelta la nota de voz", "Drop the voice note") : t("Suelta el audio", "Drop the audio")}
+        tapTitle={kind === "trim" ? t("Elige la nota de voz", "Choose the voice note") : t("Elige el audio", "Choose the audio")}
+        cta={t("Elegir audio", "Choose audio")}
+        hint={t(
+          "MP3, M4A, OGG o WAV. Sale un WAV. Extraer el audio de un MP4 o convertir a MP3 queda para más adelante.",
+          "MP3, M4A, OGG or WAV. You get a WAV. Pulling audio from an MP4, or encoding MP3, is not available.",
+        )}
+        busyTitle={en ? "Opening…" : undefined}
         onFiles={(list) => void take(list[0])}
       />
       {file && buffer ? (
@@ -96,7 +110,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
           {kind === "trim" ? (
             <div className="mt-4 grid gap-3">
               <Label htmlFor="audio-start">
-                Desde {start.toFixed(1)} s
+                {t("Desde", "From")} {start.toFixed(1)} s
               </Label>
               <input
                 id="audio-start"
@@ -110,7 +124,7 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
                   setStart(Math.min(value, end - 0.1));
                 }}
               />
-              <Label htmlFor="audio-end">Hasta {end.toFixed(1)} s</Label>
+              <Label htmlFor="audio-end">{t("Hasta", "To")} {end.toFixed(1)} s</Label>
               <input
                 id="audio-end"
                 type="range"
@@ -135,8 +149,8 @@ export function AudioKitTool({ kind }: { kind: AudioKitSlug }) {
           disabled={busy || !buffer}
           onClick={() => void run()}
         >
-          {busy ? "Preparando…" : <Download />}
-          {busy ? "" : kind === "trim" ? "Recortar a WAV" : "Guardar WAV"}
+          {busy ? t("Preparando…", "Preparing…") : <Download />}
+          {busy ? "" : kind === "trim" ? t("Recortar a WAV", "Trim to WAV") : t("Guardar WAV", "Save WAV")}
         </Button>
       </div>
       {error ? (

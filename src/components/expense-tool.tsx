@@ -90,14 +90,16 @@ function Field({
   );
 }
 
-export function ExpenseTool() {
+export function ExpenseTool({ locale = "es" }: { locale?: "es" | "en" } = {}) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const stored = useMemo(() => parseStored(json), [json]);
   const rows = useMemo(() => parseExpenses(stored.list), [stored.list]);
   const totals = expenseTotals(rows);
   const [copied, setCopied] = useState("");
   const [error, setError] = useState("");
-  const message = expenseMessage(stored.header, rows);
+  const message = expenseMessage(stored.header, rows, locale);
 
   function patchHeader(partial: Partial<ExpenseHeader>) {
     write({ ...stored, header: { ...stored.header, ...partial } });
@@ -110,7 +112,7 @@ export function ExpenseTool() {
       setCopied("msg");
       window.setTimeout(() => setCopied(""), 1600);
     } catch {
-      setError("No se pudo copiar. Selecciona el texto a mano.");
+      setError(t("No se pudo copiar. Selecciona el texto a mano.", "Could not copy. Select the text yourself."));
     }
   }
 
@@ -127,10 +129,12 @@ export function ExpenseTool() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="font-heading text-2xl">Quién entrega esto</h2>
+              <h2 className="font-heading text-2xl">{t("Quién entrega esto", "Who is handing this in")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Una lista para el gestor, no un Excel eterno. Se queda en este
-                navegador.
+                {t(
+                  "Una lista para el gestor, no un Excel eterno. Se queda en este navegador.",
+                  "A list for the bookkeeper, not an endless spreadsheet. It stays in this browser.",
+                )}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -139,19 +143,19 @@ export function ExpenseTool() {
                 variant="outline"
                 onClick={() => write(structuredClone(sampleStored))}
               >
-                Cargar ejemplo
+                {t("Cargar ejemplo", "Load example")}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => write(structuredClone(emptyStored))}
               >
-                Empezar de cero
+                {t("Empezar de cero", "Start over")}
               </Button>
             </div>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Field label="Tu nombre" htmlFor="ex-owner">
+            <Field label={t("Tu nombre", "Your name")} htmlFor="ex-owner">
               <Input
                 id="ex-owner"
                 className="h-10"
@@ -160,7 +164,7 @@ export function ExpenseTool() {
                 placeholder="Marina Ruiz"
               />
             </Field>
-            <Field label="Empresa o nombre" htmlFor="ex-company">
+            <Field label={t("Empresa o nombre", "Company or name")} htmlFor="ex-company">
               <Input
                 id="ex-company"
                 className="h-10"
@@ -171,49 +175,57 @@ export function ExpenseTool() {
                 placeholder="Clínica Alma"
               />
             </Field>
-            <Field label="Periodo" htmlFor="ex-period">
+            <Field label={t("Periodo", "Period")} htmlFor="ex-period">
               <Input
                 id="ex-period"
                 className="h-10"
                 value={stored.header.period}
                 onChange={(event) => patchHeader({ period: event.target.value })}
-                placeholder="septiembre 2026"
+                placeholder={t("septiembre 2026", "September 2026")}
               />
             </Field>
           </div>
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Los tickets</h2>
+          <h2 className="font-heading text-2xl">{t("Los tickets", "The receipts")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Una línea por ticket:{" "}
+            {t("Una línea por ticket:", "One line per receipt:")}{" "}
             <span className="text-foreground">
-              fecha, proveedor, importe con IVA, % IVA, concepto
+              {t(
+                "fecha, proveedor, importe con IVA, % IVA, concepto",
+                "date, supplier, amount with VAT, VAT %, item",
+              )}
             </span>
-            . El importe es lo que pone el ticket. Si no pones IVA, se asume 21
-            %.
+            .{" "}
+            {t(
+              "El importe es lo que pone el ticket. Si no pones IVA, se asume 21 %.",
+              "The amount is what the receipt says. If you skip VAT, 21% is assumed.",
+            )}
           </p>
           <Textarea
             className="mt-4 min-h-48 font-mono text-sm"
             value={stored.list}
             onChange={(event) => write({ ...stored, list: event.target.value })}
-            aria-label="Lista de gastos"
+            aria-label={t("Lista de gastos", "Expense list")}
             placeholder={"08/09/2026, Papelería Central, 48.40, 21, folios"}
           />
           <p className="mt-2 text-sm text-muted-foreground">
             {rows.length === 0
-              ? "No hay líneas con proveedor e importe."
-              : `${rows.length} ticket${rows.length === 1 ? "" : "s"} · ${formatEuro(totals.total)} (base ${formatEuro(totals.base)} + IVA ${formatEuro(totals.tax)})`}
+              ? t("No hay líneas con proveedor e importe.", "No lines with a supplier and an amount.")
+              : en
+                ? `${rows.length} receipt${rows.length === 1 ? "" : "s"} · ${formatEuro(totals.total)} (net ${formatEuro(totals.base)} + VAT ${formatEuro(totals.tax)})`
+                : `${rows.length} ticket${rows.length === 1 ? "" : "s"} · ${formatEuro(totals.total)} (base ${formatEuro(totals.base)} + IVA ${formatEuro(totals.tax)})`}
           </p>
         </section>
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Nota</h2>
+          <h2 className="font-heading text-2xl">{t("Nota", "Note")}</h2>
           <Textarea
             className="mt-3 min-h-24"
             value={stored.header.notes}
             onChange={(event) => patchHeader({ notes: event.target.value })}
-            aria-label="Notas para el gestor"
+            aria-label={t("Notas para el gestor", "Notes for the bookkeeper")}
           />
         </section>
 
@@ -224,18 +236,21 @@ export function ExpenseTool() {
         ) : null}
 
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
-          <h2 className="font-heading text-2xl">Cómo se manda</h2>
+          <h2 className="font-heading text-2xl">{t("Cómo se manda", "How you send it")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Guardas el PDF y se lo adjuntas al gestor. La web no envía nada.
+            {t(
+              "Guardas el PDF y se lo adjuntas al gestor. La web no envía nada.",
+              "You save the PDF and attach it for the bookkeeper. The site sends nothing.",
+            )}
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button type="submit" size="lg" className="h-12 w-full px-5 sm:w-auto">
               <Printer />
-              Guardar PDF
+              {t("Guardar PDF", "Save PDF")}
             </Button>
             <Button type="button" variant="outline" onClick={() => void copyMessage()}>
               {copied === "msg" ? <Check /> : <Copy />}
-              {copied === "msg" ? "Copiado" : "Mensaje"}
+              {copied === "msg" ? t("Copiado", "Copied") : t("Mensaje", "Message")}
             </Button>
             <Button
               type="button"
@@ -243,7 +258,7 @@ export function ExpenseTool() {
               nativeButton={false}
               render={
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`${message}\n\n(Adjunta el PDF.)`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`${message}\n\n${en ? "(Attach the PDF.)" : "(Adjunta el PDF.)"}`)}`}
                   target="_blank"
                   rel="noreferrer"
                 />
@@ -258,12 +273,12 @@ export function ExpenseTool() {
               nativeButton={false}
               render={
                 <a
-                  href={`mailto:?subject=${encodeURIComponent(`Gastos ${stored.header.period || stored.header.company}`)}&body=${encodeURIComponent(`${message}\n\n(Adjunta el PDF.)`)}`}
+                  href={`mailto:?subject=${encodeURIComponent(`${en ? "Expenses" : "Gastos"} ${stored.header.period || stored.header.company}`)}&body=${encodeURIComponent(`${message}\n\n${en ? "(Attach the PDF.)" : "(Adjunta el PDF.)"}`)}`}
                 />
               }
             >
               <Mail />
-              Correo
+              {t("Correo", "Email")}
             </Button>
           </div>
         </section>
@@ -271,11 +286,11 @@ export function ExpenseTool() {
 
       <div className="quote-preview-screen min-w-0">
         <p className="no-print mb-3 text-sm text-muted-foreground">
-          Vista previa · lo que sale en el PDF
+          {t("Vista previa · lo que sale en el PDF", "Preview · what goes in the PDF")}
         </p>
         <div className="quote-print">
           <div className="quote-sheet">
-            <ExpenseDocument header={stored.header} rows={rows} />
+            <ExpenseDocument header={stored.header} rows={rows} locale={locale} />
           </div>
         </div>
       </div>

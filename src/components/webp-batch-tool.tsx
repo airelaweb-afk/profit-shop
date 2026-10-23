@@ -53,7 +53,9 @@ function yieldToBrowser() {
   return new Promise<void>((resolve) => setTimeout(resolve, 0));
 }
 
-export function WebpBatchTool() {
+export function WebpBatchTool({ locale = "es" }: { locale?: "es" | "en" }) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
   const [queue, setQueue] = useState<Queued[]>([]);
   const [quality, setQuality] = useState(80);
   const [maxWidth, setMaxWidth] = useState(1600);
@@ -169,7 +171,10 @@ export function WebpBatchTool() {
               inBytes: item.file.size,
               outBytes: item.file.size,
               status: "kept",
-              detail: "El WebP pesaba más: se conserva el original.",
+              detail: t(
+                "El WebP pesaba más: se conserva el original.",
+                "The WebP was larger: the original is kept.",
+              ),
             });
           } else {
             const name = uniqueName(webpName(basePath));
@@ -218,7 +223,7 @@ export function WebpBatchTool() {
         ),
       );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo terminar.");
+      setError(caught instanceof Error ? caught.message : t("No se pudo terminar.", "Could not finish."));
     } finally {
       setBusy(false);
       setProgress((current) => ({ ...current, current: "" }));
@@ -236,18 +241,23 @@ export function WebpBatchTool() {
         accept={acceptImages}
         multiple
         busy={busy}
-        dropTitle="Suelta las imágenes o la carpeta entera"
-        tapTitle="Elige las imágenes a convertir"
-        cta="Elegir imágenes"
-        folderCta="Elegir una carpeta"
-        hint={`Hasta ${MAX_BATCH_FILES} imágenes por tanda (JPG, PNG, WebP, GIF, HEIC). Se convierten una a una en este navegador y bajan en un zip.`}
-        busyHint="Convirtiendo. Puedes seguir mirando la lista mientras avanza."
+        dropTitle={t("Suelta las imágenes o la carpeta entera", "Drop the images or the whole folder")}
+        tapTitle={t("Elige las imágenes a convertir", "Choose the images to convert")}
+        cta={t("Elegir imágenes", "Choose images")}
+        folderCta={t("Elegir una carpeta", "Choose a folder")}
+        hint={
+          en
+            ? `Up to ${MAX_BATCH_FILES} images per batch (JPG, PNG, WebP, GIF, HEIC). They convert one by one in this browser and download as a zip.`
+            : `Hasta ${MAX_BATCH_FILES} imágenes por tanda (JPG, PNG, WebP, GIF, HEIC). Se convierten una a una en este navegador y bajan en un zip.`
+        }
+        busyHint={t("Convirtiendo. Puedes seguir mirando la lista mientras avanza.", "Converting. You can keep watching the list.")}
+        busyTitle={en ? "Opening…" : undefined}
         onFiles={addFiles}
       />
 
       <div className="mt-6 grid gap-5 rounded-2xl bg-card p-5 ring-1 ring-foreground/10">
         <div className="grid gap-2">
-          <Label htmlFor="wb-quality">Calidad WebP: {quality}</Label>
+          <Label htmlFor="wb-quality">{t("Calidad WebP", "WebP quality")}: {quality}</Label>
           <input
             id="wb-quality"
             type="range"
@@ -258,13 +268,15 @@ export function WebpBatchTool() {
             onChange={(event) => setQuality(Number(event.target.value))}
           />
           <p className="text-xs text-muted-foreground">
-            80 es el punto habitual para una web: apenas se nota y pesa mucho
-            menos. Para fotografía de producto, 85-90.
+            {t(
+              "80 es el punto habitual para una web: apenas se nota y pesa mucho menos. Para fotografía de producto, 85-90.",
+              "80 is the usual point for a website: you barely see it and it weighs much less. For product photography, 85-90.",
+            )}
           </p>
         </div>
 
         <div className="grid gap-2">
-          <p className="text-sm font-medium">Ancho máximo</p>
+          <p className="text-sm font-medium">{t("Ancho máximo", "Maximum width")}</p>
           <div className="flex flex-wrap gap-2">
             {WIDTH_PRESETS.map((preset) => (
               <Button
@@ -282,17 +294,20 @@ export function WebpBatchTool() {
               </Button>
             ))}
             <Input
-              aria-label="Ancho máximo personalizado en píxeles"
+              aria-label={t("Ancho máximo personalizado en píxeles", "Custom maximum width in pixels")}
               className="h-11 w-32"
               inputMode="numeric"
-              placeholder="Otro (px)"
+              placeholder={t("Otro (px)", "Other (px)")}
               value={customWidth}
               disabled={busy}
               onChange={(event) => setCustomWidth(event.target.value.replace(/[^\d]/g, ""))}
             />
           </div>
           <p className="text-xs text-muted-foreground">
-            Las imágenes más pequeñas no se amplían. Se mantiene la proporción.
+            {t(
+              "Las imágenes más pequeñas no se amplían. Se mantiene la proporción.",
+              "Smaller images are not enlarged. The ratio stays.",
+            )}
           </p>
         </div>
 
@@ -306,9 +321,9 @@ export function WebpBatchTool() {
               onChange={(event) => setKeepIfBigger(event.target.checked)}
             />
             <span>
-              Si el WebP pesa más, conservar el original
+              {t("Si el WebP pesa más, conservar el original", "If the WebP is heavier, keep the original")}
               <span className="block text-xs text-muted-foreground">
-                Evita empeorar PNG muy simples o iconos.
+                {t("Evita empeorar PNG muy simples o iconos.", "Stops very simple PNGs or icons from getting worse.")}
               </span>
             </span>
           </label>
@@ -321,9 +336,9 @@ export function WebpBatchTool() {
               onChange={(event) => setKeepFolders(event.target.checked)}
             />
             <span>
-              Mantener las subcarpetas en el zip
+              {t("Mantener las subcarpetas en el zip", "Keep the subfolders in the zip")}
               <span className="block text-xs text-muted-foreground">
-                Útil para sustituir la carpeta de la web tal cual.
+                {t("Útil para sustituir la carpeta de la web tal cual.", "Useful if you want to replace the site folder as it is.")}
               </span>
             </span>
           </label>
@@ -334,7 +349,15 @@ export function WebpBatchTool() {
         <div className="mt-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm">
-              <strong>{queue.length}</strong> {queue.length === 1 ? "imagen" : "imágenes"} en cola ·{" "}
+              <strong>{queue.length}</strong>{" "}
+              {en
+                ? queue.length === 1
+                  ? "image"
+                  : "images"
+                : queue.length === 1
+                  ? "imagen"
+                  : "imágenes"}{" "}
+              {t("en cola", "queued")} ·{" "}
               {formatBytes(totalQueued)}
             </p>
             <Button
@@ -380,11 +403,13 @@ export function WebpBatchTool() {
           onClick={() => void run()}
         >
           {busy ? (
-            `Convirtiendo ${progress.done + 1} de ${progress.total}…`
+            en
+              ? `Converting ${progress.done + 1} of ${progress.total}…`
+              : `Convirtiendo ${progress.done + 1} de ${progress.total}…`
           ) : (
             <>
               <Download />
-              Convertir a WebP y bajar el zip
+              {t("Convertir a WebP y bajar el zip", "Convert to WebP and download the zip")}
             </>
           )}
         </Button>
@@ -398,7 +423,7 @@ export function WebpBatchTool() {
               cancelled.current = true;
             }}
           >
-            Parar aquí y bajar lo hecho
+            {t("Parar aquí y bajar lo hecho", "Stop here and download what is done")}
           </Button>
         ) : null}
         {zip && !busy ? (
@@ -410,7 +435,7 @@ export function WebpBatchTool() {
             onClick={() => void downloadBlob(zip.blob, zip.name)}
           >
             <RotateCcw />
-            Descargar el zip otra vez
+            {t("Descargar el zip otra vez", "Download the zip again")}
           </Button>
         ) : null}
       </div>

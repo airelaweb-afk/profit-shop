@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { offerBookmark } from "@/lib/bookmark-prompt";
 import {
   blankIssuer,
+  englishQuoteConditions,
+  englishQuoteIntro,
   formatEuro,
   newId,
   type Issuer,
@@ -69,32 +71,61 @@ function getServerSnapshot() {
   return EMPTY;
 }
 
-export function VersionQuoteTool() {
+const englishPackageNames: Record<string, string> = {
+  "pkg-basico": "Basic",
+  "pkg-recomendado": "Recommended",
+  "pkg-completo": "Complete",
+};
+
+export function VersionQuoteTool({ locale = "es" }: { locale?: "es" | "en" } = {}) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
   const json = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const job = useMemo(() => parseStored(json), [json]);
-  const versions = useMemo(() => buildVersions(job), [job]);
+  const stored = useMemo(() => parseStored(json), [json]);
+  const job = useMemo(() => {
+    if (!en) return stored;
+    return {
+      ...stored,
+      issuer: {
+        ...stored.issuer,
+        intro:
+          stored.issuer.intro === blankIssuer.intro ? englishQuoteIntro : stored.issuer.intro,
+        conditions:
+          stored.issuer.conditions === blankIssuer.conditions
+            ? englishQuoteConditions
+            : stored.issuer.conditions,
+      },
+      packages: stored.packages.map((pkg) => {
+        const original = emptyVersionJob.packages.find((item) => item.id === pkg.id);
+        const english = englishPackageNames[pkg.id];
+        if (original && english && pkg.name === original.name) return { ...pkg, name: english };
+        return pkg;
+      }),
+    };
+  }, [stored, en]);
+  const versions = useMemo(() => buildVersions(job, locale), [job, locale]);
   const [error, setError] = useState("");
   const [previewIndex, setPreviewIndex] = useState(0);
   const preview = versions[Math.min(previewIndex, Math.max(versions.length - 1, 0))];
 
   function patch(partial: Partial<VersionJob>) {
-    write({ ...job, ...partial });
+    write({ ...stored, ...partial });
   }
 
   function patchIssuer(partial: Partial<Issuer>) {
-    patch({ issuer: { ...job.issuer, ...partial } });
+    patch({ issuer: { ...stored.issuer, ...partial } });
   }
 
   function patchPackage(id: string, partial: Partial<JobPackage>) {
     patch({
-      packages: job.packages.map((pkg) =>
+      packages: stored.packages.map((pkg) =>
         pkg.id === id ? { ...pkg, ...partial } : pkg,
       ),
     });
   }
 
   function setLine(pkgId: string, lineId: string, partial: Partial<ServiceLine>) {
-    const pkg = job.packages.find((item) => item.id === pkgId);
+    const pkg = stored.packages.find((item) => item.id === pkgId);
     if (!pkg) return;
     patchPackage(pkgId, {
       lines: pkg.lines.map((line) =>
@@ -106,15 +137,25 @@ export function VersionQuoteTool() {
   function printQuotes() {
     setError("");
     if (!job.issuer.name.trim()) {
-      setError("Pon el nombre de tu negocio.");
+      setError(t("Pon el nombre de tu negocio.", "Add your business name."));
       return;
     }
     if (!job.client.company.trim()) {
-      setError("Pon el cliente. Es un solo destinatario para todas las versiones.");
+      setError(
+        t(
+          "Pon el cliente. Es un solo destinatario para todas las versiones.",
+          "Add the client. One recipient for every version.",
+        ),
+      );
       return;
     }
     if (versions.length === 0) {
-      setError("Activa al menos un paquete con un concepto y un precio.");
+      setError(
+        t(
+          "Activa al menos un paquete con un concepto y un precio.",
+          "Turn on at least one package with an item and a price.",
+        ),
+      );
       return;
     }
     window.print();
@@ -133,10 +174,12 @@ export function VersionQuoteTool() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="font-heading text-2xl">El trabajo y el cliente</h2>
+              <h2 className="font-heading text-2xl">{t("El trabajo y el cliente", "The job and the client")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Un encargo. Un destinatario. Varias ofertas, no varias empresas.
-                Los datos se quedan en este navegador.
+                {t(
+                  "Un encargo. Un destinatario. Varias ofertas, no varias empresas. Los datos se quedan en este navegador.",
+                  "One job. One recipient. Several offers, not several companies. The data stays in this browser.",
+                )}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -145,20 +188,20 @@ export function VersionQuoteTool() {
                 variant="outline"
                 onClick={() => write(structuredClone(sampleVersionJob))}
               >
-                Cargar ejemplo
+                {t("Cargar ejemplo", "Load example")}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => write(structuredClone(emptyVersionJob))}
               >
-                Empezar de cero
+                {t("Empezar de cero", "Start over")}
               </Button>
             </div>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <Field label="Título del trabajo" htmlFor="job-title">
+              <Field label={t("Título del trabajo", "Job title")} htmlFor="job-title">
                 <Input
                   id="job-title"
                   className="h-10"
@@ -167,7 +210,7 @@ export function VersionQuoteTool() {
                 />
               </Field>
             </div>
-            <Field label="Cliente" htmlFor="client-company">
+            <Field label={t("Cliente", "Client")} htmlFor="client-company">
               <Input
                 id="client-company"
                 className="h-10"
@@ -179,7 +222,7 @@ export function VersionQuoteTool() {
                 }
               />
             </Field>
-            <Field label="Contacto" htmlFor="client-contact">
+            <Field label={t("Contacto", "Contact")} htmlFor="client-contact">
               <Input
                 id="client-contact"
                 className="h-10"
@@ -191,7 +234,7 @@ export function VersionQuoteTool() {
                 }
               />
             </Field>
-            <Field label="Correo" htmlFor="client-email">
+            <Field label={t("Correo", "Email")} htmlFor="client-email">
               <Input
                 id="client-email"
                 className="h-10"
@@ -204,7 +247,7 @@ export function VersionQuoteTool() {
                 }
               />
             </Field>
-            <Field label="Tu negocio" htmlFor="issuer-name">
+            <Field label={t("Tu negocio", "Your business")} htmlFor="issuer-name">
               <Input
                 id="issuer-name"
                 className="h-10"
@@ -212,7 +255,7 @@ export function VersionQuoteTool() {
                 onChange={(event) => patchIssuer({ name: event.target.value })}
               />
             </Field>
-            <Field label="NIF / CIF" htmlFor="issuer-tax">
+            <Field label={t("NIF / CIF", "Tax ID")} htmlFor="issuer-tax">
               <Input
                 id="issuer-tax"
                 className="h-10"
@@ -220,7 +263,7 @@ export function VersionQuoteTool() {
                 onChange={(event) => patchIssuer({ taxId: event.target.value })}
               />
             </Field>
-            <Field label="IVA %" htmlFor="issuer-taxp">
+            <Field label={t("IVA %", "VAT %")} htmlFor="issuer-taxp">
               <Input
                 id="issuer-taxp"
                 className="h-10"
@@ -233,7 +276,7 @@ export function VersionQuoteTool() {
                 }
               />
             </Field>
-            <Field label="Validez (días)" htmlFor="issuer-valid">
+            <Field label={t("Validez (días)", "Valid for (days)")} htmlFor="issuer-valid">
               <Input
                 id="issuer-valid"
                 className="h-10"
@@ -251,9 +294,12 @@ export function VersionQuoteTool() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="font-heading text-2xl">Paquetes</h2>
+              <h2 className="font-heading text-2xl">{t("Paquetes", "Packages")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Básico, recomendado, completo. Cada uno es un presupuesto.
+                {t(
+                  "Básico, recomendado, completo. Cada uno es un presupuesto.",
+                  "Basic, recommended, complete. Each one is a quote.",
+                )}
               </p>
             </div>
             <Button
@@ -262,10 +308,10 @@ export function VersionQuoteTool() {
               onClick={() =>
                 patch({
                   packages: [
-                    ...job.packages,
+                    ...stored.packages,
                     {
                       id: newId(),
-                      name: "Nueva versión",
+                      name: en ? "New version" : "Nueva versión",
                       enabled: true,
                       includes: "",
                       lines: [
@@ -277,7 +323,7 @@ export function VersionQuoteTool() {
               }
             >
               <Plus />
-              Paquete
+              {t("Paquete", "Package")}
             </Button>
           </div>
 
@@ -287,7 +333,10 @@ export function VersionQuoteTool() {
               checked={job.rush}
               onChange={(event) => patch({ rush: event.target.checked })}
             />
-            Duplicar cada paquete con recargo de urgencia
+            {t(
+              "Duplicar cada paquete con recargo de urgencia",
+              "Duplicate each package with a rush fee",
+            )}
             <Input
               className="h-8 w-16"
               type="number"
@@ -297,7 +346,7 @@ export function VersionQuoteTool() {
               onChange={(event) =>
                 patch({ rushPercent: Number(event.target.value) || 0 })
               }
-              aria-label="Porcentaje de urgencia"
+              aria-label={t("Porcentaje de urgencia", "Rush percentage")}
             />
             %
           </label>
@@ -317,7 +366,7 @@ export function VersionQuoteTool() {
                         patchPackage(pkg.id, { enabled: event.target.checked })
                       }
                     />
-                    Incluir
+                    {t("Incluir", "Include")}
                   </label>
                   <Input
                     className="h-10 max-w-xs"
@@ -325,14 +374,14 @@ export function VersionQuoteTool() {
                     onChange={(event) =>
                       patchPackage(pkg.id, { name: event.target.value })
                     }
-                    aria-label="Nombre del paquete"
+                    aria-label={t("Nombre del paquete", "Package name")}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="ml-auto"
-                    aria-label="Quitar paquete"
+                    aria-label={t("Quitar paquete", "Remove package")}
                     onClick={() =>
                       patch({
                         packages: job.packages.filter((item) => item.id !== pkg.id),
@@ -345,7 +394,7 @@ export function VersionQuoteTool() {
                 <Textarea
                   className="mt-3"
                   rows={2}
-                  placeholder="Qué incluye, en una o dos frases"
+                  placeholder={t("Qué incluye, en una o dos frases", "What it includes, in one or two sentences")}
                   value={pkg.includes}
                   onChange={(event) =>
                     patchPackage(pkg.id, { includes: event.target.value })
@@ -359,7 +408,7 @@ export function VersionQuoteTool() {
                     >
                       <Input
                         className="h-10"
-                        placeholder="Concepto"
+                        placeholder={t("Concepto", "Item")}
                         value={line.name}
                         onChange={(event) =>
                           setLine(pkg.id, line.id, { name: event.target.value })
@@ -375,7 +424,7 @@ export function VersionQuoteTool() {
                             quantity: Number(event.target.value) || 0,
                           })
                         }
-                        aria-label="Cantidad"
+                        aria-label={t("Cantidad", "Quantity")}
                       />
                       <Input
                         className="h-10"
@@ -389,7 +438,7 @@ export function VersionQuoteTool() {
                               Math.round(Number(event.target.value) * 100) || 0,
                           })
                         }
-                        aria-label="Precio en euros"
+                        aria-label={t("Precio en euros", "Price in euros")}
                       />
                     </li>
                   ))}
@@ -409,7 +458,7 @@ export function VersionQuoteTool() {
                   }
                 >
                   <Plus />
-                  Concepto
+                  {t("Concepto", "Item")}
                 </Button>
               </div>
             ))}
@@ -424,9 +473,11 @@ export function VersionQuoteTool() {
 
         <Button type="submit" size="lg" className="h-12 w-full px-5 self-start sm:w-auto">
           <Printer />
-          Guardar PDF
+          {t("Guardar PDF", "Save PDF")}
           {versions.length
-            ? ` · ${versions.length} versión${versions.length === 1 ? "" : "es"}`
+            ? en
+              ? ` · ${versions.length} version${versions.length === 1 ? "" : "s"}`
+              : ` · ${versions.length} versión${versions.length === 1 ? "" : "es"}`
             : ""}
         </Button>
       </form>
@@ -434,14 +485,17 @@ export function VersionQuoteTool() {
       <aside className="no-print min-w-0 lg:sticky lg:top-20 lg:self-start">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-muted-foreground">
-            Vista previa · una página por versión en el PDF
+            {t(
+              "Vista previa · una página por versión en el PDF",
+              "Preview · one page per version in the PDF",
+            )}
           </p>
           {versions.length > 1 ? (
             <select
               className="h-8 rounded-md border border-border bg-background px-2 text-sm"
               value={Math.min(previewIndex, versions.length - 1)}
               onChange={(event) => setPreviewIndex(Number(event.target.value))}
-              aria-label="Versión a previsualizar"
+              aria-label={t("Versión a previsualizar", "Version to preview")}
             >
               {versions.map((version, index) => (
                 <option key={version.key} value={index}>
@@ -464,6 +518,7 @@ export function VersionQuoteTool() {
               services={preview?.lines ?? []}
               index={Math.min(previewIndex, Math.max(versions.length - 1, 0))}
               optionLabel={preview?.label}
+              locale={locale}
             />
           </div>
         </div>
@@ -493,6 +548,7 @@ export function VersionQuoteTool() {
               services={version.lines}
               index={index}
               optionLabel={version.label}
+              locale={locale}
             />
           </div>
         ))}

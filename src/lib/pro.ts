@@ -54,16 +54,30 @@ export function isProFromSnapshot(json: string) {
   return expiryDate(state.expires).getTime() > Date.now();
 }
 
-export async function activatePro(code: string): Promise<ProKeyInfo> {
+export async function activatePro(
+  code: string,
+  locale: "es" | "en" = "es",
+): Promise<ProKeyInfo> {
+  const en = locale === "en";
   const info = await verifyProKey(code);
   if (!info) {
-    throw new Error("Esa clave no vale. Si has pagado, escríbenos.");
+    throw new Error(
+      en ? "That key is not valid. If you have paid, email us." : "Esa clave no vale. Si has pagado, escríbenos.",
+    );
   }
   if (info.revoked) {
-    throw new Error("Esa clave ha sido anulada. Escríbenos si crees que es un error.");
+    throw new Error(
+      en
+        ? "That key was cancelled. Email us if you think this is a mistake."
+        : "Esa clave ha sido anulada. Escríbenos si crees que es un error.",
+    );
   }
   if (info.expiresAt.getTime() < Date.now()) {
-    throw new Error("Esa clave ha caducado. Renueva Pro para seguir sin anuncios.");
+    throw new Error(
+      en
+        ? "That key has expired. Renew Pro to keep going without the cap."
+        : "Esa clave ha caducado. Renueva Pro para seguir sin anuncios.",
+    );
   }
   const state: ProState = {
     serial: info.serial,

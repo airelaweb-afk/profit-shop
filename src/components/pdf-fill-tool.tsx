@@ -28,8 +28,10 @@ function clampScale(value: number) {
   return Math.min(2, Math.max(0.7, Math.round(value * 20) / 20));
 }
 
-export function PdfFillTool() {
-  const { pro, limit, upgrade, beforeRun, afterRun } = useJobGuard();
+export function PdfFillTool({ locale = "es" }: { locale?: "es" | "en" }) {
+  const en = locale === "en";
+  const t = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, beforeRun, afterRun } = useJobGuard(locale);
   const handle = useRef<PdfFormHandle | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -49,8 +51,11 @@ export function PdfFillTool() {
     if (data.byteLength > limit.pdfBytes) {
       throw new Error(
         pro
-          ? `El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`
-          : `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+          ? t(`El PDF pesa más de ${bytesLabel(limit.pdfBytes)}.`, `The PDF is over ${bytesLabel(limit.pdfBytes)}.`)
+          : t(
+              `Gratis son ${bytesLabel(limit.pdfBytes)}. Pro admite archivos más grandes.`,
+              `Free allows ${bytesLabel(limit.pdfBytes)}. Pro allows larger files.`,
+            ),
       );
     }
     const found = await listPdfFields(data.slice(0));
@@ -72,7 +77,7 @@ export function PdfFillTool() {
   async function takeFile(file: File | undefined) {
     if (!file) return;
     if (!isPdfFile(file)) {
-      setError("Sube un archivo PDF.");
+      setError(t("Sube un archivo PDF.", "Upload a PDF file."));
       return;
     }
     setBusy(true);
@@ -120,7 +125,7 @@ export function PdfFillTool() {
 
   async function download() {
     if (!handle.current) {
-      setError("Espera a que cargue el PDF.");
+      setError(t("Espera a que cargue el PDF.", "Wait for the PDF to load."));
       return;
     }
     if (!beforeRun()) return;
@@ -133,12 +138,13 @@ export function PdfFillTool() {
       setNotice(
         noticeForSave(
           result,
-          "Listo. Los valores van en los campos originales del PDF.",
+          t("Listo. Los valores van en los campos originales del PDF.", "Done. The values are in the original PDF fields."),
+          locale,
         ),
       );
       afterRun();
     } catch {
-      setError("No se pudo guardar. Prueba con otro PDF (sin contraseña).");
+      setError(t("No se pudo guardar. Prueba con otro PDF (sin contraseña).", "Could not save. Try another PDF (without a password)."));
     } finally {
       setBusy(false);
     }
@@ -150,15 +156,19 @@ export function PdfFillTool() {
         <FileDrop
           accept="application/pdf,.pdf"
           busy={busy}
-          dropTitle="PDF con campos"
-          tapTitle="Elige el PDF del teléfono"
-          cta="Elegir PDF"
-          hint="Tiene que traer casillas de formulario. Si es un escaneo, no hay campos que rellenar."
-          busyHint="Abriendo el formulario del PDF."
+          dropTitle={t("PDF con campos", "A PDF with fields")}
+          tapTitle={t("Elige el PDF del teléfono", "Choose the PDF from your phone")}
+          cta={t("Elegir PDF", "Choose PDF")}
+          hint={t(
+            "Tiene que traer casillas de formulario. Si es un escaneo, no hay campos que rellenar.",
+            "It has to contain form fields. A scan has nothing to fill.",
+          )}
+          busyHint={t("Abriendo el formulario del PDF.", "Opening the PDF form.")}
+          busyTitle={en ? "Opening…" : undefined}
           onFiles={(list) => void takeFile(list[0])}
         />
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          ¿La máquina va justa o no tienes un PDF a mano?
+          {t("¿La máquina va justa o no tienes un PDF a mano?", "Short on time, or no PDF handy?")}
         </p>
         <div className="mt-2 flex justify-center">
           <Button
@@ -167,13 +177,18 @@ export function PdfFillTool() {
             onClick={() => void openSample()}
             disabled={busy}
           >
-            Probar ahora con un ejemplo
+            {t("Probar ahora con un ejemplo", "Try a sample now")}
           </Button>
         </div>
         <FreeCapNote
-          text={`Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`}
+          locale={locale}
+          text={
+            en
+              ? `Free: one PDF of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
+              : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+          }
         />
-        {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+        {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
         {error ? (
           <p className="mt-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
@@ -200,7 +215,7 @@ export function PdfFillTool() {
           disabled={busy}
         >
           <FileUp />
-          Cambiar
+          {t("Cambiar", "Change")}
         </Button>
         {pageCount > 1 ? (
           <>
@@ -211,7 +226,7 @@ export function PdfFillTool() {
               disabled={pageIndex <= 0}
               onClick={() => setPageIndex((current) => Math.max(0, current - 1))}
             >
-              Anterior
+              {t("Anterior", "Previous")}
             </Button>
             <span className="text-sm text-muted-foreground">
               {pageIndex + 1} / {pageCount}
@@ -225,7 +240,7 @@ export function PdfFillTool() {
                 setPageIndex((current) => Math.min(pageCount - 1, current + 1))
               }
             >
-              Siguiente
+              {t("Siguiente", "Next")}
             </Button>
           </>
         ) : null}
@@ -233,7 +248,7 @@ export function PdfFillTool() {
           type="button"
           variant="outline"
           className="size-11"
-          aria-label="Alejar"
+          aria-label={t("Alejar", "Zoom out")}
           onClick={() => setScale((current) => clampScale(current - 0.15))}
         >
           <Minus />
@@ -245,7 +260,7 @@ export function PdfFillTool() {
           type="button"
           variant="outline"
           className="size-11"
-          aria-label="Acercar"
+          aria-label={t("Acercar", "Zoom in")}
           onClick={() => setScale((current) => clampScale(current + 0.15))}
         >
           <Plus />
@@ -257,21 +272,22 @@ export function PdfFillTool() {
           disabled={busy}
         >
           <Download />
-          {busy ? "Preparando…" : "Guardar PDF"}
+          {busy ? t("Preparando…", "Preparing…") : t("Guardar PDF", "Save PDF")}
         </Button>
       </div>
 
       <p className="no-print text-sm text-muted-foreground">
         {fileName}
-        {fieldCount ? ` · ${fieldCount} campos` : ""}
-        {xfa ? " · formulario XFA" : ""}
-        . Las cajas azuladas son las del PDF: escribe dentro.
+        {fieldCount ? (en ? ` · ${fieldCount} fields` : ` · ${fieldCount} campos`) : ""}
+        {xfa ? (en ? " · XFA form" : " · formulario XFA") : ""}
+        {t(". Las cajas azuladas son las del PDF: escribe dentro.", ". The blue boxes belong to the PDF: type inside them.")}
       </p>
 
       <PdfFormViewer
         data={source}
         pageIndex={pageIndex}
         scale={scale}
+        locale={locale}
         fields={fields}
         onMeta={(meta) => {
           handle.current = meta;
@@ -290,13 +306,13 @@ export function PdfFillTool() {
         <p className="rounded-[2px] bg-muted px-3 py-2 text-sm text-muted-foreground">
           {notice}{" "}
           {fieldCount === 0 && !xfa ? (
-            <Link href="/pdf/" className="text-primary underline-offset-4 hover:underline">
-              Ir a Firmar PDF
+            <Link href={en ? "/en/sign-pdf/" : "/pdf/"} className="text-primary underline-offset-4 hover:underline">
+              {t("Ir a Firmar PDF", "Go to Sign PDF")}
             </Link>
           ) : null}
         </p>
       ) : null}
-      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+      {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
     </div>
   );
 }

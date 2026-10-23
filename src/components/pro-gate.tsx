@@ -6,19 +6,25 @@ import { usePro } from "@/lib/use-consent";
 export function ProGate({
   children,
   pitch,
+  title,
+  locale = "es",
 }: {
   children: React.ReactNode;
   pitch: string;
+  title?: string;
+  locale?: "es" | "en";
 }) {
   const pro = usePro();
   if (pro) return <>{children}</>;
   return (
     <div className="grid gap-6">
       <div className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10">
-        <p className="font-heading text-2xl">Esto es Pro</p>
+        <p className="font-heading text-2xl">
+          {title ?? (locale === "en" ? "This is Pro" : "Esto es Pro")}
+        </p>
         <p className="mt-2 text-sm text-muted-foreground">{pitch}</p>
       </div>
-      <PricingBox />
+      <PricingBox locale={locale} />
     </div>
   );
 }
