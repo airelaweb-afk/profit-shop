@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { BookmarkPrompt } from "@/components/bookmark-prompt";
 import { CookieBanner } from "@/components/cookie-banner";
 import { initCloudAuth } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
@@ -14,6 +15,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <CartProvider>
       {children}
       <CookieBanner />
+      <BookmarkPrompt />
     </CartProvider>
   );
 }

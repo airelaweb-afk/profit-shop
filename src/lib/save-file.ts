@@ -1,3 +1,5 @@
+import { offerBookmark } from "@/lib/bookmark-prompt";
+
 function triggerDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -31,6 +33,7 @@ export async function saveBlob(
   if (prefersShareSheet() && navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: filename });
+      offerBookmark();
       return "shared";
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
@@ -39,6 +42,7 @@ export async function saveBlob(
     }
   }
   triggerDownload(blob, filename);
+  offerBookmark();
   return "saved";
 }
 

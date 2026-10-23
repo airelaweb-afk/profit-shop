@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { offerBookmark } from "@/lib/bookmark-prompt";
 import { readLogoFile } from "@/lib/logo";
 import {
   blankIssuer,
@@ -193,6 +194,7 @@ export function QuoteBatchTool() {
   useEffect(() => {
     function done() {
       setPrintOnly(null);
+      offerBookmark();
     }
     window.addEventListener("afterprint", done);
     return () => window.removeEventListener("afterprint", done);

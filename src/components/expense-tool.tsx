@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { offerBookmark } from "@/lib/bookmark-prompt";
 import { formatEuro } from "@/lib/quotes";
 import {
   blankExpenseHeader,
@@ -120,6 +121,7 @@ export function ExpenseTool() {
         onSubmit={(event) => {
           event.preventDefault();
           window.print();
+          offerBookmark();
         }}
       >
         <section className="rounded-2xl bg-card p-5 ring-1 ring-foreground/10 sm:p-6">
