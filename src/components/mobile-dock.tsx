@@ -70,7 +70,7 @@ export function MobileDock() {
             const active = isActive(pathname, item.match);
             return (
               <li key={item.href}>
-                <Link
+                <Link prefetch={false}
                   href={item.href}
                   className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] ${
                     active ? "text-accent" : "text-background/60"
@@ -103,7 +103,7 @@ export function MobileDock() {
           </SheetHeader>
           <nav className="flex flex-col gap-1 px-3 pb-8">
             {allNavLinks.map((link) => (
-              <Link
+              <Link prefetch={false}
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
@@ -112,35 +112,35 @@ export function MobileDock() {
                 {link.label}
               </Link>
             ))}
-            <Link
+            <Link prefetch={false}
               href="/blog"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Blog
             </Link>
-            <Link
+            <Link prefetch={false}
               href="/faq"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Preguntas frecuentes
             </Link>
-            <Link
+            <Link prefetch={false}
               href="/como-funciona"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Cómo funciona
             </Link>
-            <Link
+            <Link prefetch={false}
               href="/audio-a-wav"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
             >
               Audio a WAV
             </Link>
-            <Link
+            <Link prefetch={false}
               href="/cookies"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base hover:bg-muted"
@@ -149,7 +149,7 @@ export function MobileDock() {
             </Link>
             {session ? (
               <div className="mt-3 grid gap-1">
-                <Link
+                <Link prefetch={false}
                   href="/cuenta/"
                   onClick={() => setOpen(false)}
                   className="rounded-lg px-3 py-3 text-base hover:bg-muted"
@@ -173,7 +173,7 @@ export function MobileDock() {
                 <Button
                   className="h-12"
                   render={
-                    <Link href="/entrar/" onClick={() => setOpen(false)} />
+                    <Link prefetch={false} href="/entrar/" onClick={() => setOpen(false)} />
                   }
                   nativeButton={false}
                 >
@@ -183,7 +183,7 @@ export function MobileDock() {
                   variant="outline"
                   className="h-12"
                   render={
-                    <Link
+                    <Link prefetch={false}
                       href="/entrar/?tab=crear"
                       onClick={() => setOpen(false)}
                     />
@@ -195,11 +195,11 @@ export function MobileDock() {
               </div>
             )}
             <p className="mt-6 px-3 text-xs text-muted-foreground">
-              <Link href="/precios" onClick={() => setOpen(false)} className="hover:text-foreground">
+              <Link prefetch={false} href="/precios" onClick={() => setOpen(false)} className="hover:text-foreground">
                 Pro
               </Link>
               {" · "}
-              <Link href="/comparar" onClick={() => setOpen(false)} className="hover:text-foreground">
+              <Link prefetch={false} href="/comparar" onClick={() => setOpen(false)} className="hover:text-foreground">
                 Fichas
               </Link>
             </p>

@@ -19,17 +19,20 @@ export function FaqList({
             className="rounded-[2px] bg-card p-5 ring-1 ring-foreground/15"
           >
             <dt className="font-heading text-lg text-foreground">{item.q}</dt>
-            <dd className="mt-2 text-sm text-muted-foreground">{item.a}</dd>
-            {item.href ? (
-              <p className="mt-3">
-                <Link
-                  href={item.href}
-                  className="text-sm text-primary underline-offset-4 hover:underline"
-                >
-                  Abrir la herramienta
-                </Link>
-              </p>
-            ) : null}
+            <dd className="mt-2 text-sm text-muted-foreground">
+              {item.a}
+              {item.href ? (
+                <p className="mt-3">
+                  <Link
+                    href={item.href}
+                    prefetch={false}
+                    className="text-sm text-primary underline-offset-4 hover:underline"
+                  >
+                    Abrir la herramienta
+                  </Link>
+                </p>
+              ) : null}
+            </dd>
           </div>
         ))}
       </dl>

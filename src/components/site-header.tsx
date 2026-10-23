@@ -18,7 +18,7 @@ function AccountActions() {
           size="sm"
           variant="ghost"
           className="h-11 px-3 text-background hover:bg-background/10 hover:text-accent xl:h-9"
-          render={<Link href="/entrar/" />}
+          render={<Link prefetch={false} href="/entrar/" />}
           nativeButton={false}
         >
           Entrar
@@ -26,7 +26,7 @@ function AccountActions() {
         <Button
           size="sm"
           className="hidden h-9 sm:inline-flex"
-          render={<Link href="/entrar/?tab=crear" />}
+          render={<Link prefetch={false} href="/entrar/?tab=crear" />}
           nativeButton={false}
         >
           Crear cuenta
@@ -37,6 +37,7 @@ function AccountActions() {
   return (
     <div className="flex items-center gap-2">
       <Link
+        prefetch={false}
         href="/cuenta/"
         className="hidden max-w-[10rem] truncate text-sm text-background/70 hover:text-accent sm:inline"
       >
@@ -63,29 +64,30 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-4 text-sm 2xl:flex">
           {allNavLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="ink-link">
+            <Link key={link.href} href={link.href} prefetch={false} className="ink-link">
               {link.label}
             </Link>
           ))}
         </nav>
 
         <nav className="hidden items-center gap-3 text-sm xl:flex 2xl:hidden">
-          <Link href="/herramientas-pdf" className="ink-link">
+          <Link prefetch={false} href="/herramientas-pdf" className="ink-link">
             PDF
           </Link>
-          <Link href="/herramientas-imagen" className="ink-link">
+          <Link prefetch={false} href="/herramientas-imagen" className="ink-link">
             Imagen
           </Link>
-          <Link href="/audio-a-wav" className="ink-link">
+          <Link prefetch={false} href="/audio-a-wav" className="ink-link">
             Audio
           </Link>
-          <Link href="/presupuestos" className="ink-link">
+          <Link prefetch={false} href="/presupuestos" className="ink-link">
             Documentos
           </Link>
         </nav>
 
         <div className="ml-auto hidden items-center gap-4 xl:flex">
           <Link
+            prefetch={false}
             href="/quitar-fondo/"
             className="new-glow rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground transition hover:bg-primary hover:text-primary-foreground"
           >

@@ -53,6 +53,7 @@ export function MoreMenu({ tone = "ink" }: { tone?: "ink" | "paper" }) {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={false}
               role="menuitem"
               className="block px-4 py-2.5 text-sm hover:bg-muted"
               onClick={() => setOpen(false)}

@@ -46,7 +46,7 @@ export default function HomePage() {
               Cómo unir un PDF, bajar el peso de una foto o abrir un HEIC.
             </p>
           </div>
-          <Button variant="outline" className="h-11" render={<Link href="/blog" />} nativeButton={false}>
+          <Button variant="outline" className="h-11" render={<Link href="/blog" prefetch={false} />} nativeButton={false}>
             Ver el blog
           </Button>
         </div>

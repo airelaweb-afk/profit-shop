@@ -1,0 +1,31 @@
+# Luna Oficio
+
+> Herramientas de PDF, imagen y audio que funcionan en el navegador. El archivo no se sube a ningún servidor. Gratis con un tope; Pro, sin límite (7 €/mes o 40 €/año).
+
+Luna Oficio es de Airela Web. Idioma: español. No hace falta cuenta para las herramientas gratuitas. La foto o el PDF se procesan en el aparato de quien lo usa.
+
+## Herramientas
+
+- [Quitar fondo](https://lunaoficio.com/quitar-fondo/): quita el fondo de una foto y descarga un PNG transparente. En el navegador.
+- [Unir PDF](https://lunaoficio.com/unir-pdf/): junta varios PDF en uno, en el orden elegido.
+- [Dividir PDF](https://lunaoficio.com/dividir-pdf/): saca un rango de páginas o un PDF por hoja.
+- [Comprimir PDF](https://lunaoficio.com/comprimir-pdf/): baja el peso para que entre en el correo.
+- [JPG a PDF](https://lunaoficio.com/jpg-a-pdf/): pasa fotos a un PDF A4.
+- [PDF a JPG](https://lunaoficio.com/pdf-a-jpg/): cada página del PDF, un JPG.
+- [Firmar PDF](https://lunaoficio.com/pdf/): rúbrica y marcas encima del documento.
+- [Rellenar PDF](https://lunaoficio.com/rellenar-pdf/): completa los campos del formulario.
+- [Editar PDF](https://lunaoficio.com/editar-pdf/): cambia frases de la página o el texto de un escaneo.
+- [Comprimir imagen](https://lunaoficio.com/comprimir-imagen/): baja el peso de JPG, PNG o WebP.
+- [HEIC a JPG](https://lunaoficio.com/heic-a-jpg/): la foto del iPhone, en JPG.
+- [PNG a JPG](https://lunaoficio.com/png-a-jpg/): convierte a JPG. El transparente queda blanco.
+- [Recortar imagen](https://lunaoficio.com/recortar-imagen/): recorta la zona que interesa.
+- [Audio a WAV](https://lunaoficio.com/audio-a-wav/): MP3, M4A u OGG a WAV.
+- [Presupuestos](https://lunaoficio.com/presupuestos/): un PDF por cliente, con logo.
+
+## Para saber más
+
+- [Todas las herramientas](https://lunaoficio.com/)
+- [Preguntas frecuentes](https://lunaoficio.com/faq/)
+- [Precios](https://lunaoficio.com/precios/)
+- [Cómo funciona](https://lunaoficio.com/como-funciona/)
+- [Blog](https://lunaoficio.com/blog/)

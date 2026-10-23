@@ -32,7 +32,7 @@ export function FeaturedRemoveBg() {
             <Button
               size="lg"
               className="h-12 w-full shrink-0 border-2 border-foreground bg-foreground px-6 text-background hover:bg-foreground/90 md:w-auto"
-              render={<Link href="/quitar-fondo/" />}
+              render={<Link href="/quitar-fondo/" prefetch={false} />}
               nativeButton={false}
             >
               Quitar fondo gratis

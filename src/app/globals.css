@@ -770,16 +770,27 @@ button.punch-card:hover {
 }
 
 @keyframes new-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 225, 74, 0.7);
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
   }
-  50% {
-    box-shadow: 0 0 0 8px rgba(255, 225, 74, 0);
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
   }
 }
 
 .new-glow {
+  position: relative;
+}
+
+.new-glow::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 2px solid #ffe14a;
+  border-radius: inherit;
+  pointer-events: none;
   animation: new-glow 1.8s ease-out infinite;
 }
 

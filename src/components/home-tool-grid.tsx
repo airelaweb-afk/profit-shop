@@ -178,6 +178,7 @@ function Tile({ href, name, pro }: TileData) {
   return (
     <Link
       href={href}
+      prefetch={false}
       className={`group flex h-full flex-col rounded-2xl border p-5 transition hover:-translate-y-0.5 ${
         isNew
           ? "border-2 border-foreground bg-accent shadow-[6px_6px_0_0_#ff4b1a] hover:shadow-[8px_8px_0_0_#ff4b1a]"

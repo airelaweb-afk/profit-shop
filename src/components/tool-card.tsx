@@ -17,7 +17,7 @@ export function ToolCard({
   kicker?: string;
 }) {
   return (
-    <Link href={href} className="punch-card flex h-full flex-col p-5">
+    <Link href={href} prefetch={false} className="punch-card flex h-full flex-col p-5">
       {kicker ? (
         <p className="text-sm tracking-wide text-primary uppercase">{kicker}</p>
       ) : null}

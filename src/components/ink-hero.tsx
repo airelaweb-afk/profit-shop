@@ -34,7 +34,7 @@ export function InkHero() {
           <Button
             size="lg"
             className="h-12 w-full px-6 sm:w-auto"
-            render={<Link href="#herramientas" />}
+            render={<Link href="#herramientas" prefetch={false} />}
             nativeButton={false}
           >
             Ver herramientas
@@ -43,7 +43,7 @@ export function InkHero() {
           <Button
             size="lg"
             className="h-12 w-full border-2 border-accent bg-accent px-6 text-accent-foreground hover:bg-accent/90 sm:w-auto"
-            render={<Link href="/unir-pdf" />}
+            render={<Link href="/unir-pdf" prefetch={false} />}
             nativeButton={false}
           >
             Unir PDF
