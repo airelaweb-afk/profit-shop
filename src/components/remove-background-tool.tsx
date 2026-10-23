@@ -14,15 +14,17 @@ import { noticeForSave, saveBlob } from "@/lib/save-file";
 const accept =
   "image/*,image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif";
 
-export function RemoveBackgroundTool() {
-  const { pro, limit, upgrade, beforeRun, afterRun } = useJobGuard();
+export function RemoveBackgroundTool({ locale = "es" }: { locale?: "es" | "en" } = {}) {
+  const en = locale === "en";
+  const tr = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, beforeRun, afterRun } = useJobGuard(locale);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState("");
   const [blob, setBlob] = useState<Blob | null>(null);
-  const [name, setName] = useState("sin-fondo.png");
+  const [name, setName] = useState(locale === "en" ? "no-background.png" : "sin-fondo.png");
 
   useEffect(() => {
     return () => {
@@ -35,14 +37,18 @@ export function RemoveBackgroundTool() {
     setError("");
     setNotice("");
     if (!isImageFile(file)) {
-      setError("Elige un JPG, PNG, WebP o HEIC.");
+      setError(tr("Elige un JPG, PNG, WebP o HEIC.", "Choose a JPG, PNG, WebP or HEIC."));
       return;
     }
     if (file.size > limit.imageBytes) {
       setError(
         pro
-          ? `La foto pesa más de ${bytesLabel(limit.imageBytes)}.`
-          : `Gratis son ${bytesLabel(limit.imageBytes)}. Pro admite fotos más grandes.`,
+          ? en
+            ? `The photo is larger than ${bytesLabel(limit.imageBytes)}.`
+            : `La foto pesa más de ${bytesLabel(limit.imageBytes)}.`
+          : en
+            ? `The free plan allows ${bytesLabel(limit.imageBytes)}. Pro accepts larger photos.`
+            : `Gratis son ${bytesLabel(limit.imageBytes)}. Pro admite fotos más grandes.`,
       );
       return;
     }
@@ -54,15 +60,15 @@ export function RemoveBackgroundTool() {
       return "";
     });
     try {
-      const result = await removeBackground(file, setStatus);
+      const result = await removeBackground(file, setStatus, locale);
       setBlob(result.blob);
       setPreview(URL.createObjectURL(result.blob));
-      setName(suggestedOutName(file.name, "sin-fondo", "png"));
+      setName(suggestedOutName(file.name, en ? "no-background" : "sin-fondo", "png"));
       setStatus("");
       afterRun();
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "";
-      setError(message || "No se pudo quitar el fondo.");
+      setError(message || tr("No se pudo quitar el fondo.", "Could not remove the background."));
       setStatus("");
     } finally {
       setBusy(false);
@@ -72,7 +78,13 @@ export function RemoveBackgroundTool() {
   async function download() {
     if (!blob) return;
     const result = await saveBlob(blob, name);
-    setNotice(noticeForSave(result, "PNG con el fondo transparente."));
+    setNotice(
+      noticeForSave(
+        result,
+        tr("PNG con el fondo transparente.", "PNG with a transparent background."),
+        locale,
+      ),
+    );
   }
 
   return (
@@ -80,18 +92,27 @@ export function RemoveBackgroundTool() {
       <FileDrop
         accept={accept}
         busy={busy}
-        dropTitle="Suelta la foto"
-        tapTitle="Elige la foto"
-        cta="Elegir foto"
-        cameraCta="Hacer foto ahora"
-        hint="La foto no se sube. El modelo se descarga una vez en este aparato."
-        busyHint={status || "Quitando el fondo…"}
+        dropTitle={tr("Suelta la foto", "Drop the photo")}
+        tapTitle={tr("Elige la foto", "Choose the photo")}
+        cta={tr("Elegir foto", "Choose photo")}
+        cameraCta={tr("Hacer foto ahora", "Take a photo")}
+        hint={tr(
+          "La foto no se sube. El modelo se descarga una vez en este aparato.",
+          "The photo is not uploaded. The model downloads once onto this device.",
+        )}
+        busyHint={status || tr("Quitando el fondo…", "Removing the background…")}
+        busyTitle={en ? "Opening…" : undefined}
         onFiles={(list) => void take(list[0])}
       />
       <FreeCapNote
-        text={`Gratis: fotos de hasta ${bytesLabel(limit.imageBytes)} y ${limit.jobsPerDay} tareas al día. Una foto cada vez.`}
+        locale={locale}
+        text={
+          en
+            ? `Free: photos up to ${bytesLabel(limit.imageBytes)} and ${limit.jobsPerDay} tasks a day. One photo at a time.`
+            : `Gratis: fotos de hasta ${bytesLabel(limit.imageBytes)} y ${limit.jobsPerDay} tareas al día. Una foto cada vez.`
+        }
       />
-      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+      {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
       {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
       {notice ? <p className="mt-4 text-sm text-muted-foreground">{notice}</p> : null}
       {preview ? (
@@ -107,12 +128,16 @@ export function RemoveBackgroundTool() {
             }}
           >
             {/* The checkerboard shows the transparent pixels. */}
-            <img src={preview} alt="Foto sin fondo" className="mx-auto max-h-[28rem] w-full object-contain" />
+            <img
+              src={preview}
+              alt={tr("Foto sin fondo", "Photo with the background removed")}
+              className="mx-auto max-h-[28rem] w-full object-contain"
+            />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button type="button" onClick={() => void download()}>
               <Download />
-              Guardar PNG
+              {tr("Guardar PNG", "Save PNG")}
             </Button>
             <Button
               type="button"
@@ -126,12 +151,14 @@ export function RemoveBackgroundTool() {
                 setNotice("");
               }}
             >
-              Otra foto
+              {tr("Otra foto", "Another photo")}
             </Button>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            El pelo fino y un fondo del mismo color que la ropa pueden quedar
-            irregulares. Sirve para un producto, un logo o un retrato sencillo.
+            {tr(
+              "El pelo fino y un fondo del mismo color que la ropa pueden quedar irregulares. Sirve para un producto, un logo o un retrato sencillo.",
+              "Fine hair, and a background the same color as the clothes, can look uneven. It works well for a product, a logo or a simple portrait.",
+            )}
           </p>
         </div>
       ) : null}

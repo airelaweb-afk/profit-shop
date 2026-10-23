@@ -62,7 +62,21 @@ function targetFormat(kind: ImageKitSlug, file: File): OutFormat {
   return "jpeg";
 }
 
-function titles(kind: ImageKitSlug) {
+function titles(kind: ImageKitSlug, locale: "es" | "en" = "es") {
+  if (locale === "en" && kind === "heic") {
+    return {
+      drop: "Drop the iPhone HEIC photos",
+      tap: "Choose the HEIC photos from your camera roll",
+      cta: "Choose photos",
+    };
+  }
+  if (locale === "en" && kind === "compress") {
+    return {
+      drop: "Drop the photos that are too large",
+      tap: "Choose the photos that are too large",
+      cta: "Choose photos",
+    };
+  }
   if (kind === "heic") {
     return {
       drop: "Suelta las fotos HEIC del iPhone",
@@ -119,8 +133,16 @@ function titles(kind: ImageKitSlug) {
   };
 }
 
-export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
-  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
+export function ImageKitTool({
+  kind,
+  locale = "es",
+}: {
+  kind: ImageKitSlug;
+  locale?: "es" | "en";
+}) {
+  const en = locale === "en";
+  const tr = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard(locale);
   const stage = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
@@ -158,13 +180,16 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
       picked = picked.filter(isHeicFile);
       if (picked.length === 0) {
         setError(
-          "Sube un HEIC o HEIF. Si el iPhone ya te lo abre como JPG, no hace falta esta herramienta.",
+          tr(
+            "Sube un HEIC o HEIF. Si el iPhone ya te lo abre como JPG, no hace falta esta herramienta.",
+            "Upload a HEIC or HEIF. If the iPhone already opened it as a JPG, you don't need this tool.",
+          ),
         );
         return;
       }
     }
     if (picked.length === 0) {
-      setError("Sube JPG, PNG, WebP o HEIC.");
+      setError(tr("Sube JPG, PNG, WebP o HEIC.", "Upload a JPG, PNG, WebP or HEIC."));
       return;
     }
     const next: Item[] = [];
@@ -172,8 +197,12 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
       if (file.size > limit.imageBytes) {
         setUpgrade(
           pro
-            ? `${file.name} pesa más de ${bytesLabel(limit.imageBytes)}.`
-            : `${file.name} pesa más de ${bytesLabel(limit.imageBytes)}. Pro admite archivos más grandes.`,
+            ? en
+              ? `${file.name} is larger than ${bytesLabel(limit.imageBytes)}.`
+              : `${file.name} pesa más de ${bytesLabel(limit.imageBytes)}.`
+            : en
+              ? `${file.name} is larger than ${bytesLabel(limit.imageBytes)}. Pro accepts larger files.`
+              : `${file.name} pesa más de ${bytesLabel(limit.imageBytes)}. Pro admite archivos más grandes.`,
         );
         return;
       }
@@ -198,7 +227,9 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         });
       } catch (caught) {
         setError(
-          caught instanceof Error ? caught.message : "No se pudo abrir la imagen.",
+          caught instanceof Error
+            ? caught.message
+            : tr("No se pudo abrir la imagen.", "Could not open the image."),
         );
         return;
       }
@@ -315,7 +346,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
 
   async function run() {
     if (items.length === 0) {
-      setError("Elige al menos una imagen.");
+      setError(tr("Elige al menos una imagen.", "Choose at least one image."));
       return;
     }
     if (!beforeRun()) return;
@@ -343,7 +374,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         outputs.push({
           name: suggestedOutName(
             item.file.name,
-            kind === "compress" ? "ligera" : kind,
+            kind === "compress" ? (en ? "light" : "ligera") : kind,
             extFor(format),
           ),
           bytes,
@@ -362,7 +393,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         const copy = new Uint8Array(zipped);
         result = await downloadBlob(
           new Blob([copy], { type: "application/zip" }),
-          "imagenes-luna-oficio.zip",
+          en ? "images-luna-oficio.zip" : "imagenes-luna-oficio.zip",
         );
       }
       const ratio =
@@ -370,14 +401,20 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
       const ready =
         kind === "compress"
           ? totalOut < totalIn
-            ? `Listo: ${formatBytes(totalIn)} → ${formatBytes(totalOut)} (${ratio} % menos).`
-            : `Se ha reescrito (${formatBytes(totalOut)}). Si no baja, es un PNG: pásalo a JPG.`
-          : `Listo: ${outputs.length} archivo${outputs.length === 1 ? "" : "s"}.`;
-      setNotice(noticeForSave(result, ready));
+            ? en
+              ? `Done: ${formatBytes(totalIn)} → ${formatBytes(totalOut)} (${ratio}% smaller).`
+              : `Listo: ${formatBytes(totalIn)} → ${formatBytes(totalOut)} (${ratio} % menos).`
+            : en
+              ? `Rewritten (${formatBytes(totalOut)}). If it didn't shrink, it's a PNG: save it as JPG.`
+              : `Se ha reescrito (${formatBytes(totalOut)}). Si no baja, es un PNG: pásalo a JPG.`
+          : en
+            ? `Done: ${outputs.length} file${outputs.length === 1 ? "" : "s"}.`
+            : `Listo: ${outputs.length} archivo${outputs.length === 1 ? "" : "s"}.`;
+      setNotice(noticeForSave(result, ready, locale));
       afterRun();
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "No se pudo terminar.",
+        caught instanceof Error ? caught.message : tr("No se pudo terminar.", "Could not finish."),
       );
     } finally {
       setBusy(false);
@@ -385,9 +422,12 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
   }
 
   const first = items[0];
-  const copy = titles(kind);
-  const action =
-    kind === "compress"
+  const copy = titles(kind, locale);
+  const action = en
+    ? kind === "compress"
+      ? "Compress and save"
+      : "Convert and save"
+    : kind === "compress"
       ? "Comprimir y guardar"
       : kind === "crop"
         ? "Recortar y guardar"
@@ -407,19 +447,30 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
         dropTitle={copy.drop}
         tapTitle={copy.tap}
         cta={copy.cta}
-        cameraCta={wantsCamera ? "Hacer foto ahora" : undefined}
-        hint="No se envía a ningún servidor. Ampliar con IA y PDF a Word siguen aparcados."
+        cameraCta={wantsCamera ? tr("Hacer foto ahora", "Take a photo") : undefined}
+        hint={tr(
+          "No se envía a ningún servidor. Ampliar con IA y PDF a Word siguen aparcados.",
+          "Nothing is uploaded. No account needed.",
+        )}
+        busyTitle={en ? "Opening…" : undefined}
         onFiles={(list) => void addFiles(list)}
       />
       <FreeCapNote
-        text={`Gratis: ${limit.imageFiles} imágenes de ${bytesLabel(limit.imageBytes)} y ${limit.jobsPerDay} tareas al día`}
+        locale={locale}
+        text={
+          en
+            ? `Free: ${limit.imageFiles} images of ${bytesLabel(limit.imageBytes)} and ${limit.jobsPerDay} tasks a day`
+            : `Gratis: ${limit.imageFiles} imágenes de ${bytesLabel(limit.imageBytes)} y ${limit.jobsPerDay} tareas al día`
+        }
       />
-      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+      {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
 
       {kind === "compress" ? (
         <div className="mt-6 grid gap-2">
           <Label htmlFor="img-quality">
-            Calidad JPG/WebP: {Math.round(quality * 100)} %
+            {en
+              ? `JPG/WebP quality: ${Math.round(quality * 100)}%`
+              : `Calidad JPG/WebP: ${Math.round(quality * 100)} %`}
           </Label>
           <input
             id="img-quality"
@@ -430,8 +481,9 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
             onChange={(event) => setQuality(Number(event.target.value) / 100)}
           />
           <p className="text-xs text-muted-foreground">
-            Un PNG a veces no baja hasta pasarlo a JPG (se pierde la
-            transparencia).
+            {en
+              ? "A PNG sometimes will not shrink until you save it as JPG (that drops the transparency)."
+              : "Un PNG a veces no baja hasta pasarlo a JPG (se pierde la transparencia)."}
           </p>
         </div>
       ) : null}
@@ -525,7 +577,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
                 size="icon"
                 variant="ghost"
                 className="size-11"
-                aria-label="Quitar"
+                aria-label={tr("Quitar", "Remove")}
                 onClick={() => {
                   if (item.preview.startsWith("blob:")) {
                     URL.revokeObjectURL(item.preview);
@@ -614,7 +666,7 @@ export function ImageKitTool({ kind }: { kind: ImageKitSlug }) {
           disabled={busy || items.length === 0}
           onClick={() => void run()}
         >
-          {busy ? "Preparando…" : <Download />}
+          {busy ? tr("Preparando…", "Preparing…") : <Download />}
           {busy ? "" : action}
         </Button>
       </div>

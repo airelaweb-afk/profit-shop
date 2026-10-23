@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/locale";
 import { PRO_MONTHLY, PRO_YEARLY } from "@/lib/payments";
 import { absUrl } from "@/lib/seo";
 import { LEGAL, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
@@ -15,7 +16,55 @@ function Script({ data }: { data: unknown }) {
   );
 }
 
-export function JsonLd() {
+export function JsonLd({ locale = "es" }: { locale?: Locale }) {
+  if (locale === "en") {
+    const data = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          name: SITE_NAME,
+          url: absUrl("/en"),
+          description:
+            "PDF and image tools in your browser. No account, and your files are never uploaded.",
+          inLanguage: "en",
+        },
+        {
+          "@type": "Organization",
+          name: LEGAL.holder,
+          email: LEGAL.email,
+          url: SITE_URL,
+          logo: `${SITE_URL}/brand/mark.jpg`,
+        },
+        {
+          "@type": "SoftwareApplication",
+          name: SITE_NAME,
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          offers: [
+            { "@type": "Offer", price: "0", priceCurrency: "EUR", name: "Free" },
+            {
+              "@type": "Offer",
+              price: euros(PRO_MONTHLY),
+              priceCurrency: "EUR",
+              name: "Pro monthly",
+            },
+            {
+              "@type": "Offer",
+              price: euros(PRO_YEARLY),
+              priceCurrency: "EUR",
+              name: "Pro yearly",
+            },
+          ],
+          description:
+            "Merge PDFs, compress images, remove backgrounds and convert HEIC to JPG in the browser.",
+          url: absUrl("/en"),
+          inLanguage: "en",
+        },
+      ],
+    };
+    return <Script data={data} />;
+  }
   const data = {
     "@context": "https://schema.org",
     "@graph": [
@@ -73,13 +122,16 @@ export function ToolJsonLd({
   path,
   section,
   free = true,
+  locale = "es",
 }: {
   name: string;
   description: string;
   path: string;
   section: { name: string; path: string };
   free?: boolean;
+  locale?: Locale;
 }) {
+  const english = locale === "en";
   const url = absUrl(path);
   const data = {
     "@context": "https://schema.org",
@@ -91,9 +143,11 @@ export function ToolJsonLd({
         description,
         applicationCategory: "MultimediaApplication",
         operatingSystem: "Web",
-        browserRequirements: "Requiere un navegador moderno con JavaScript.",
+        browserRequirements: english
+          ? "Requires a modern browser with JavaScript."
+          : "Requiere un navegador moderno con JavaScript.",
         isAccessibleForFree: free,
-        inLanguage: "es-ES",
+        inLanguage: english ? "en" : "es-ES",
         offers: {
           "@type": "Offer",
           price: free ? "0" : euros(PRO_MONTHLY),
@@ -104,7 +158,12 @@ export function ToolJsonLd({
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Inicio", item: `${SITE_URL}/` },
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: english ? "Home" : "Inicio",
+            item: english ? absUrl("/en") : `${SITE_URL}/`,
+          },
           {
             "@type": "ListItem",
             position: 2,

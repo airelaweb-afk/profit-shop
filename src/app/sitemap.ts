@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { posts } from "@/lib/blog";
 import { competitors } from "@/lib/comparisons";
 import { imageKit, imageProKit, audioKit } from "@/lib/image-kit";
+import { localePairs, pairForPath } from "@/lib/locale";
 import { allPdfTools } from "@/lib/pdf-kit";
+import { absUrl } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -76,11 +78,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    ...localePairs.map((pair) => ({
+      url: absUrl(pair.en),
+      lastModified: new Date("2026-10-23"),
+      changeFrequency: "weekly" as const,
+      priority: pair.en === "/en" ? 0.9 : 0.8,
+    })),
   ];
   const seen = new Set<string>();
-  return pages.filter((page) => {
-    if (seen.has(page.url)) return false;
-    seen.add(page.url);
-    return true;
-  });
+  return pages
+    .filter((page) => {
+      if (seen.has(page.url)) return false;
+      seen.add(page.url);
+      return true;
+    })
+    .map((page) => {
+      const path = page.url.slice(SITE_URL.length).replace(/\/$/, "") || "/";
+      const pair = pairForPath(path);
+      if (!pair) return page;
+      return {
+        ...page,
+        alternates: {
+          languages: {
+            es: absUrl(pair.es),
+            en: absUrl(pair.en),
+            "x-default": absUrl(pair.es),
+          },
+        },
+      };
+    });
 }

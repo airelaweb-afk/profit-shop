@@ -24,14 +24,17 @@ export function LogoMark({ className }: { className?: string }) {
 export function SiteBrand({
   compact = false,
   tone = "bone",
+  href = "/",
 }: {
   compact?: boolean;
   tone?: "bone" | "ink";
+  href?: string;
 }) {
   const ink = tone === "ink";
   return (
     <Link
-      href="/"
+      href={href}
+      prefetch={false}
       className={cn(
         "flex items-center gap-2.5",
         ink ? "text-background" : "text-foreground",

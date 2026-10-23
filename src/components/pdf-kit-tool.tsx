@@ -82,8 +82,16 @@ function copyFor(kind: Exclude<PdfKitSlug, "sign" | "fill" | "edit">) {
   }
 }
 
-export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill" | "edit"> }) {
-  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard();
+export function PdfKitTool({
+  kind,
+  locale = "es",
+}: {
+  kind: Exclude<PdfKitSlug, "sign" | "fill" | "edit">;
+  locale?: "es" | "en";
+}) {
+  const en = locale === "en";
+  const tr = (es: string, english: string) => (en ? english : es);
+  const { pro, limit, upgrade, setUpgrade, beforeRun, afterRun } = useJobGuard(locale);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -94,7 +102,21 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
 
   const multiple = kind === "merge" || kind === "images";
   const wantsPdf = kind !== "images";
-  const copy = copyFor(kind);
+  const spanishCopy = copyFor(kind);
+  const copy =
+    en && kind === "merge"
+      ? {
+          drop: "Drop the PDFs, in the order you want",
+          tap: "Choose the PDFs, in the order you want",
+          cta: "Choose PDFs",
+        }
+      : en && kind === "compress"
+        ? {
+            drop: "Drop the PDF that's too large",
+            tap: "Choose the PDF that's too large",
+            cta: "Choose PDF",
+          }
+        : spanishCopy;
 
   async function addFiles(list: File[]) {
     setError("");
@@ -103,7 +125,11 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
       wantsPdf ? isPdfFile(file) : isImageFile(file),
     );
     if (picked.length === 0) {
-      setError(wantsPdf ? "Sube archivos PDF." : "Sube JPG o PNG.");
+      setError(
+        wantsPdf
+          ? tr("Sube archivos PDF.", "Upload PDF files.")
+          : tr("Sube JPG o PNG.", "Upload a JPG or PNG."),
+      );
       return;
     }
     const maxBytes = limit.pdfBytes;
@@ -111,10 +137,16 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
     for (const file of picked) {
       if (file.size > maxBytes) {
         if (pro) {
-          setError(`${file.name} pesa más de ${bytesLabel(maxBytes)}.`);
+          setError(
+            en
+              ? `${file.name} is larger than ${bytesLabel(maxBytes)}.`
+              : `${file.name} pesa más de ${bytesLabel(maxBytes)}.`,
+          );
         } else {
           setUpgrade(
-            `${file.name} pesa más de ${bytesLabel(maxBytes)}. En Pro caben archivos más grandes.`,
+            en
+              ? `${file.name} is larger than ${bytesLabel(maxBytes)}. Pro accepts larger files.`
+              : `${file.name} pesa más de ${bytesLabel(maxBytes)}. En Pro caben archivos más grandes.`,
           );
         }
         return;
@@ -125,7 +157,9 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
           pages = await countPdfPages(await file.arrayBuffer());
         } catch (caught) {
           setError(
-            caught instanceof Error ? caught.message : "No se pudo leer el PDF.",
+            caught instanceof Error
+              ? caught.message
+              : tr("No se pudo leer el PDF.", "Could not read the PDF."),
           );
           return;
         }
@@ -143,8 +177,10 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
       if (merged.length > cap) {
         setUpgrade(
           pro
-            ? `Como máximo ${cap} archivos.`
-            : `Gratis son ${cap} ${kind === "images" ? "imágenes" : "PDF"}. Pro es ilimitado.`,
+            ? tr(`Como máximo ${cap} archivos.`, `At most ${cap} files.`)
+            : en
+              ? `The free plan allows ${cap} ${kind === "images" ? "images" : "PDFs"}. Pro has no limit.`
+              : `Gratis son ${cap} ${kind === "images" ? "imágenes" : "PDF"}. Pro es ilimitado.`,
         );
         return merged.slice(0, cap);
       }
@@ -173,15 +209,19 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
       let result: SaveResult = "saved";
       let ready = "";
       if (kind === "merge") {
-        if (items.length < 2) throw new Error("Elige al menos dos PDF.");
+        if (items.length < 2) {
+          throw new Error(tr("Elige al menos dos PDF.", "Choose at least two PDFs."));
+        }
         const buffers = await Promise.all(items.map((item) => item.file.arrayBuffer()));
         const bytes = await mergePdfs(buffers);
         result = await downloadBytes(
           bytes,
-          suggestedOutName(items[0].file.name, "unido", "pdf"),
+          suggestedOutName(items[0].file.name, en ? "merged" : "unido", "pdf"),
           "application/pdf",
         );
-        ready = `Listo: ${items.length} archivos, ${formatBytes(bytes.byteLength)}.`;
+        ready = en
+          ? `Done: ${items.length} files, ${formatBytes(bytes.byteLength)}.`
+          : `Listo: ${items.length} archivos, ${formatBytes(bytes.byteLength)}.`;
       } else if (kind === "split") {
         const file = items[0]?.file;
         if (!file) throw new Error("Sube un PDF.");
@@ -214,22 +254,28 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
         }
       } else if (kind === "compress") {
         const file = items[0]?.file;
-        if (!file) throw new Error("Sube un PDF.");
+        if (!file) throw new Error(tr("Sube un PDF.", "Upload a PDF."));
         const data = await file.arrayBuffer();
         const { bytes, rasterized } = await compressPdf(data, strength);
         result = await downloadBytes(
           bytes,
-          suggestedOutName(file.name, "comprimido", "pdf"),
+          suggestedOutName(file.name, en ? "compressed" : "comprimido", "pdf"),
           "application/pdf",
         );
         const before = file.size;
         const after = bytes.byteLength;
         const ratio = after < before ? Math.round((1 - after / before) * 100) : 0;
         ready = rasterized
-          ? `Listo: ${formatBytes(before)} → ${formatBytes(after)}. El texto ya no se puede seleccionar (va como foto).`
+          ? en
+            ? `Done: ${formatBytes(before)} → ${formatBytes(after)}. The text can no longer be selected (each page is a photo).`
+            : `Listo: ${formatBytes(before)} → ${formatBytes(after)}. El texto ya no se puede seleccionar (va como foto).`
           : after < before
-            ? `Listo: ${formatBytes(before)} → ${formatBytes(after)} (${ratio} % menos).`
-            : `Se ha reescrito el PDF (${formatBytes(after)}). Si casi no baja, prueba la compresión fuerte.`;
+            ? en
+              ? `Done: ${formatBytes(before)} → ${formatBytes(after)} (${ratio}% smaller).`
+              : `Listo: ${formatBytes(before)} → ${formatBytes(after)} (${ratio} % menos).`
+            : en
+              ? `The PDF was rewritten (${formatBytes(after)}). If it barely shrank, try Strong.`
+              : `Se ha reescrito el PDF (${formatBytes(after)}). Si casi no baja, prueba la compresión fuerte.`;
       } else if (kind === "images") {
         if (items.length === 0) throw new Error("Elige al menos una imagen.");
         const images = await Promise.all(
@@ -261,11 +307,13 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
         );
         ready = "Listo: un JPG por página, en un zip.";
       }
-      setNotice(noticeForSave(result, ready));
+      setNotice(noticeForSave(result, ready, locale));
       afterRun();
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "No se pudo terminar.",
+        caught instanceof Error
+          ? caught.message
+          : tr("No se pudo terminar.", "Could not finish."),
       );
     } finally {
       setBusy(false);
@@ -274,13 +322,13 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
 
   const actionLabel =
     kind === "merge"
-      ? "Unir y guardar"
+      ? tr("Unir y guardar", "Merge and save")
       : kind === "split"
         ? perPage
           ? "Dividir y guardar zip"
           : "Extraer y guardar"
         : kind === "compress"
-          ? "Comprimir y guardar"
+          ? tr("Comprimir y guardar", "Compress and save")
           : kind === "images"
             ? "Crear PDF"
             : "Sacar JPG";
@@ -295,20 +343,26 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
         tapTitle={copy.tap}
         cta={copy.cta}
         cameraCta={"camera" in copy ? copy.camera : undefined}
-        hint="No se envía a ningún servidor. Sin cuenta."
-        busyHint="Un archivo grande tarda un momento."
+        hint={tr("No se envía a ningún servidor. Sin cuenta.", "Nothing is uploaded. No account needed.")}
+        busyHint={tr("Un archivo grande tarda un momento.", "A large file takes a moment.")}
+        busyTitle={en ? "Opening…" : undefined}
         onFiles={(list) => void addFiles(list)}
       />
       <FreeCapNote
+        locale={locale}
         text={
           kind === "merge"
-            ? `Gratis: hasta ${limit.pdfFiles} PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+            ? en
+              ? `Free: up to ${limit.pdfFiles} PDFs of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
+              : `Gratis: hasta ${limit.pdfFiles} PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
             : kind === "images"
               ? `Gratis: hasta ${limit.imagesToPdf} fotos de ${bytesLabel(limit.pdfBytes)}`
-              : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
+              : en
+                ? `Free: one PDF of ${bytesLabel(limit.pdfBytes)} and ${limit.jobsPerDay} tasks a day`
+                : `Gratis: un PDF de ${bytesLabel(limit.pdfBytes)} y ${limit.jobsPerDay} tareas al día`
         }
       />
-      {upgrade ? <UpgradeNudge reason={upgrade} compact /> : null}
+      {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
 
       {items.length > 0 ? (
         <ul className="mt-6 grid gap-2">
@@ -323,7 +377,9 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
                 <p className="text-xs text-muted-foreground">
                   {formatBytes(item.file.size)}
                   {item.pages
-                    ? ` · ${item.pages} página${item.pages === 1 ? "" : "s"}`
+                    ? en
+                      ? ` · ${item.pages} page${item.pages === 1 ? "" : "s"}`
+                      : ` · ${item.pages} página${item.pages === 1 ? "" : "s"}`
                     : ""}
                 </p>
               </div>
@@ -334,7 +390,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
                     size="icon"
                     variant="ghost"
                     className="size-11"
-                    aria-label="Subir"
+                    aria-label={tr("Subir", "Move up")}
                     disabled={index === 0}
                     onClick={() => move(item.id, -1)}
                   >
@@ -345,7 +401,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
                     size="icon"
                     variant="ghost"
                     className="size-11"
-                    aria-label="Bajar"
+                    aria-label={tr("Bajar", "Move down")}
                     disabled={index === items.length - 1}
                     onClick={() => move(item.id, 1)}
                   >
@@ -358,7 +414,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
                 size="icon"
                 variant="ghost"
                 className="size-11"
-                aria-label="Quitar"
+                aria-label={tr("Quitar", "Remove")}
                 onClick={() =>
                   setItems((current) => current.filter((row) => row.id !== item.id))
                 }
@@ -407,7 +463,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
             variant={strength === "light" ? "default" : "outline"}
             onClick={() => setStrength("light")}
           >
-            Ligera (mantiene el texto)
+            {tr("Ligera (mantiene el texto)", "Light (keeps the text)")}
           </Button>
           <Button
             type="button"
@@ -415,7 +471,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
             variant={strength === "strong" ? "default" : "outline"}
             onClick={() => setStrength("strong")}
           >
-            Fuerte (páginas como foto)
+            {tr("Fuerte (páginas como foto)", "Strong (pages become photos)")}
           </Button>
         </div>
       ) : null}
@@ -428,7 +484,7 @@ export function PdfKitTool({ kind }: { kind: Exclude<PdfKitSlug, "sign" | "fill"
           disabled={busy || items.length === 0}
           onClick={() => void run()}
         >
-          {busy ? "Preparando…" : <Download />}
+          {busy ? tr("Preparando…", "Preparing…") : <Download />}
           {busy ? "" : actionLabel}
         </Button>
       </div>

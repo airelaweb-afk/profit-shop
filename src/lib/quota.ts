@@ -23,11 +23,17 @@ export function jobsUsedToday() {
 }
 
 /** Returns an error message if the free daily cap is hit. Does not increment. */
-export function quotaBlock(pro: boolean, jobsPerDay: number) {
+export function quotaBlock(
+  pro: boolean,
+  jobsPerDay: number,
+  locale: "es" | "en" = "es",
+) {
   if (pro || !Number.isFinite(jobsPerDay)) return null;
   const used = read().n;
   if (used >= jobsPerDay) {
-    return `Hoy ya has usado las ${jobsPerDay} tareas gratis. Pro es ilimitado.`;
+    return locale === "en"
+      ? `You've used today's ${jobsPerDay} free tasks. Pro has no limit.`
+      : `Hoy ya has usado las ${jobsPerDay} tareas gratis. Pro es ilimitado.`;
   }
   return null;
 }

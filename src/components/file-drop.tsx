@@ -12,6 +12,7 @@ type FileDropProps = {
   tapTitle: string;
   hint: string;
   busyHint?: string;
+  busyTitle?: string;
   cta: string;
   cameraCta?: string;
   /** Adds a second button that opens the folder picker (all files inside are passed to onFiles). */
@@ -27,6 +28,7 @@ export function FileDrop({
   tapTitle,
   hint,
   busyHint = "Un momento. Un archivo grande tarda.",
+  busyTitle = "Abriendo…",
   cta,
   cameraCta,
   folderCta,
@@ -109,7 +111,7 @@ export function FileDrop({
       >
         <FileUp className="size-10 text-primary" />
         <p className="mt-4 font-heading text-2xl leading-tight sm:text-3xl">
-          {busy ? "Abriendo…" : coarse ? tapTitle : dropTitle}
+          {busy ? busyTitle : coarse ? tapTitle : dropTitle}
         </p>
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
           {busy ? busyHint : hint}

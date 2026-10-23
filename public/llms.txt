@@ -29,3 +29,14 @@ Luna Oficio es de Airela Web. Idioma: español. No hace falta cuenta para las he
 - [Precios](https://lunaoficio.com/precios/)
 - [Cómo funciona](https://lunaoficio.com/como-funciona/)
 - [Blog](https://lunaoficio.com/blog/)
+
+## English
+
+The same tools, in English. Spanish URLs stay where they are.
+
+- [English home](https://lunaoficio.com/en/)
+- [Remove background](https://lunaoficio.com/en/remove-background/): transparent PNG, in the browser.
+- [Merge PDF](https://lunaoficio.com/en/merge-pdf/): join several PDFs into one.
+- [Compress PDF](https://lunaoficio.com/en/compress-pdf/): shrink a PDF for email.
+- [HEIC to JPG](https://lunaoficio.com/en/heic-to-jpg/): iPhone photos Windows can open.
+- [Compress image](https://lunaoficio.com/en/compress-image/): shrink a JPG, PNG or WebP.

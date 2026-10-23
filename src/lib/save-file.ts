@@ -55,7 +55,20 @@ export async function saveBytes(
   return saveBlob(new Blob([copy], { type: mime }), filename);
 }
 
-export function noticeForSave(result: SaveResult, ready: string) {
+export function noticeForSave(
+  result: SaveResult,
+  ready: string,
+  locale: "es" | "en" = "es",
+) {
+  if (locale === "en") {
+    if (result === "cancelled") {
+      return "You closed the menu. Tap again to save or share.";
+    }
+    if (result === "shared") {
+      return `${ready} On a phone, choose Save to Files or send it.`;
+    }
+    return ready;
+  }
   if (result === "cancelled") {
     return "Has cerrado el menú. Pulsa otra vez para guardar o enviar.";
   }

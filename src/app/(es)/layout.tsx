@@ -1,25 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, DM_Mono } from "next/font/google";
-import { JsonLd } from "@/components/json-ld";
-import { MobileDock } from "@/components/mobile-dock";
-import { Providers } from "@/components/providers";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { DocumentShell } from "@/components/document-shell";
+import { archivo, dmMono } from "@/lib/fonts";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
-import "./globals.css";
-
-const archivo = Archivo({
-  variable: "--font-archivo",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const dmMono = DM_Mono({
-  variable: "--font-dm-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
+import "../globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -69,20 +52,14 @@ export const viewport: Viewport = {
   themeColor: "#12110f",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="es"
       className={`${archivo.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <JsonLd />
-        <Providers>
-          <SiteHeader />
-          <main className="flex-1 pb-dock">{children}</main>
-          <SiteFooter />
-          <MobileDock />
-        </Providers>
+        <DocumentShell locale="es">{children}</DocumentShell>
       </body>
     </html>
   );

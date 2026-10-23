@@ -4,6 +4,7 @@ export type FaqItem = {
   q: string;
   a: string;
   href?: string;
+  linkLabel?: string;
 };
 
 const cloud = hasCloud();

@@ -4,9 +4,11 @@ import type { FaqItem } from "@/lib/faq";
 export function FaqList({
   items,
   title = "Preguntas que se buscan",
+  linkLabel = "Abrir la herramienta",
 }: {
   items: FaqItem[];
   title?: string;
+  linkLabel?: string;
 }) {
   if (items.length === 0) return null;
   return (
@@ -28,7 +30,7 @@ export function FaqList({
                     prefetch={false}
                     className="text-sm text-primary underline-offset-4 hover:underline"
                   >
-                    Abrir la herramienta
+                    {item.linkLabel ?? linkLabel}
                   </Link>
                 </p>
               ) : null}

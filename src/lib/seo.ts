@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pairForPath, type Locale } from "@/lib/locale";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const SHARE_IMAGE = { url: "/brand/wordmark.jpg", width: 1376, height: 768 };
@@ -14,23 +15,34 @@ export function pageMeta({
   description,
   path,
   keywords = [],
+  locale = "es",
 }: {
   title: string;
   description: string;
   path: string;
   keywords?: string[];
+  locale?: Locale;
 }): Metadata {
   const url = absUrl(path);
+  const pair = pairForPath(path);
+  const languages = pair
+    ? {
+        es: absUrl(pair.es),
+        en: absUrl(pair.en),
+        "x-default": absUrl(pair.es),
+      }
+    : undefined;
   return {
     title,
     description,
     keywords: keywords.length > 0 ? keywords : undefined,
-    alternates: { canonical: url },
+    alternates: languages ? { canonical: url, languages } : { canonical: url },
     openGraph: {
       title,
       description,
       url,
-      locale: "es_ES",
+      locale: locale === "en" ? "en_US" : "es_ES",
+      alternateLocale: languages ? (locale === "en" ? ["es_ES"] : ["en_US"]) : undefined,
       siteName: SITE_NAME,
       type: "website",
       images: [SHARE_IMAGE],

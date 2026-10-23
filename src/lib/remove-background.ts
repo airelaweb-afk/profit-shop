@@ -159,15 +159,23 @@ function alphaMask(gray: Uint8ClampedArray, width: number, height: number) {
 export async function removeBackground(
   file: File,
   onStatus?: (status: string) => void,
+  locale: "es" | "en" = "es",
 ) {
+  const english = locale === "en";
   if (!isImageFile(file) && !isHeicFile(file)) {
-    throw new Error("Elige un JPG, PNG, WebP o HEIC.");
+    throw new Error(
+      english ? "Choose a JPG, PNG, WebP or HEIC." : "Elige un JPG, PNG, WebP o HEIC.",
+    );
   }
-  onStatus?.("Leyendo la foto…");
+  onStatus?.(english ? "Reading the photo…" : "Leyendo la foto…");
   const bitmap = await loadBitmap(file);
   try {
     const fitted = fitCanvas(bitmap);
-    onStatus?.("Cargando el modelo. La primera vez tarda un momento…");
+    onStatus?.(
+      english
+        ? "Loading the model. The first time takes a moment…"
+        : "Cargando el modelo. La primera vez tarda un momento…",
+    );
     const session = await openSession();
     const ort = await loadOrt();
     const feeds: Record<string, unknown> = {};
@@ -177,12 +185,14 @@ export async function removeBackground(
       MODEL_SIZE,
       MODEL_SIZE,
     ]);
-    onStatus?.("Quitando el fondo…");
+    onStatus?.(english ? "Removing the background…" : "Quitando el fondo…");
     const outputs = await session.run(feeds);
     const firstName = session.outputNames[0];
     const output = outputs[firstName];
     if (!output || typeof output.data[0] !== "number") {
-      throw new Error("El modelo no devolvió una máscara.");
+      throw new Error(
+        english ? "The model did not return a mask." : "El modelo no devolvió una máscara.",
+      );
     }
     const gray = maskValues(output.data as ArrayLike<number>);
     const alpha = alphaMask(gray, fitted.width, fitted.height);
@@ -194,7 +204,7 @@ export async function removeBackground(
     const blob = await new Promise<Blob>((resolve, reject) => {
       fitted.canvas.toBlob((result) => {
         if (result) resolve(result);
-        else reject(new Error("No se pudo guardar el PNG."));
+        else reject(new Error(english ? "Could not save the PNG." : "No se pudo guardar el PNG."));
       }, "image/png");
     });
     return { blob, width: fitted.width, height: fitted.height };

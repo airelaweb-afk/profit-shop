@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { onFileSaved } from "@/lib/bookmark-prompt";
+import { useLocale } from "@/lib/locale-context";
 import { useConsent } from "@/lib/use-consent";
 
 const KEY = "luna-bookmark-prompt";
@@ -41,6 +42,7 @@ function alreadyInstalled() {
 
 export function BookmarkPrompt() {
   const consent = useConsent();
+  const english = useLocale() === "en";
   const pathname = usePathname();
   const [pending, setPending] = useState(false);
 
@@ -81,16 +83,29 @@ export function BookmarkPrompt() {
           </span>
           <div>
             <p className="font-heading text-xl leading-tight">
-              Guárdala para la próxima vez
+              {english ? "Save it for next time" : "Guárdala para la próxima vez"}
             </p>
             <p className="mt-1 text-sm text-background/75">
-              En el ordenador pulsa{" "}
-              <kbd className="border border-accent px-1.5 py-0.5 font-mono text-xs text-accent">
-                Ctrl + D
-              </kbd>{" "}
-              (en Mac, ⌘ + D). En el móvil, abre el menú del navegador y pulsa
-              la estrella. Si la usas a menudo, Añadir a pantalla de inicio la
-              deja con su icono.
+              {english ? (
+                <>
+                  On a computer, press{" "}
+                  <kbd className="border border-accent px-1.5 py-0.5 font-mono text-xs text-accent">
+                    Ctrl + D
+                  </kbd>{" "}
+                  (on a Mac, ⌘ + D). On a phone, open the browser menu and tap the
+                  star. If you use it often, Add to Home Screen keeps the icon.
+                </>
+              ) : (
+                <>
+                  En el ordenador pulsa{" "}
+                  <kbd className="border border-accent px-1.5 py-0.5 font-mono text-xs text-accent">
+                    Ctrl + D
+                  </kbd>{" "}
+                  (en Mac, ⌘ + D). En el móvil, abre el menú del navegador y pulsa
+                  la estrella. Si la usas a menudo, Añadir a pantalla de inicio la
+                  deja con su icono.
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -100,10 +115,10 @@ export function BookmarkPrompt() {
             className="h-10 px-3 text-sm text-background/70 hover:text-accent"
             onClick={() => setPending(false)}
           >
-            Ahora no
+            {english ? "Not now" : "Ahora no"}
           </button>
           <Button type="button" className="h-10" onClick={keep}>
-            Ya la he guardado
+            {english ? "I've saved it" : "Ya la he guardado"}
           </Button>
         </div>
       </div>

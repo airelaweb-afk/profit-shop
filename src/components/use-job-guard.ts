@@ -5,13 +5,13 @@ import { caps } from "@/lib/limits";
 import { markJobDone, quotaBlock } from "@/lib/quota";
 import { usePro } from "@/lib/use-consent";
 
-export function useJobGuard() {
+export function useJobGuard(locale: "es" | "en" = "es") {
   const pro = usePro();
   const limit = caps(pro);
   const [upgrade, setUpgrade] = useState("");
 
   function beforeRun() {
-    const blocked = quotaBlock(pro, limit.jobsPerDay);
+    const blocked = quotaBlock(pro, limit.jobsPerDay, locale);
     if (blocked) {
       setUpgrade(blocked);
       return false;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { FileImage, FileText, House, Menu, NotebookPen } from "lucide-react";
+import { Eraser, FileImage, FileText, House, Menu, NotebookPen } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -11,8 +11,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { logoutAccount } from "@/lib/auth";
+import { useLocale } from "@/lib/locale-context";
 import {
   allNavLinks,
+  cleanPath,
   isImagePath,
   isOfficePath,
   isPdfPath,
@@ -52,7 +54,7 @@ function isActive(
   return isOfficePath(pathname);
 }
 
-export function MobileDock() {
+function SpanishDock() {
   const pathname = usePathname() || "/";
   const [open, setOpen] = useState(false);
   const session = useSession();
@@ -208,4 +210,134 @@ export function MobileDock() {
       </Sheet>
     </div>
   );
+}
+
+const englishDock = [
+  { href: "/en/", label: "Home", icon: House },
+  { href: "/en/remove-background/", label: "Background", icon: Eraser },
+  { href: "/en/merge-pdf/", label: "PDFs", icon: FileText },
+  { href: "/en/compress-image/", label: "Photos", icon: FileImage },
+];
+
+const englishSheet = [
+  { href: "/en/remove-background/", label: "Remove background" },
+  { href: "/en/merge-pdf/", label: "Merge PDF" },
+  { href: "/en/compress-pdf/", label: "Compress PDF" },
+  { href: "/en/heic-to-jpg/", label: "HEIC to JPG" },
+  { href: "/en/compress-image/", label: "Compress image" },
+  { href: "/", label: "Spanish site" },
+  { href: "/cookies/", label: "Cookie policy" },
+];
+
+function EnglishDock() {
+  const pathname = cleanPath(usePathname() || "/");
+  const [open, setOpen] = useState(false);
+  const session = useSession();
+
+  return (
+    <div className="no-print xl:hidden">
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-primary bg-foreground text-background"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        aria-label="Mobile shortcuts"
+      >
+        <ul className="mx-auto grid h-[3.75rem] max-w-lg grid-cols-5">
+          {englishDock.map((item) => {
+            const Icon = item.icon;
+            const target = cleanPath(item.href);
+            const active = target === "/en" ? pathname === "/en" : pathname === target;
+            return (
+              <li key={item.href}>
+                <Link
+                  prefetch={false}
+                  href={item.href}
+                  className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] ${
+                    active ? "text-accent" : "text-background/60"
+                  }`}
+                >
+                  <Icon className="size-5" />
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+          <li>
+            <button
+              type="button"
+              className="flex h-full w-full flex-col items-center justify-center gap-0.5 text-[11px] text-background/60"
+              aria-label="More tools"
+              onClick={() => setOpen(true)}
+            >
+              <Menu className="size-5" />
+              More
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="left" className="w-[min(20rem,92vw)]">
+          <SheetHeader>
+            <SheetTitle className="font-heading text-xl">Tools</SheetTitle>
+          </SheetHeader>
+          <nav className="flex flex-col gap-1 px-3 pb-8">
+            {englishSheet.map((link) => (
+              <Link
+                prefetch={false}
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+              >
+                {link.label}
+              </Link>
+            ))}
+            {session ? (
+              <div className="mt-3 grid gap-1">
+                <Link
+                  prefetch={false}
+                  href="/cuenta/"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-3 text-base hover:bg-muted"
+                >
+                  My account · {session.name || session.email}
+                </Link>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-12 justify-start"
+                  onClick={() => {
+                    logoutAccount();
+                    setOpen(false);
+                  }}
+                >
+                  Log out
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-3 grid gap-2">
+                <Button
+                  className="h-12"
+                  render={<Link prefetch={false} href="/entrar/" onClick={() => setOpen(false)} />}
+                  nativeButton={false}
+                >
+                  Sign in
+                </Button>
+              </div>
+            )}
+            <p className="mt-6 px-3 text-xs text-muted-foreground">
+              <Link prefetch={false} href="/precios" onClick={() => setOpen(false)} className="hover:text-foreground">
+                Pro
+              </Link>
+            </p>
+          </nav>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+export function MobileDock() {
+  const locale = useLocale();
+  if (locale === "en") return <EnglishDock />;
+  return <SpanishDock />;
 }

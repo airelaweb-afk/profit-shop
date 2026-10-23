@@ -11,6 +11,7 @@ const nextConfig = {
   // Hostinger reports 63 CPUs but caps threads; one worker per CPU aborts the build.
   experimental: {
     cpus: 2,
+    globalNotFound: true,
   },
 };
 

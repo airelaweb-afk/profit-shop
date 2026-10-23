@@ -1,10 +1,100 @@
 import Link from "next/link";
 import { SearchTicker } from "@/components/search-ticker";
 import { SiteBrand } from "@/components/site-brand";
+import type { Locale } from "@/lib/locale";
 import { hasCloud } from "@/lib/supabase";
 
-export function SiteFooter() {
+const englishTools = [
+  { href: "/en/remove-background/", label: "Remove background" },
+  { href: "/en/merge-pdf/", label: "Merge PDF" },
+  { href: "/en/compress-pdf/", label: "Compress PDF" },
+  { href: "/en/heic-to-jpg/", label: "HEIC to JPG" },
+  { href: "/en/compress-image/", label: "Compress image" },
+];
+
+function EnglishFooter() {
+  return (
+    <footer className="no-print mt-auto border-t-2 border-foreground pb-dock">
+      <div className="luna-wrap grid gap-8 py-12 md:grid-cols-3">
+        <div>
+          <SiteBrand href="/en/" />
+          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
+            PDF and image tools that run in your browser. The file is processed
+            on your device and is never uploaded.
+          </p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Tools</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            {englishTools.map((tool) => (
+              <li key={tool.href}>
+                <Link prefetch={false} href={tool.href} className="hover:text-foreground">
+                  {tool.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link prefetch={false} href="/" className="hover:text-foreground">
+                More tools, in Spanish
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Legal</p>
+          <p className="mt-3 text-sm text-muted-foreground">These pages are in Spanish.</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>
+              <Link prefetch={false} href="/aviso-legal" className="hover:text-foreground">
+                Legal notice
+              </Link>
+            </li>
+            <li>
+              <Link prefetch={false} href="/privacidad" className="hover:text-foreground">
+                Privacy
+              </Link>
+            </li>
+            <li>
+              <Link prefetch={false} href="/cookies" className="hover:text-foreground">
+                Cookies
+              </Link>
+            </li>
+            <li>
+              <Link prefetch={false} href="/condiciones" className="hover:text-foreground">
+                Terms
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="bg-foreground text-background">
+        <p className="luna-wrap py-4 text-xs text-background/70">
+          Luna Oficio, by Airela Web. Tools for working with files without uploading
+          them. Other companies&apos; trademarks are identified in the{" "}
+          <Link prefetch={false} href="/aviso-legal" className="text-accent underline underline-offset-2 hover:text-background">
+            legal notice
+          </Link>
+          .{" "}
+          <Link prefetch={false} href="/admin" className="text-background/70 underline underline-offset-2 hover:text-accent">
+            Panel
+          </Link>
+          {" · "}
+          <Link prefetch={false} href="/precios" className="text-background/70 underline underline-offset-2 hover:text-accent">
+            Pro
+          </Link>
+          {" · "}
+          <Link prefetch={false} href="/comparar" className="text-background/70 underline underline-offset-2 hover:text-accent">
+            Comparisons
+          </Link>
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+export function SiteFooter({ locale = "es" }: { locale?: Locale }) {
   const cloud = hasCloud();
+  if (locale === "en") return <EnglishFooter />;
   return (
     <footer className="no-print mt-auto border-t-2 border-foreground pb-dock">
       <SearchTicker reverse tone="orange" />
