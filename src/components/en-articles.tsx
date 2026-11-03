@@ -35,7 +35,7 @@ export const enSiteFaqs: FaqItem[] = [
   },
   {
     q: "Can I merge PDFs for free without uploading them?",
-    a: "Yes. In Merge PDF you choose the files, put them in order and download one. No account needed. Free: 5 PDFs of 20 MB. Pro removes the cap.",
+    a: "Yes. In Merge PDF you choose the files, put them in order and download one. No account needed. Free: 25 PDFs of 20 MB. Pro, up to 80.",
     href: "/en/merge-pdf/",
     linkLabel: open,
   },
