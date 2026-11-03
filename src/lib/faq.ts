@@ -28,7 +28,7 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Puedo rellenar las casillas reales de un PDF?",
-    a: "Sí, si el archivo trae campos de formulario (AcroForm). Rellenar PDF escribe dentro de esas cajas y el PDF sigue siendo un formulario. Un escaneo o un PDF ‘impreso’ no tiene campos: no se pueden inventar. En ese caso usa Firmar PDF y marcas encima.",
+    a: "Sí, si el archivo trae campos de formulario (AcroForm). Rellenar PDF escribe dentro de esas cajas y el PDF sigue siendo un formulario. Si no los trae pero tiene líneas, casillas dibujadas o cajas (la mayoría de modelos oficiales), las detecta y escribes encima en su sitio, con marca y firma incluida. Un escaneo o una foto sí que no trae nada aprovechable: ahí solo puedes poner texto y firma encima.",
     href: "/rellenar-pdf",
   },
   {
@@ -109,7 +109,7 @@ export const toolFaqs: Record<string, FaqItem[]> = {
   "/rellenar-pdf": [
     {
       q: "¿Cualquier PDF se puede hacer editable?",
-      a: "No. Solo los que ya traen campos (AcroForm). Un escaneo, una foto o un PDF exportado como imagen no tiene cajas reales. No las inventamos pintando texto: eso sería mentir. Esos van a Firmar PDF. Si el PDF tiene texto seleccionable (un cartel, un contrato), usa Editar texto PDF.",
+      a: "Casi. Los que traen campos (AcroForm) se rellenan en las cajas reales. Los que no los traen pero tienen líneas, casillas o cajas dibujadas (los modelos oficiales son así) se rellenan encima con snap a cada zona: texto, checks y firma, igual que en papel. Un escaneo o una foto no tiene geometría que detectar: solo puedes poner texto y firma encima. Si el PDF tiene texto seleccionable (un cartel, un contrato), usa Editar texto PDF.",
     },
     {
       q: "¿El PDF sigue siendo un formulario al descargarlo?",

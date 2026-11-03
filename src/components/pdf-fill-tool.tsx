@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Download, FileUp, Minus, Plus } from "lucide-react";
 import { FileDrop } from "@/components/file-drop";
+import { PdfFlatFill } from "@/components/pdf-flat-fill";
 import { PdfFormViewer, type PdfFormHandle } from "@/components/pdf-form-viewer";
 import { FreeCapNote, UpgradeNudge } from "@/components/upgrade-nudge";
 import { useJobGuard } from "@/components/use-job-guard";
@@ -65,7 +66,10 @@ export function PdfFillTool({ locale = "es" }: { locale?: "es" | "en" }) {
     setSource(data.slice(0));
     if (found.length === 0) {
       setNotice(
-        "Si ves casillas azules, son las del PDF: pulsa y escribe ahí. Si no hay ninguna, este archivo no trae campos (escaneo o PDF ‘impreso’). Eso no se inventa; usa Firmar PDF.",
+        t(
+          "PDF sin campos de formulario: he buscado sus líneas y casillas. Escríbelas o márcalas encima y descarga.",
+          "This PDF has no form fields: I detected its lines and boxes. Type or mark on top and download.",
+        ),
       );
     } else {
       setNotice(
@@ -119,7 +123,8 @@ export function PdfFillTool({ locale = "es" }: { locale?: "es" | "en" }) {
 
   useEffect(() => {
     if (!demo || source) return;
-    void openSample();
+    const timer = window.setTimeout(() => void openSample(), 0);
+    return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [demo]);
 
@@ -160,8 +165,8 @@ export function PdfFillTool({ locale = "es" }: { locale?: "es" | "en" }) {
           tapTitle={t("Elige el PDF del teléfono", "Choose the PDF from your phone")}
           cta={t("Elegir PDF", "Choose PDF")}
           hint={t(
-            "Tiene que traer casillas de formulario. Si es un escaneo, no hay campos que rellenar.",
-            "It has to contain form fields. A scan has nothing to fill.",
+            "Con campos o sin ellos: busco las líneas y casillas y escribes encima. Los escaneos solo llevan texto y firma encima.",
+            "Fields or not: I find the lines and boxes and you type on top. Scans only take text and signature on top.",
           )}
           busyHint={t("Abriendo el formulario del PDF.", "Opening the PDF form.")}
           busyTitle={en ? "Opening…" : undefined}
@@ -194,6 +199,22 @@ export function PdfFillTool({ locale = "es" }: { locale?: "es" | "en" }) {
             {error}
           </p>
         ) : null}
+      </div>
+    );
+  }
+
+  if (fields.length === 0) {
+    return (
+      <div className="grid gap-4 pb-24">
+        <PdfFlatFill
+          data={source}
+          name={fileName}
+          locale={locale}
+          beforeRun={beforeRun}
+          afterRun={afterRun}
+          onChangeFile={(file) => void takeFile(file)}
+        />
+        {upgrade ? <UpgradeNudge reason={upgrade} compact locale={locale} /> : null}
       </div>
     );
   }
@@ -305,7 +326,7 @@ export function PdfFillTool({ locale = "es" }: { locale?: "es" | "en" }) {
       {notice ? (
         <p className="rounded-[2px] bg-muted px-3 py-2 text-sm text-muted-foreground">
           {notice}{" "}
-          {fieldCount === 0 && !xfa ? (
+          {xfa ? (
             <Link href={en ? "/en/sign-pdf/" : "/pdf/"} className="text-primary underline-offset-4 hover:underline">
               {t("Ir a Firmar PDF", "Go to Sign PDF")}
             </Link>
