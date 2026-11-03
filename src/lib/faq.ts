@@ -18,7 +18,7 @@ export const siteFaqs: FaqItem[] = [
   },
   {
     q: "¿Puedo unir PDF gratis y sin subir el archivo?",
-    a: "Sí. En Unir PDF eliges los archivos, los ordenas y descargas uno solo. No hace falta cuenta. Gratis: 5 PDF de 20 MB. Pro quita el tope.",
+    a: "Sí. En Unir PDF eliges los archivos, los ordenas y descargas uno solo. No hace falta cuenta. Gratis: 25 PDF de 20 MB. Pro, hasta 80.",
     href: "/unir-pdf",
   },
   {
@@ -77,7 +77,7 @@ export const toolFaqs: Record<string, FaqItem[]> = {
   "/unir-pdf": [
     {
       q: "¿Cuántos PDF puedo juntar?",
-      a: "Gratis: 25 PDF de 20 MB cada uno. Pro: 80. Si son más, une en tandas.",
+      a: "Gratis: 25 PDF de 20 MB cada uno. Pro, hasta 80. Si son más, une en tandas.",
     },
     {
       q: "¿Se mantiene el orden?",

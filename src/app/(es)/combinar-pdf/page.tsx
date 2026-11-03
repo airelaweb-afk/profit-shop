@@ -18,7 +18,7 @@ export default function CombinarPdfPage() {
       ctaHref="/unir-pdf"
       ctaLabel="Combinar ahora"
       points={[
-        "Hasta 15 PDF y 20 MB cada uno. Si son más, combina en tandas.",
+        "Hasta 25 PDF de 20 MB cada uno (80 con Pro). Si son más, combina en tandas.",
         "Un PDF con contraseña no entra: quítala en el original.",
         "La cuenta vive en localStorage. Cambias de teléfono, la creas otra vez.",
       ]}
