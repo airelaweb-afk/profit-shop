@@ -52,7 +52,7 @@ export const enHomeFaqs: FaqItem[] = [
   },
   {
     q: "Can I merge PDFs for free without uploading them?",
-    a: "Yes. Choose the files, put them in order and download one PDF. No account. The free plan allows 5 PDFs of 20 MB. Pro removes the cap.",
+    a: "Yes. Choose the files, put them in order and download one PDF. No account. The free plan allows 25 PDFs of 20 MB. Pro, up to 80.",
     href: "/en/merge-pdf/",
     linkLabel: openTool,
   },
@@ -149,7 +149,7 @@ export const enMergePdf: EnToolCopy = {
   faqs: [
     {
       q: "How many PDFs can I join?",
-      a: "Free: 5 PDFs of 20 MB. Pro removes that cap. If you have more, merge them in batches or switch to Pro.",
+      a: "Free: 25 PDFs of 20 MB each. Pro, up to 80. If you have more, merge them in batches.",
     },
     {
       q: "Does the order stay?",

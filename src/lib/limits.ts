@@ -1,7 +1,7 @@
 /** Límites de cortesía del plan gratis. Pro no tiene tope práctico (el navegador sí). */
 
 export const FREE = {
-  pdfFiles: 5,
+  pdfFiles: 25,
   pdfBytes: 20 * 1024 * 1024,
   pdfPages: 40,
   imagesToPdf: 8,

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PdfKitSlug } from "@/lib/pdf-kit";
-import { bytesLabel } from "@/lib/limits";
+import { bytesLabel, caps } from "@/lib/limits";
 import { newId } from "@/lib/quotes";
 import { noticeForSave, type SaveResult } from "@/lib/save-file";
 import {
@@ -190,12 +190,14 @@ export function PdfKitTool({
             ? limit.pdfFiles
             : 1;
       if (merged.length > cap) {
+        const proCap =
+          kind === "images" ? caps(true).imagesToPdf : caps(true).pdfFiles;
         setUpgrade(
           pro
             ? tr(`Como máximo ${cap} archivos.`, `At most ${cap} files.`)
             : en
-              ? `The free plan allows ${cap} ${kind === "images" ? "images" : "PDFs"}. Pro has no limit.`
-              : `Gratis son ${cap} ${kind === "images" ? "imágenes" : "PDF"}. Pro es ilimitado.`,
+              ? `The free plan allows ${cap} ${kind === "images" ? "images" : "PDFs"}. Pro allows ${proCap}.`
+              : `Gratis son ${cap} ${kind === "images" ? "imágenes" : "PDF"}. Pro admite ${proCap}.`,
         );
         return merged.slice(0, cap);
       }
@@ -249,8 +251,8 @@ export function PdfKitTool({
                 ? `This PDF has ${pageCount} pages (maximum ${limit.pdfPages}).`
                 : `Este PDF tiene ${pageCount} páginas (máximo ${limit.pdfPages}).`
               : en
-                ? `Free covers ${limit.pdfPages} pages. This one has ${pageCount}. Pro has no page cap.`
-                : `Gratis son ${limit.pdfPages} páginas. Este tiene ${pageCount}. Pro es ilimitado.`,
+                ? `Free covers ${limit.pdfPages} pages. This one has ${pageCount}. Pro allows ${caps(true).pdfPages}.`
+                : `Gratis son ${limit.pdfPages} páginas. Este tiene ${pageCount}. Pro admite ${caps(true).pdfPages}.`,
           );
         }
         if (perPage) {
