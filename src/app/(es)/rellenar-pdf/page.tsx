@@ -7,9 +7,9 @@ import { faqsForPath } from "@/lib/faq";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta({
-  title: "Rellenar PDF: campos originales del formulario",
+  title: "Rellenar PDF: cualquier formulario, con campos o sin ellos",
   description:
-    "Rellena las casillas reales de un PDF (AcroForm) en el navegador. No pinta texto encima. El archivo no se sube. Si el PDF es un escaneo, no hay campos.",
+    "Rellena las casillas reales de un PDF (AcroForm) en el navegador o, si no las tiene, las líneas y casillas detectadas del documento, con checks y firma. El archivo no se sube.",
   path: "/rellenar-pdf",
   keywords: [
     "rellenar pdf",
@@ -26,12 +26,13 @@ export default function RellenarPdfPage() {
         Rellenar PDF · gratis
       </p>
       <h1 className="no-print mt-2 font-heading text-4xl tracking-tight sm:text-5xl">
-        Los campos de verdad. No texto encima.
+        Cualquier formulario. Con campos o dibujado.
       </h1>
       <p className="no-print mt-3 max-w-2xl text-muted-foreground">
         Si el PDF nació con casillas, las ves y las rellenas en su sitio (las
-        mismas que en Adobe). Un escaneo no tiene campos: no los inventamos.
-        Para marcar encima, Firmar PDF.
+        mismas que en Adobe). Si es un modelo «impreso», busca las líneas,
+        casillas y cajas y escribes encima, con marca y firma. Un escaneo solo
+        admite texto y firma encima.
       </p>
       <AdSlot label="Rellenar campos es gratis." wrapClassName="no-print mt-6" />
       <div className="mt-10">

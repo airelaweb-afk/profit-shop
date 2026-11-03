@@ -47,7 +47,7 @@ export const enSiteFaqs: FaqItem[] = [
   },
   {
     q: "Can I fill the real boxes of a PDF?",
-    a: "Yes, if the file has form fields (AcroForm). Fill PDF writes inside those boxes and the PDF stays a form. A scan or a flat PDF has no fields. Use Sign PDF and mark it on top.",
+    a: "Yes, if the file has form fields (AcroForm). Fill PDF writes inside those boxes and the PDF stays a form. If it has no fields but has drawn lines, boxes or checkboxes (most official forms), it detects them and you type on top in place, with check marks and a signature. A scan or a photo has nothing to detect: there you can only place text and a signature on top.",
     href: "/en/fill-pdf/",
     linkLabel: open,
   },
